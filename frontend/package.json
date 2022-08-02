@@ -8,9 +8,17 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "12.0.9",
+    "@ckeditor/ckeditor5-build-classic": "^34.2.0",
+    "@ckeditor/ckeditor5-react": "^5.0.2",
+    "css-loader": "^5.2.7",
+    "next": "^12.2.3",
+    "postcss-loader": "^4.3.0",
+    "raw-loader": "^4.0.2",
     "react": "17.0.2",
-    "react-dom": "17.0.2"
+    "react-dom": "17.0.2",
+    "style-loader": "^2.0.0",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
   },
   "devDependencies": {
     "@types/node": "17.0.13",
