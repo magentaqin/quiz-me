@@ -15,6 +15,7 @@ model User {
   email   String        @unique
   userName  String      @unique
   userId String         @unique
+  password String       @default("")
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @default(now())
 }
