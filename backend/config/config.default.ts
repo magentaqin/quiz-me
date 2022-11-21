@@ -15,6 +15,10 @@ export default (appInfo: EggAppInfo) => {
     sourceUrl: `https://github.com/eggjs/examples/tree/master/${appInfo.name}`,
   };
 
+
+  config.security = {} 
+  config.security.csrf = false
+
   // the return config will combines to EggAppConfig
   return {
     ...config,
