@@ -1,7 +1,7 @@
 import { Controller } from 'egg';
 import userErrorCodes from '../error_codes/user'
 import globalErrorCodes from '../error_codes/global'
-import { hashPassword, generateUserId } from '../utils/hash'
+import { hashPassword, generateUserId, checkPassword } from '../utils/hash'
 import { jwtSign } from '../utils/jwt'
 
 export default class UserController extends Controller {
@@ -65,6 +65,51 @@ export default class UserController extends Controller {
   }
 
   public async login() {
+    console.log('===login')
+    try {
+      const { prisma } = this.app
+      const { email, password } = this.ctx.request.body
+      if (!email || !password) {
+        this.ctx.status = 400
+        this.ctx.body = globalErrorCodes.REQUIRED_PARAMETERS_NOT_PROVIDED
+      }
 
+      // 01 find whether user exists
+      const userResp = await prisma.user.findUnique({
+        where: {
+          email,
+        },
+      })
+      if (!userResp) {
+        this.ctx.status = 401
+        this.ctx.body = userErrorCodes.USER_NOT_EXIST
+        return
+      }
+
+      // 02 validate password
+      const isPasswordValid = await checkPassword(password, userResp.password).catch(() => {
+        this.ctx.status = 401
+        this.ctx.body = userErrorCodes.USER_EMAIL_PASSWORD_NOT_MATCH
+      })
+      if (!isPasswordValid) {
+        this.ctx.status = 401
+        this.ctx.body = userErrorCodes.USER_EMAIL_PASSWORD_NOT_MATCH
+        return
+      }
+
+      // 03 sign token
+      const token = jwtSign({ userId: userResp.userId })
+
+      this.ctx.status = 201
+      this.ctx.body = {
+        token,
+        userName: userResp.userName,
+        userId: userResp.userName,
+      }
+
+    } catch(err) {
+      this.ctx.status = 500
+      this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR
+    }
   }
 }

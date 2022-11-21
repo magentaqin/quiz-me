@@ -21,10 +21,8 @@ export const hashPassword: (password: string) => Promise<string> = (password: st
 export const checkPassword = (password: string, hash: string) => {
   return new Promise((resolve, reject) => {
     bcrypt.compare(password, hash, function(err, result) {
-        if (err) {
-          return reject(err)
-        }
-        if (result) resolve(result)
+        if (result) return resolve(result)
+        return reject(err)
     });
   })
 }

@@ -11,7 +11,11 @@ const userErrorCodes = {
   USER_EMAIL_PASSWORD_NOT_MATCH: {
     code: 1003,
     msg: 'Password is Not Matched with Email. Please retry.'
-  }
+  },
+  USER_NOT_EXIST: {
+    code: 1004,
+    msg: 'User Not Exist. Please check your email.'
+  },
 }
 
 export default userErrorCodes
