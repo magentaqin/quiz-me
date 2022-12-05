@@ -1,8 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["fullTextIndex"]
 }
 
 datasource db {
@@ -18,4 +16,36 @@ model User {
   password String       @default("")
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @default(now())
+}
+
+model Question {
+  id      Int           @id @default(autoincrement()) 
+  title   String        @db.VarChar(30)
+  description  String   @db.VarChar(500)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @default(now())
+  authorId String
+  tags        QuestionTag[]
+  answers     Answer[]
+
+  @@fulltext([title, description])
+}
+
+model QuestionTag {
+  id      Int           @id @default(autoincrement())
+  name    String        @db.VarChar(20)
+  question Question? @relation(fields: [questionId], references: [id]) 
+  questionId Int
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @default(now())
+}
+
+model Answer {
+  id      Int           @id @default(autoincrement())
+  content    String        @db.Text()
+  authorId Int
+  question Question? @relation(fields: [questionId], references: [id]) 
+  questionId Int
+  
+  @@fulltext([content])
 }
