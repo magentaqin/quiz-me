@@ -16,6 +16,10 @@ const userErrorCodes = {
     code: 1004,
     msg: 'User Not Exist. Please check your email.'
   },
+  USER_NOT_AUTHORIZED: {
+    code: 1005,
+    msg: 'User Not Authorized. Please login. '
+  },
 }
 
 export default userErrorCodes
