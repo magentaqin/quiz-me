@@ -16,36 +16,45 @@ model User {
   password String       @default("")
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @default(now())
+  questions Question[]
+  answers Answer[]
 }
 
 model Question {
+  authorId String
   id      Int           @id @default(autoincrement()) 
   title   String        @db.VarChar(30)
   description  String   @db.VarChar(500)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @default(now())
-  authorId String
+  author User @relation(fields: [authorId], references: [userId])
   tags        QuestionTag[]
   answers     Answer[]
 
+  @@index([authorId], name: "author")
   @@fulltext([title, description])
 }
 
 model QuestionTag {
+  questionId Int
   id      Int           @id @default(autoincrement())
   name    String        @db.VarChar(20)
-  question Question? @relation(fields: [questionId], references: [id]) 
-  questionId Int
+  question Question @relation(fields: [questionId], references: [id]) 
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @default(now())
+
+  @@index([questionId], name: "question")
 }
 
 model Answer {
+  authorId String
+  questionId Int
   id      Int           @id @default(autoincrement())
   content    String        @db.Text()
-  authorId Int
-  question Question? @relation(fields: [questionId], references: [id]) 
-  questionId Int
+  author User @relation(fields: [authorId], references: [userId])
+  question Question @relation(fields: [questionId], references: [id]) 
   
   @@fulltext([content])
+  @@index([authorId], name: "author")
+  @@index([questionId], name: "question")
 }
