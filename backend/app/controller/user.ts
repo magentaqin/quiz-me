@@ -1,7 +1,7 @@
 import { Controller } from 'egg';
 import userErrorCodes from '../error_codes/user'
 import globalErrorCodes from '../error_codes/global'
-import { hashPassword, generateUserId, checkPassword } from '../utils/hash'
+import { hashPassword, generateUuid, checkPassword } from '../utils/hash'
 import { jwtSign } from '../utils/jwt'
 
 export default class UserController extends Controller {
@@ -39,7 +39,7 @@ export default class UserController extends Controller {
       // 03 Hash Password with salt
       const hashedPassword = await hashPassword(password)
       // 04 JWT Sign token
-      const userId = generateUserId(userName)
+      const userId = generateUuid(userName)
       const token = jwtSign({ userId })
       // 05 Create User
       await prisma.user.create({
@@ -65,7 +65,6 @@ export default class UserController extends Controller {
   }
 
   public async login() {
-    console.log('===login')
     try {
       const { prisma } = this.app
       const { email, password } = this.ctx.request.body

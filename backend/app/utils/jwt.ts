@@ -20,3 +20,13 @@ export const jwtCheck = (token: string) => {
     })
   })
 }
+
+export const getUserIdFromToken = async (token: string) => {
+  const isVerified = await jwtCheck(token).catch(() => {
+    return ''
+  })
+  if (!isVerified) return ''
+  const decodedData = await jwt.decode(token)
+  if (!decodedData) return ''
+  return decodedData.userId
+}

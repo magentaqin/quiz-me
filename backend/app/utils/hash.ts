@@ -27,7 +27,7 @@ export const checkPassword = (password: string, hash: string) => {
   })
 }
 
-// generate user id hash value
-export const generateUserId= (userName: string) => {
-  return uuid(userName)
+// generate uuid hash value
+export const generateUuid= (str: string) => {
+  return uuid(str)
 }

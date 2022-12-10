@@ -3,11 +3,9 @@
 
 import 'egg';
 import ExportLog from '../../../app/middleware/log';
-import ExportUserAuth from '../../../app/middleware/userAuth';
 
 declare module 'egg' {
   interface IMiddleware {
     log: typeof ExportLog;
-    userAuth: typeof ExportUserAuth;
   }
 }
