@@ -1,3 +1,53 @@
 .editorWrapper {
+  background-color: #eee;
+  display: flex;
+  justify-content: center;
+}
 
+.editor {
+  background-color: #fff;
+  height: 100vh;
+  max-width: 42rem;
+  margin: 20px auto;
+  padding: 20px;
+  pre {
+    padding: 10px;
+    background-color: #eee;
+    white-space: pre-wrap;
+  }
+  
+  :not(pre) > code {
+    font-family: monospace;
+    background-color: #eee;
+    padding: 3px;
+  }
+  
+  blockquote {
+    border-left: 2px solid #ddd;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 10px;
+    color: #aaa;
+    font-style: italic;
+  }
+  
+  blockquote[dir='rtl'] {
+    border-left: none;
+    padding-left: 0;
+    padding-right: 10px;
+    border-right: 2px solid #ddd;
+  }
+  
+  [data-slate-editor] > * + * {
+    margin-top: 1em;
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    .toolbarSubtitle {
+      width: 0.85em;
+      height: 0.85em;
+    }
+  }
 }
