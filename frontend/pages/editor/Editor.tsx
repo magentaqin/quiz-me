@@ -53,7 +53,15 @@ const RichTextEditor = () => {
       JSON.parse(localStorage.getItem('content')) || initialValue,
     []
   )
-  const renderElement = useCallback(props => <Element {...props} />, [])
+  const renderElement = useCallback(props => {
+    // cutomize elemtents: https://docs.slatejs.org/walkthroughs/03-defining-custom-elements
+    if (props.element.children[0].code) {
+      return <div {...props.attributes} style={{backgroundColor: '#ddd', margin: 0, padding: '4px 8px'}}>{props.children}</div>
+    }
+    return (
+      <Element {...props} />
+    )
+  }, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
 
   // withHistory: tracks changes to the Slate value state over time, and enables undo and redo functionality.
@@ -62,7 +70,7 @@ const RichTextEditor = () => {
   // decorate function depends on the language selected
   const decorate = useCallback(
     ([node, path]) => {
-      const ranges = []
+      const ranges: any = []
       if (!Text.isText(node)) {
         return ranges
       }
@@ -218,7 +226,7 @@ const renderCode = (attributes, children, leaf) => {
       {...attributes}
       className={css`
           font-family: monospace;
-          background: hsla(0, 0%, 100%, .5);
+          background: #ddd;
 
       ${leaf.comment &&
         css`
