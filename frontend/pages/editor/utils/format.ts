@@ -7,6 +7,8 @@ interface TextNode {
   bold?: boolean;
   italic?: boolean;
   code?: boolean;
+  underline?: boolean;
+  codeInline?: boolean;
 }
 
 interface ElementNode {
@@ -22,10 +24,16 @@ export const serialize = (node: ElementNode | TextNode) => {
       string = `<strong>${string}</strong>`
     }
     if (node.italic) {
-
+      string = `<i>${string}</i>`
+    }
+    if (node.underline) {
+      string = `<u>${string}</u>`
+    }
+    if (node.codeInline) {
+      string = `<code>${string}</code>`
     }
     if (node.code) {
-
+      string = `<code-block>${string}</code-block>`
     }
     return string
   }
@@ -46,7 +54,6 @@ export const serialize = (node: ElementNode | TextNode) => {
 export const toSlateJson = (html: string) => {
   // html string to DOM document
   const document = new DOMParser().parseFromString(html, 'text/html')
-  console.log('document', document)
   return deserialize(document.body)
 }
 
@@ -73,7 +80,7 @@ const deserialize = (el: HTMLElement, markAttributes = {}) => {
   if (children.length === 0) {
     children.push(jsx('text', nodeAttributes, ''))
   }
-
+  console.log('el.nodeName', el.nodeName, children)
   switch (el.nodeName) {
     case 'BODY':
       return jsx('fragment', {}, children)
@@ -88,6 +95,31 @@ const deserialize = (el: HTMLElement, markAttributes = {}) => {
         'element',
         { type: 'link', url: el.getAttribute('href') },
         children
+      )
+    case 'I': // italic
+      return jsx(
+        'text',
+        {...children[0], italic: true }
+      )
+    case 'U': // underline
+      return jsx(
+        'text',
+        {...children[0], underline: true }
+      )
+    case 'STRONG': // bold text
+      return jsx(
+        'text',
+        { ...children[0], bold: true }
+      )
+    case 'CODE': // code inline
+      return jsx(
+        'text',
+        { ...children[0], codeInline: true }
+      )
+    case 'CODE-BLOCK': // code block
+      return jsx(
+        'text',
+        { ...children[0], code: true }
       )
     default:
       return children

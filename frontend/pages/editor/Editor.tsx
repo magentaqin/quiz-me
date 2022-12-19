@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import isHotkey from 'is-hotkey'
+import Prism from 'prismjs'
 import { Editable, withReact, useSlate, Slate } from 'slate-react'
 import {
   Editor,
@@ -7,7 +8,7 @@ import {
   createEditor,
   Descendant,
   Element as SlateElement,
-  Node,
+  Text,
 } from 'slate'
 import { withHistory } from 'slate-history'
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
@@ -18,8 +19,10 @@ import TitleIcon from '@mui/icons-material/Title';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
 import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
+import DataObjectIcon from '@mui/icons-material/DataObject';
+import { css } from '@emotion/css'
 
-import { Button, Icon, Toolbar } from './components'
+import { Button, Toolbar } from './components'
 import styles from '../../styles/Editor.module.scss'
 import { serialize, toSlateJson } from './utils/format'
 
@@ -32,7 +35,18 @@ const HOTKEYS = {
 
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 
-const RichTextExample = () => {
+const getLength = token => {
+  if (typeof token === 'string') {
+    return token.length
+  } else if (typeof token.content === 'string') {
+    return token.content.length
+  } else {
+    return token.content.reduce((l, t) => l + getLength(t), 0)
+  }
+}
+
+const RichTextEditor = () => {
+  const [language, setLanguage] = useState('js')
   // Update the initial content to be pulled from Local Storage if it exists.
   const value = useMemo(
     () =>
@@ -45,10 +59,43 @@ const RichTextExample = () => {
   // withHistory: tracks changes to the Slate value state over time, and enables undo and redo functionality.
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
+  // decorate function depends on the language selected
+  const decorate = useCallback(
+    ([node, path]) => {
+      const ranges = []
+      if (!Text.isText(node)) {
+        return ranges
+      }
+      const tokens = Prism.tokenize(node.text, Prism.languages[language])
+      let start = 0
+
+      for (const token of tokens) {
+        const length = getLength(token)
+        const end = start + length
+
+        if (typeof token !== 'string') {
+          ranges.push({
+            [token.type]: true,
+            anchor: { path, offset: start },
+            focus: { path, offset: end },
+          })
+        }
+
+        start = end
+      }
+
+      return ranges
+    },
+    [language]
+  )
+
   return (
     <div className={styles.editorWrapper}>
       <div className={styles.editor}>
-        <Slate editor={editor} value={value} onChange={value => {
+        <Slate 
+          editor={editor} 
+          value={value} 
+          onChange={value => {
           const isAstChange = editor.operations.some(
             op => 'set_selection' !== op.type
           )
@@ -56,15 +103,16 @@ const RichTextExample = () => {
             // Save the value to Local Storage.
             const content = JSON.stringify(value)
             localStorage.setItem('content', content)
-            console.log('value', value)
+            console.log('editor value', value)
             const serializedVal = serialize({ children: value })
-            console.log(toSlateJson(serializedVal))
+            console.log('slate json', toSlateJson(serializedVal))
           }
         }}>
         <Toolbar className={styles.toolbar}>
           <MarkButton format="bold" icon={() => <FormatBoldIcon />} />
           <MarkButton format="italic" icon={() => <FormatItalicIcon /> } />
           <MarkButton format="underline" icon={() => <FormatUnderlinedIcon />} />
+          <MarkButton format="codeInline" icon={() => <DataObjectIcon /> } />
           <MarkButton format="code" icon={() => <CodeIcon /> } />
           <BlockButton format="heading-one" icon={() => <TitleIcon />} />
           <BlockButton format="heading-two" icon={() => <TitleIcon className={styles.toolbarSubtitle} />}/>
@@ -75,6 +123,7 @@ const RichTextExample = () => {
         <Editable
           renderElement={renderElement}
           renderLeaf={renderLeaf}
+          decorate={decorate}
           placeholder="Enter some rich text…"
           spellCheck
           autoFocus
@@ -163,12 +212,70 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
+const renderCode = (attributes, children, leaf) => {
+  return (
+    <span
+      {...attributes}
+      className={css`
+          font-family: monospace;
+          background: hsla(0, 0%, 100%, .5);
+
+      ${leaf.comment &&
+        css`
+          color: slategray;
+        `}
+
+      ${(leaf.operator || leaf.url) &&
+        css`
+          color: #9a6e3a;
+        `}
+      ${leaf.keyword &&
+        css`
+          color: #07a;
+        `}
+      ${(leaf.variable || leaf.regex) &&
+        css`
+          color: #e90;
+        `}
+      ${(leaf.number ||
+        leaf.boolean ||
+        leaf.tag ||
+        leaf.constant ||
+        leaf.symbol ||
+        leaf['attr-name'] ||
+        leaf.selector) &&
+        css`
+          color: #905;
+        `}
+      ${leaf.punctuation &&
+        css`
+          color: #999;
+        `}
+      ${(leaf.string || leaf.char) &&
+        css`
+          color: #690;
+        `}
+      ${(leaf.function || leaf['class-name']) &&
+        css`
+          color: #dd4a68;
+        `}
+      `}
+  >
+    {children}
+  </span>
+  )
+}
+
 const Leaf = ({ attributes, children, leaf }) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }
 
   if (leaf.code) {
+    children = renderCode(attributes, children, leaf)
+  }
+
+  if (leaf.codeInline) {
     children = <code>{children}</code>
   }
 
@@ -222,7 +329,7 @@ const initialValue: Descendant[] = [
       { text: ' text, ' },
       { text: 'much', italic: true },
       { text: ' better than a ' },
-      { text: '<textarea>', code: true },
+      { text: '<textarea>', 'codeInline': true },
       { text: '!' },
     ],
   },
@@ -250,4 +357,4 @@ const initialValue: Descendant[] = [
   },
 ]
 
-export default RichTextExample
+export default RichTextEditor
