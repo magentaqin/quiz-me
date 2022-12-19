@@ -7,6 +7,7 @@ import {
   createEditor,
   Descendant,
   Element as SlateElement,
+  Node,
 } from 'slate'
 import { withHistory } from 'slate-history'
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
@@ -20,6 +21,7 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 
 import { Button, Icon, Toolbar } from './components'
 import styles from '../../styles/Editor.module.scss'
+import { serialize, toSlateJson } from './utils/format'
 
 const HOTKEYS = {
   'mod+b': 'bold',
@@ -31,15 +33,34 @@ const HOTKEYS = {
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 
 const RichTextExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
+  // Update the initial content to be pulled from Local Storage if it exists.
+  const value = useMemo(
+    () =>
+      JSON.parse(localStorage.getItem('content')) || initialValue,
+    []
+  )
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
+
+  // withHistory: tracks changes to the Slate value state over time, and enables undo and redo functionality.
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
     <div className={styles.editorWrapper}>
       <div className={styles.editor}>
-        <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+        <Slate editor={editor} value={value} onChange={value => {
+          const isAstChange = editor.operations.some(
+            op => 'set_selection' !== op.type
+          )
+          if (isAstChange) {
+            // Save the value to Local Storage.
+            const content = JSON.stringify(value)
+            localStorage.setItem('content', content)
+            console.log('value', value)
+            const serializedVal = serialize({ children: value })
+            console.log(toSlateJson(serializedVal))
+          }
+        }}>
         <Toolbar className={styles.toolbar}>
           <MarkButton format="bold" icon={() => <FormatBoldIcon />} />
           <MarkButton format="italic" icon={() => <FormatItalicIcon /> } />
@@ -179,7 +200,6 @@ const BlockButton = ({ format, icon }) => {
 
 const MarkButton = ({ format, icon }) => {
   const editor = useSlate()
-  console.log('icon', icon)
   return (
     <Button
       active={isMarkActive(editor, format)}
