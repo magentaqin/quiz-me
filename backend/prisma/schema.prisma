@@ -52,6 +52,7 @@ model Answer {
   authorId String
   questionId String 
   id      Int           @id @default(autoincrement())
+  answerId String     @unique
   content    String        @db.Text()
   author User @relation(fields: [authorId], references: [userId])
   question Question @relation(fields: [questionId], references: [questionId]) 

@@ -8,4 +8,9 @@ export default (app: Application) => {
 
   /** Question */
   router.post('/question/add', controller.question.addQuestion)
+
+  /**
+   * Answer
+   */
+  router.post('/answer/add', controller.answer.addAnswer)
 };

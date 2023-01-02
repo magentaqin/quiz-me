@@ -49,7 +49,6 @@ export default class QuestionController extends Controller {
           console.log(e)
           throw new Error(e)
         })
-        console.log('resp', resp)
         if (resp) {
           this.ctx.status = 200
           this.ctx.body = {
