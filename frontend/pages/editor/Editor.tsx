@@ -33,7 +33,7 @@ const HOTKEYS = {
   'mod+`': 'code',
 }
 
-const LIST_TYPES = ['numbered-list', 'bulleted-list']
+const LIST_TYPES = ['numberedList', 'bulletedList']
 
 const getLength = token => {
   if (typeof token === 'string') {
@@ -113,6 +113,7 @@ const RichTextEditor = () => {
             localStorage.setItem('content', content)
             console.log('editor value', value)
             const serializedVal = serialize({ children: value })
+            console.log('htmlstring', serializedVal)
             console.log('slate json', toSlateJson(serializedVal))
           }
         }}>
@@ -122,11 +123,11 @@ const RichTextEditor = () => {
           <MarkButton format="underline" icon={() => <FormatUnderlinedIcon />} />
           <MarkButton format="codeInline" icon={() => <DataObjectIcon /> } />
           <MarkButton format="code" icon={() => <CodeIcon /> } />
-          <BlockButton format="heading-one" icon={() => <TitleIcon />} />
-          <BlockButton format="heading-two" icon={() => <TitleIcon className={styles.toolbarSubtitle} />}/>
-          <BlockButton format="block-quote" icon={() => <FormatQuoteIcon />} />
-          <BlockButton format="numbered-list" icon={() => <FormatListNumberedIcon />} />
-          <BlockButton format="bulleted-list" icon={() => <FormatListBulletedIcon />} />
+          <BlockButton format="headingOne" icon={() => <TitleIcon />} />
+          <BlockButton format="headingTwo" icon={() => <TitleIcon className={styles.toolbarSubtitle} />}/>
+          <BlockButton format="blockQuote" icon={() => <FormatQuoteIcon />} />
+          <BlockButton format="numberedList" icon={() => <FormatListNumberedIcon />} />
+          <BlockButton format="bulletedList" icon={() => <FormatListBulletedIcon />} />
         </Toolbar>
         <Editable
           renderElement={renderElement}
@@ -163,7 +164,7 @@ const toggleBlock = (editor, format) => {
     split: true,
   })
   const newProperties: Partial<SlateElement> = {
-    type: isActive ? 'paragraph' : isList ? 'list-item' : format,
+    type: isActive ? 'paragraph' : isList ? 'listItem' : format,
   }
   Transforms.setNodes(editor, newProperties)
 
@@ -203,17 +204,17 @@ const isMarkActive = (editor, format) => {
 
 const Element = ({ attributes, children, element }) => {
   switch (element.type) {
-    case 'block-quote':
-      return <blockquote {...attributes}>{children}</blockquote>
-    case 'bulleted-list':
+    case 'blockQuote':
+      return <blockquote {...attributes}><p>{children}</p></blockquote>
+    case 'bulletedList':
       return <ul {...attributes}>{children}</ul>
-    case 'heading-one':
+    case 'headingOne':
       return <h1 {...attributes}>{children}</h1>
-    case 'heading-two':
+    case 'headingTwo':
       return <h2 {...attributes}>{children}</h2>
-    case 'list-item':
+    case 'listItem':
       return <li {...attributes}>{children}</li>
-    case 'numbered-list':
+    case 'numberedList':
       return <ol {...attributes}>{children}</ol>
     default:
       return <p {...attributes}>{children}</p>
@@ -356,7 +357,7 @@ const initialValue: Descendant[] = [
     ],
   },
   {
-    type: 'block-quote',
+    type: 'blockQuote',
     children: [{ text: 'A wise quote.' }],
   },
   {

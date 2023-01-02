@@ -18,6 +18,7 @@ interface ElementNode {
 
 // transform slate json-format to html string
 export const serialize = (node: ElementNode | TextNode) => {
+  console.log('node', node)
   if (Text.isText(node)) {
     let string = escapeHtml(node.text)
     if (node.bold) {
@@ -41,10 +42,20 @@ export const serialize = (node: ElementNode | TextNode) => {
   const children: string = node.children.map(n => serialize(n)).join('')
 
   switch (node.type) {
-    case 'quote':
+    case 'blockQuote':
       return `<blockquote><p>${children}</p></blockquote>`
     case 'paragraph':
       return `<p>${children}</p>`
+    case 'headingOne':
+      return `<h1>${children}</h1>`
+    case 'headingTwo':
+      return `<h2>${children}</h2>`
+    case 'numberedList': 
+      return `<ol>${children}</ol>`
+    case 'bulletedList':
+      return `<ul>${children}</ul>`
+    case 'listItem':
+      return `<li>${children}</li>`
     default:
       return children
   }
@@ -87,9 +98,19 @@ const deserialize = (el: HTMLElement, markAttributes = {}) => {
     case 'BR':
       return '\n'
     case 'BLOCKQUOTE':
-      return jsx('element', { type: 'quote' }, children)
+      return jsx('element', { type: 'blockQuote' }, children)
     case 'P':
       return jsx('element', { type: 'paragraph' }, children)
+    case 'H1': 
+      return jsx('element', { type: 'headinOne'}, children)
+    case 'H2': 
+      return jsx('element', { type: 'headeingTwo'}, children)
+    case 'OL':
+      return jsx('element', { type: 'numberedList'}, children)
+    case 'UL':
+        return jsx('element', { type: 'bulletedList'}, children)
+    case 'LI':
+      return jsx('element', { type: 'listItem'}, children)
     case 'A':
       return jsx(
         'element',
