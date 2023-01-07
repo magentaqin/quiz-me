@@ -2,6 +2,7 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 import NavBar from '../components/Navbar'
+import MainContent from '../components/MainContent'
 import styles from '../styles/Home.module.scss'
 
 const Home: NextPage = () => {
@@ -15,6 +16,7 @@ const Home: NextPage = () => {
 
       <main>
         <NavBar />
+        <MainContent />
         <Link href="/editor">
           <a>to editor</a>
         </Link>

@@ -1,7 +1,7 @@
 .navbar {
     height: 60px;
     border-bottom: 1px solid #ddd;
-    padding: 4px 24px;
+    padding: 4px 100px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -9,4 +9,10 @@
     button {
       height: 36px;
     }
+}
+
+.searchContainer {
+    margin: 24px 0;
+    display: flex;
+    justify-content: center;
 }
