@@ -4,6 +4,7 @@ import userErrorCodes from '../error_codes/user';
 import { generateUuid } from '../utils/hash';
 
 export default class QuestionController extends Controller {
+    // Add Question
     public async addQuestion() {
       try {
         const { prisma } = this.app
@@ -58,7 +59,36 @@ export default class QuestionController extends Controller {
           }
         }
       } catch (err) {
-        console.log('err', err)
+        this.ctx.status = 500
+        this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR
+      }
+    }
+
+    // Get Question Tag List
+    public async listQuestionTag() {
+      try {
+        const { prisma } = this.app
+        const resp = await prisma.questionTag.findMany({
+          distinct: ['name'],
+          orderBy: {
+            name: 'asc',
+          },
+          select: {
+            name: true,
+            tagId: true,
+          },
+        }).catch((e) => {
+          console.log(e)
+          throw new Error(e)
+        })
+        if (Array.isArray(resp)) {
+          this.ctx.status = 200
+          this.ctx.body = {
+            tags: resp
+          }
+        }
+        console.log('resp', resp)
+      } catch (err) {
         this.ctx.status = 500
         this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR
       }
