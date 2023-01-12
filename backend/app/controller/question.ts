@@ -87,7 +87,34 @@ export default class QuestionController extends Controller {
             tags: resp
           }
         }
-        console.log('resp', resp)
+      } catch (err) {
+        this.ctx.status = 500
+        this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR
+      }
+    }
+
+    public async listQuestion() {
+      try {
+        const { prisma } = this.app
+        const { offset, count } = this.ctx.query
+        const resp = await prisma.question.findMany({
+          select: {
+            questionId: true,
+            title: true,
+            description: true,
+          },
+          skip: Number(offset),
+          take: Number(count)
+        }).catch((e) => {
+          console.log(e)
+          throw new Error(e)
+        })
+        if (Array.isArray(resp)) {
+          this.ctx.status = 200
+          this.ctx.body = {
+            questions: resp
+          }
+        }
       } catch (err) {
         this.ctx.status = 500
         this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR

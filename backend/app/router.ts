@@ -9,6 +9,7 @@ export default (app: Application) => {
   /** Question */
   router.post('/question/add', controller.question.addQuestion)
   router.get('/tag/list', controller.question.listQuestionTag)
+  router.get('/question/list', controller.question.listQuestion)
 
   /**
    * Answer
