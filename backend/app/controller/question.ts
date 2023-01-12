@@ -120,4 +120,27 @@ export default class QuestionController extends Controller {
         this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR
       }
     }
+
+    public async countQuestion() {
+      try {
+        const { prisma } = this.app
+        const resp = await prisma.question.aggregate({
+          _count: {
+            questionId: true,
+          },
+        }).catch((e) => {
+          console.log(e)
+          throw new Error(e)
+        })
+        if (resp) {
+          this.ctx.status = 200
+          this.ctx.body = {
+            count: resp._count.questionId
+          }
+        }
+      } catch (err) {
+        this.ctx.status = 500
+        this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR
+      }
+    }
 }

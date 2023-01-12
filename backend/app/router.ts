@@ -10,6 +10,7 @@ export default (app: Application) => {
   router.post('/question/add', controller.question.addQuestion)
   router.get('/tag/list', controller.question.listQuestionTag)
   router.get('/question/list', controller.question.listQuestion)
+  router.get('/question/totalCount', controller.question.countQuestion)
 
   /**
    * Answer
