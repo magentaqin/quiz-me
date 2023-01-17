@@ -1,4 +1,4 @@
-import { useState, MouseEvent } from 'react'
+import { useState, MouseEvent, ChangeEvent } from 'react'
 import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
 import Divider from '@mui/material/Divider';
@@ -13,7 +13,11 @@ import Stack from '@mui/material/Stack';
 import { listTagsApi } from '../api/question'
 import styles from '../styles/SearchInput.module.scss'
 
-export default function SearchInput() {
+interface Props {
+  onInputChange: (value: string) => void;
+}
+
+export default function SearchInput(props: Props) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [tags, setTags] = useState<any[]>([])
 
@@ -47,6 +51,10 @@ export default function SearchInput() {
     setTags(newTags)
   }
 
+  const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    props.onInputChange(event.target.value)
+  }
+
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
   return (
@@ -65,6 +73,7 @@ export default function SearchInput() {
         sx={{ ml: 1, flex: 1 }}
         placeholder="Search Quiz Questions"
         inputProps={{ 'aria-label': 'Search Quiz Questions' }}
+        onChange={handleInputChange}
       />
       <IconButton type="button" sx={{ p: '10px' }} aria-label="search">
         <SearchIcon />

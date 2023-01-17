@@ -19,11 +19,15 @@ interface Column {
 }
 
 const columns: readonly Column[] = [
-  { id: 'title', label: 'Question', minWidth: 150 },
-  { id: 'description', label: 'Description', minWidth: 200 },
+  { id: 'title', label: 'Question', minWidth: 250 },
+  { id: 'description', label: 'Description', minWidth: 250 },
 ];
 
-export default function QuizTable() {
+interface Props {
+  keyword: string;
+}
+
+export default function QuizTable(props: Props) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [rowsData, setRowsData] = useState<ListQuestionRes[]>([])
@@ -31,40 +35,45 @@ export default function QuizTable() {
 
   const handleChangePage = (_: unknown, newPage: number) => {
     setPage(newPage);
-    fetchQuestions(rowsPerPage*newPage)
   };
 
   const handleChangeRowsPerPage = (event: ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-
-  const fetchQuestions = async (offset: number) => {
-    const res = await listQuestionsApi({
-      offset,
-      count: rowsPerPage
-    })
-    if (res.data) {
-      const questions = res.data.questions.map((item: ListQuestionRes) => {
-        return {
-          ...item,
-          title: unEscape(item.title),
-          description: unEscape(item.description)
-        }
-      })
-      setRowsData(questions)
-    }
-  }
-
   useEffect(() => {
     // get the total count of questions
-    countQuestionApi().then(res => {
+    const getTotalCount = () => {
+      countQuestionApi({ keyword: props.keyword}).then(res => {
+        if (res.data) {
+          setCount(res.data.count)
+        }
+      })
+    }
+    getTotalCount()
+  }, [props.keyword]);
+
+  useEffect(() => {
+    const fetchQuestions = async (offset: number) => {
+      const res = await listQuestionsApi({
+        offset,
+        count: rowsPerPage,
+        keyword: props.keyword || undefined
+      })
       if (res.data) {
-        setCount(res.data.count)
+        const questions = res.data.questions.map((item: ListQuestionRes) => {
+          return {
+            ...item,
+            title: unEscape(item.title),
+            description: unEscape(item.description)
+          }
+        })
+        setRowsData(questions)
       }
-    })
-    fetchQuestions(0)
-  }, []);
+    }
+  
+    fetchQuestions(rowsPerPage*page)
+  }, [rowsPerPage, page, props.keyword])
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>

@@ -3,6 +3,7 @@ import { axiosInstance } from "./axios"
 export interface ListQuestionReq {
   offset: number
   count: number
+  keyword?: string
 }
 
 export interface ListQuestionRes {
@@ -20,6 +21,6 @@ export const listQuestionsApi = async (params: ListQuestionReq) => {
   return await axiosInstance.get('/question/list', { params })
 }
 
-export const countQuestionApi = async () => {
-  return await axiosInstance.get('/question/totalCount')
+export const countQuestionApi = async (params: { keyword: string; }) => {
+  return await axiosInstance.get('/question/totalCount', { params })
 }
