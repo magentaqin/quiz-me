@@ -108,10 +108,10 @@ export default class QuestionController extends Controller {
         take: Number(count),
         where: {
           title: {
-            search: keyword,
+            search: keyword ? `${keyword}*` : undefined,
           },
           description: {
-            search: keyword,
+            search: keyword ? `${keyword}*` : undefined,
           },
         },
       }).catch(e => {
@@ -140,10 +140,10 @@ export default class QuestionController extends Controller {
         },
         where: {
           title: {
-            search: keyword,
+            search: keyword ? `${keyword}*` : undefined,
           },
           description: {
-            search: keyword,
+            search: keyword ? `${keyword}*` : undefined,
           },
         },
       }).catch(e => {
