@@ -7,7 +7,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import { countQuestionApi, listQuestionsApi, ListQuestionRes } from '../api/question'
+import { countQuestionApi, listQuestionsApi, ListQuestionRes, ListTagRes } from '../api/question'
 import { unEscape } from '../pages/editor/utils/html';
 
 interface Column {
@@ -25,6 +25,7 @@ const columns: readonly Column[] = [
 
 interface Props {
   keyword: string;
+  tags: ListTagRes[];
 }
 
 export default function QuizTable(props: Props) {

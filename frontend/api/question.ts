@@ -13,6 +13,12 @@ export interface ListQuestionRes {
   tags: string[]
 }
 
+export interface ListTagRes {
+  name: string;
+  tagId: string;
+}
+
+
 export const listTagsApi = async () => {
   return await axiosInstance.get('/tag/list')
 }

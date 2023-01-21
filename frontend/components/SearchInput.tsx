@@ -1,4 +1,4 @@
-import { useState, MouseEvent, ChangeEvent } from 'react'
+import { useState, MouseEvent, ChangeEvent, useEffect } from 'react'
 import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
 import Divider from '@mui/material/Divider';
@@ -10,16 +10,17 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
-import { listTagsApi } from '../api/question'
+import { listTagsApi, ListTagRes } from '../api/question'
 import styles from '../styles/SearchInput.module.scss'
 
 interface Props {
   onInputChange: (value: string) => void;
+  onTagsChange: (value: ListTagRes[]) => void;
 }
 
 export default function SearchInput(props: Props) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [tags, setTags] = useState<any[]>([])
+  const [tags, setTags] = useState<ListTagRes[]>([])
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -57,9 +58,14 @@ export default function SearchInput(props: Props) {
 
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
+
+  useEffect(() => {
+
+  }, [tags])
+
   return (
     <Paper
-      component="form"
+      component="div"
       sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400 }}
     >
       <Button onClick={handleClick}>
@@ -69,12 +75,13 @@ export default function SearchInput(props: Props) {
         <KeyboardArrowDownIcon />
       </Button>
       <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-      <InputBase
-        sx={{ ml: 1, flex: 1 }}
-        placeholder="Search Quiz Questions"
-        inputProps={{ 'aria-label': 'Search Quiz Questions' }}
-        onChange={handleInputChange}
-      />
+        <InputBase
+          id="searchinput"
+          sx={{ ml: 1, flex: 1 }}
+          placeholder="Search Quiz Questions"
+          inputProps={{ 'aria-label': 'Search Quiz Questions' }}
+          onChange={handleInputChange}
+        />
       <IconButton type="button" sx={{ p: '10px' }} aria-label="search">
         <SearchIcon />
       </IconButton>
