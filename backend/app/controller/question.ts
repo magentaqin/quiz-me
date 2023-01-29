@@ -35,7 +35,13 @@ export default class QuestionController extends Controller {
       const escapedDescription = description ? this.ctx.helper.escape(description) : '';
 
       // // 03 use transaction to insert one record into Question Table and multiple records into QuestionTag Table
-      const tagsToCreate = tags.map(item => ({ name: item, tagId: generateUuid(item) }));
+      const tagsToCreate = tags.map(item => {
+        return {
+          tag: {
+            create: { name: item, tagId: generateUuid(item) },
+          },
+        };
+      });
       const resp = await prisma.question.create({
         data: {
           questionId: generateUuid(escapedTitle),
