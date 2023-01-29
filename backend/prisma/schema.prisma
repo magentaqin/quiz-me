@@ -29,23 +29,30 @@ model Question {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @default(now())
   author User @relation(fields: [authorId], references: [userId])
-  tags        QuestionTag[]
   answers     Answer[]
+  tags TagsOnQuestions[]
 
+  @@index([questionId], name: "questionId")
   @@index([authorId], name: "author")
   @@fulltext([title, description])
 }
 
 model QuestionTag {
-  questionId String
   id      Int           @id @default(autoincrement())
   tagId   String        @unique
   name    String        @db.VarChar(20)
-  question Question @relation(fields: [questionId], references: [questionId]) 
+  questions TagsOnQuestions[]
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @default(now())
+}
 
-  @@index([questionId], name: "question")
+model TagsOnQuestions {
+  question Question @relation(fields: [questionId], references: [questionId])
+  questionId String 
+  tag QuestionTag @relation(fields: [tagId], references: [tagId])
+  tagId String 
+  createdAt DateTime @default(now())
+  @@id([questionId, tagId])
 }
 
 model Answer {
