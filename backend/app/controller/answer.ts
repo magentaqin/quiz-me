@@ -39,7 +39,6 @@ export default class AnswerController extends Controller {
           content: escapedAnswerContent,
         },
       }).catch(e => {
-        console.log(e);
         throw new Error(e);
       });
       if (resp) {
@@ -49,7 +48,6 @@ export default class AnswerController extends Controller {
         };
       }
     } catch (err) {
-      console.log('err', err);
       this.ctx.status = 500;
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
     }

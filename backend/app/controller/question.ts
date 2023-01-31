@@ -53,7 +53,6 @@ export default class QuestionController extends Controller {
           },
         },
       }).catch(e => {
-        console.log(e);
         throw new Error(e);
       });
       if (resp) {
@@ -84,7 +83,6 @@ export default class QuestionController extends Controller {
           tagId: true,
         },
       }).catch(e => {
-        console.log(e);
         throw new Error(e);
       });
       if (Array.isArray(resp)) {
@@ -102,34 +100,82 @@ export default class QuestionController extends Controller {
   public async listQuestion() {
     try {
       const { prisma } = this.app;
-      const { offset, count, keyword } = this.ctx.query;
-      const resp = await prisma.question.findMany({
-        select: {
-          questionId: true,
-          title: true,
-          description: true,
-          tags: true,
-        },
-        skip: Number(offset),
-        take: Number(count),
-        where: {
-          title: {
-            search: keyword ? `${keyword}*` : undefined,
-          },
-          description: {
-            search: keyword ? `${keyword}*` : undefined,
-          },
-        },
-      }).catch(e => {
-        console.log(e);
-        throw new Error(e);
+      const { offset, count, keyword, ...tags } = this.ctx.query;
+      const queryTags: string[] = [];
+      Object.keys(tags).forEach(tagKey => {
+        if (/tags\[[0-9]{1,}\]/.test(tagKey)) {
+          queryTags.push(tags[tagKey]);
+        }
       });
-      if (Array.isArray(resp)) {
-        this.ctx.status = 200;
-        this.ctx.body = {
-          questions: resp,
-        };
+      let questions: any[] = [];
+      // TODO Consider using Transaction
+      if (queryTags.length) {
+        for (const tag of queryTags) {
+          const perResult = await prisma.question.findMany({
+            select: {
+              questionId: true,
+              title: true,
+              description: true,
+              tags: true,
+            },
+            where: {
+              title: {
+                search: keyword ? `${keyword}*` : undefined,
+              },
+              description: {
+                search: keyword ? `${keyword}*` : undefined,
+              },
+              tags: {
+                some: {
+                  tag: {
+                    name: tag,
+                  },
+                },
+              },
+            },
+          }).catch(e => {
+            throw new Error(e);
+          });
+          if (Array.isArray(perResult)) {
+            questions = questions.concat(perResult);
+          } else {
+            throw new Error();
+          }
+        }
+        // TODO Primsa skip and take not working in many-to-many relation
+        questions = questions.slice(Number(offset), Number(count));
+      } else {
+        const perResult = await prisma.question.findMany({
+          select: {
+            questionId: true,
+            title: true,
+            description: true,
+            tags: true,
+          },
+          skip: Number(offset),
+          take: Number(count),
+          where: {
+            title: {
+              search: keyword ? `${keyword}*` : undefined,
+            },
+            description: {
+              search: keyword ? `${keyword}*` : undefined,
+            },
+          },
+        }).catch(e => {
+          throw new Error(e);
+        });
+        if (Array.isArray(perResult)) {
+          questions = questions.concat(perResult);
+        } else {
+          throw new Error();
+        }
       }
+
+      this.ctx.status = 200;
+      this.ctx.body = {
+        questions,
+      };
     } catch (err) {
       this.ctx.status = 500;
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
@@ -153,7 +199,6 @@ export default class QuestionController extends Controller {
           },
         },
       }).catch(e => {
-        console.log(e);
         throw new Error(e);
       });
       if (resp) {
