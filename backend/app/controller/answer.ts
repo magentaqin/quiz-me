@@ -52,4 +52,25 @@ export default class AnswerController extends Controller {
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
     }
   }
+
+  public async getAnswer() {
+    try {
+      const { prisma } = this.app;
+      const { id } = this.ctx.query;
+      const resp = await prisma.answer.findUnique({
+        where: {
+          answerId: id,
+        },
+      });
+      if (resp) {
+        this.ctx.status = 200;
+        this.ctx.body = {
+          content: resp.content,
+        };
+      }
+    } catch (err) {
+      this.ctx.status = 500;
+      this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
+    }
+  }
 }
