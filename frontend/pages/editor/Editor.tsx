@@ -47,6 +47,7 @@ const getLength = token => {
 
 const RichTextEditor = () => {
   const [language, setLanguage] = useState('js')
+  const [htmlString, setHtmlString] = useState('')
   // Update the initial content to be pulled from Local Storage if it exists.
   const value = useMemo(
     () =>
@@ -97,6 +98,10 @@ const RichTextEditor = () => {
     [language]
   )
 
+  const submit = () => {
+    console.log('submit!', htmlString)
+  }
+
   return (
     <div className={styles.editorWrapper}>
       <div className={styles.editor}>
@@ -113,11 +118,13 @@ const RichTextEditor = () => {
             localStorage.setItem('content', content)
             console.log('editor value', value)
             const serializedVal = serialize({ children: value })
+            setHtmlString(serializedVal)
             console.log('htmlstring', serializedVal)
             console.log('slate json', toSlateJson(serializedVal))
           }
         }}>
         <Toolbar className={styles.toolbar}>
+          <button onClick={submit}>Submit</button>
           <MarkButton format="bold" icon={() => <FormatBoldIcon />} />
           <MarkButton format="italic" icon={() => <FormatItalicIcon /> } />
           <MarkButton format="underline" icon={() => <FormatUnderlinedIcon />} />

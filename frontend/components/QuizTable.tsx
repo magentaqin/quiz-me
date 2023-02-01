@@ -59,7 +59,8 @@ export default function QuizTable(props: Props) {
       const res = await listQuestionsApi({
         offset,
         count: rowsPerPage,
-        keyword: props.keyword || undefined
+        keyword: props.keyword || undefined,
+        tags: [],
       })
       if (res.data) {
         const questions = res.data.questions.map((item: ListQuestionRes) => {
@@ -74,7 +75,7 @@ export default function QuizTable(props: Props) {
     }
   
     fetchQuestions(rowsPerPage*page)
-  }, [rowsPerPage, page, props.keyword])
+  }, [rowsPerPage, page, props.keyword, props.tags])
 
   return (
     <Paper sx={{ width: '100%', overflow: 'hidden' }}>

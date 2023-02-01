@@ -1,9 +1,11 @@
+import qs from 'qs'
 import { axiosInstance } from "./axios"
 
 export interface ListQuestionReq {
   offset: number
   count: number
   keyword?: string
+  tags?: string[]
 }
 
 export interface ListQuestionRes {
@@ -24,7 +26,14 @@ export const listTagsApi = async () => {
 }
 
 export const listQuestionsApi = async (params: ListQuestionReq) => {
-  return await axiosInstance.get('/question/list', { params })
+  return await axiosInstance.get('/question/list', { 
+    params,   
+    paramsSerializer: {
+      serialize: (params) => {
+        return qs.stringify(params)
+      },
+    }
+ })
 }
 
 export const countQuestionApi = async (params: { keyword: string; }) => {

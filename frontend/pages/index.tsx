@@ -20,6 +20,9 @@ const Home: NextPage = () => {
         <Link href="/editor">
           <a>to editor</a>
         </Link>
+        <Link href="/answer">
+          <a>to answer</a>
+        </Link>
       </main>
     </div>
   )

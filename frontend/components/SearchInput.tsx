@@ -50,6 +50,7 @@ export default function SearchInput(props: Props) {
       return item
     })
     setTags(newTags)
+    props.onTagsChange(newTags)
   }
 
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
