@@ -26,6 +26,10 @@ import { Button, Toolbar } from './components'
 import styles from '../../styles/Editor.module.scss'
 import { serialize, toSlateJson } from './utils/format'
 
+interface Props {
+  fromAnswer?: boolean;
+}
+
 const HOTKEYS = {
   'mod+b': 'bold',
   'mod+i': 'italic',
@@ -43,7 +47,7 @@ const getLength = token => {
   }
 }
 
-const RichTextEditor = () => {
+const RichTextEditor = (props: Props) => {
   const [language, setLanguage] = useState('js')
   const [htmlString, setHtmlString] = useState('')
   const [value, setValue] = useState(initialValue)
@@ -105,6 +109,24 @@ const RichTextEditor = () => {
     console.log('submit!', htmlString)
   }
 
+  const renderToolbar = () => {
+    return (
+      <Toolbar className={styles.toolbar}>
+      <button onClick={submit}>Submit</button>
+      <MarkButton format="bold" icon={() => <FormatBoldIcon />} />
+      <MarkButton format="italic" icon={() => <FormatItalicIcon /> } />
+      <MarkButton format="underline" icon={() => <FormatUnderlinedIcon />} />
+      <MarkButton format="codeInline" icon={() => <DataObjectIcon /> } />
+      <MarkButton format="code" icon={() => <CodeIcon /> } />
+      <BlockButton format="headingOne" icon={() => <TitleIcon />} />
+      <BlockButton format="headingTwo" icon={() => <TitleIcon className={styles.toolbarSubtitle} />}/>
+      <BlockButton format="blockQuote" icon={() => <FormatQuoteIcon />} />
+      <BlockButton format="numberedList" icon={() => <FormatListNumberedIcon />} />
+      <BlockButton format="bulletedList" icon={() => <FormatListBulletedIcon />} />
+    </Toolbar>
+    )
+  }
+
   const renderSlate = () => {
     // Only render editor on client side.
     if (showSlate) {
@@ -127,24 +149,12 @@ const RichTextEditor = () => {
           console.log('slate json', toSlateJson(serializedVal))
         }
       }}>
-      <Toolbar className={styles.toolbar}>
-        <button onClick={submit}>Submit</button>
-        <MarkButton format="bold" icon={() => <FormatBoldIcon />} />
-        <MarkButton format="italic" icon={() => <FormatItalicIcon /> } />
-        <MarkButton format="underline" icon={() => <FormatUnderlinedIcon />} />
-        <MarkButton format="codeInline" icon={() => <DataObjectIcon /> } />
-        <MarkButton format="code" icon={() => <CodeIcon /> } />
-        <BlockButton format="headingOne" icon={() => <TitleIcon />} />
-        <BlockButton format="headingTwo" icon={() => <TitleIcon className={styles.toolbarSubtitle} />}/>
-        <BlockButton format="blockQuote" icon={() => <FormatQuoteIcon />} />
-        <BlockButton format="numberedList" icon={() => <FormatListNumberedIcon />} />
-        <BlockButton format="bulletedList" icon={() => <FormatListBulletedIcon />} />
-      </Toolbar>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
         decorate={decorate}
         placeholder="Enter some rich text…"
+        readOnly={props.fromAnswer}
         spellCheck
         autoFocus
         onKeyDown={event => {

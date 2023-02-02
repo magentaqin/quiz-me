@@ -3,7 +3,7 @@ import Editor from '../editor/Editor'
 const AnswerPage = () => {
   return (
     <div>
-      <Editor />
+      <Editor fromAnswer={true}/>
     </div>
   )
 }
