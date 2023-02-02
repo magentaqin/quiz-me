@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import isHotkey from 'is-hotkey'
 import Prism from 'prismjs'
 import { Editable, withReact, useSlate, Slate } from 'slate-react'
@@ -33,8 +33,6 @@ const HOTKEYS = {
   'mod+`': 'code',
 }
 
-const LIST_TYPES = ['numberedList', 'bulletedList']
-
 const getLength = token => {
   if (typeof token === 'string') {
     return token.length
@@ -48,12 +46,17 @@ const getLength = token => {
 const RichTextEditor = () => {
   const [language, setLanguage] = useState('js')
   const [htmlString, setHtmlString] = useState('')
+  const [value, setValue] = useState(initialValue)
+  const [showSlate, setShowSlate] = useState(false)
+
   // Update the initial content to be pulled from Local Storage if it exists.
-  const value = useMemo(
-    () =>
-      JSON.parse(localStorage.getItem('content')) || initialValue,
-    []
-  )
+  useEffect(() => {
+    const cache = localStorage.getItem('content') || ''
+    console.log('cache', cache)
+    setValue(JSON.parse(cache))
+    setShowSlate(true)
+  }, [])
+
   const renderElement = useCallback(props => {
     // cutomize elemtents: https://docs.slatejs.org/walkthroughs/03-defining-custom-elements
     if (props.element.children[0].code) {
@@ -102,83 +105,74 @@ const RichTextEditor = () => {
     console.log('submit!', htmlString)
   }
 
+  const renderSlate = () => {
+    // Only render editor on client side.
+    if (showSlate) {
+      return (
+        <Slate
+        editor={editor}
+        value={value}
+        onChange={value => {
+        const isAstChange = editor.operations.some(
+          op => 'set_selection' !== op.type
+        )
+        if (isAstChange) {
+          // Save the value to Local Storage.
+          const content = JSON.stringify(value)
+          localStorage.setItem('content', content)
+          console.log('editor value', value)
+          const serializedVal = serialize({ children: value })
+          setHtmlString(serializedVal)
+          console.log('htmlstring', serializedVal)
+          console.log('slate json', toSlateJson(serializedVal))
+        }
+      }}>
+      <Toolbar className={styles.toolbar}>
+        <button onClick={submit}>Submit</button>
+        <MarkButton format="bold" icon={() => <FormatBoldIcon />} />
+        <MarkButton format="italic" icon={() => <FormatItalicIcon /> } />
+        <MarkButton format="underline" icon={() => <FormatUnderlinedIcon />} />
+        <MarkButton format="codeInline" icon={() => <DataObjectIcon /> } />
+        <MarkButton format="code" icon={() => <CodeIcon /> } />
+        <BlockButton format="headingOne" icon={() => <TitleIcon />} />
+        <BlockButton format="headingTwo" icon={() => <TitleIcon className={styles.toolbarSubtitle} />}/>
+        <BlockButton format="blockQuote" icon={() => <FormatQuoteIcon />} />
+        <BlockButton format="numberedList" icon={() => <FormatListNumberedIcon />} />
+        <BlockButton format="bulletedList" icon={() => <FormatListBulletedIcon />} />
+      </Toolbar>
+      <Editable
+        renderElement={renderElement}
+        renderLeaf={renderLeaf}
+        decorate={decorate}
+        placeholder="Enter some rich text…"
+        spellCheck
+        autoFocus
+        onKeyDown={event => {
+          for (const hotkey in HOTKEYS) {
+            if (isHotkey(hotkey, event as any)) {
+              event.preventDefault()
+              const mark = HOTKEYS[hotkey]
+              toggleMark(editor, mark)
+            }
+          }
+        }}
+      />
+      </Slate>
+      )
+    }
+    return null
+  }
+
   return (
     <div className={styles.editorWrapper}>
       <div className={styles.editor}>
-        <Slate 
-          editor={editor} 
-          value={value} 
-          onChange={value => {
-          const isAstChange = editor.operations.some(
-            op => 'set_selection' !== op.type
-          )
-          if (isAstChange) {
-            // Save the value to Local Storage.
-            const content = JSON.stringify(value)
-            localStorage.setItem('content', content)
-            console.log('editor value', value)
-            const serializedVal = serialize({ children: value })
-            setHtmlString(serializedVal)
-            console.log('htmlstring', serializedVal)
-            console.log('slate json', toSlateJson(serializedVal))
-          }
-        }}>
-        <Toolbar className={styles.toolbar}>
-          <button onClick={submit}>Submit</button>
-          <MarkButton format="bold" icon={() => <FormatBoldIcon />} />
-          <MarkButton format="italic" icon={() => <FormatItalicIcon /> } />
-          <MarkButton format="underline" icon={() => <FormatUnderlinedIcon />} />
-          <MarkButton format="codeInline" icon={() => <DataObjectIcon /> } />
-          <MarkButton format="code" icon={() => <CodeIcon /> } />
-          <BlockButton format="headingOne" icon={() => <TitleIcon />} />
-          <BlockButton format="headingTwo" icon={() => <TitleIcon className={styles.toolbarSubtitle} />}/>
-          <BlockButton format="blockQuote" icon={() => <FormatQuoteIcon />} />
-          <BlockButton format="numberedList" icon={() => <FormatListNumberedIcon />} />
-          <BlockButton format="bulletedList" icon={() => <FormatListBulletedIcon />} />
-        </Toolbar>
-        <Editable
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          decorate={decorate}
-          placeholder="Enter some rich text…"
-          spellCheck
-          autoFocus
-          onKeyDown={event => {
-            for (const hotkey in HOTKEYS) {
-              if (isHotkey(hotkey, event as any)) {
-                event.preventDefault()
-                const mark = HOTKEYS[hotkey]
-                toggleMark(editor, mark)
-              }
-            }
-          }}
-        />
-        </Slate>
+        {renderSlate()}
       </div>
     </div>
   )
 }
 
 const toggleBlock = (editor, format) => {
-  const isActive = isBlockActive(editor, format)
-  const isList = LIST_TYPES.includes(format)
-
-  Transforms.unwrapNodes(editor, {
-    match: n =>
-      !Editor.isEditor(n) &&
-      SlateElement.isElement(n) &&
-      LIST_TYPES.includes(n.type),
-    split: true,
-  })
-  const newProperties: Partial<SlateElement> = {
-    type: isActive ? 'paragraph' : isList ? 'listItem' : format,
-  }
-  Transforms.setNodes(editor, newProperties)
-
-  if (!isActive && isList) {
-    const block = { type: format, children: [] }
-    Transforms.wrapNodes(editor, block)
-  }
 }
 
 const toggleMark = (editor, format) => {
