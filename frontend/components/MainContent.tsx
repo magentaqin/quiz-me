@@ -4,12 +4,11 @@ import Container from '@mui/material/Container';
 import SearchInput from './SearchInput'
 import QuizTable from './QuizTable'
 import styles from '../styles/Home.module.scss'
-import { ListTagRes } from '../api/question'
 
 export default function MainContent() {
   const [keyword, setKeyword] = useState('')
-  const [tags, setTags] = useState<ListTagRes[]>([])
-  const searchList = (params: string | ListTagRes[]) => {
+  const [tags, setTags] = useState<string[]>([])
+  const searchList = (params: string | string[]) => {
     if (typeof params === 'string') {
       setKeyword(params)
     } else {

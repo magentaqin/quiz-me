@@ -15,7 +15,7 @@ import styles from '../styles/SearchInput.module.scss'
 
 interface Props {
   onInputChange: (value: string) => void;
-  onTagsChange: (value: ListTagRes[]) => void;
+  onTagsChange: (value: string[]) => void;
 }
 
 export default function SearchInput(props: Props) {
@@ -42,15 +42,19 @@ export default function SearchInput(props: Props) {
 
   const handleTagClick = (event: MouseEvent<HTMLElement>) => {
     const activeItem = (event.target as HTMLElement).innerText
+    const activeTags: string[] = []
 
     const newTags = tags.map(item => {
       if (item.name === activeItem) {
         item.active = !item.active
       }
+      if (item.active) {
+        activeTags.push(item.name)
+      }
       return item
     })
     setTags(newTags)
-    props.onTagsChange(newTags)
+    props.onTagsChange(activeTags)
   }
 
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -107,11 +111,11 @@ export default function SearchInput(props: Props) {
           <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
             {tags.map((item) => {
               return (
-                <Chip 
+                <Chip
                   label={item.name}
-                  color="primary" 
+                  color="primary"
                   variant={item.active ? 'filled' : 'outlined'}
-                  key={item.tagId} 
+                  key={item.tagId}
                   className={styles.tagItem}
                   onClick={handleTagClick}
                 />

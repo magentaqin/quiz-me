@@ -25,7 +25,7 @@ const columns: readonly Column[] = [
 
 interface Props {
   keyword: string;
-  tags: ListTagRes[];
+  tags: string[];
 }
 
 export default function QuizTable(props: Props) {
@@ -60,7 +60,7 @@ export default function QuizTable(props: Props) {
         offset,
         count: rowsPerPage,
         keyword: props.keyword || undefined,
-        tags: [],
+        tags: props.tags,
       })
       if (res.data) {
         const questions = res.data.questions.map((item: ListQuestionRes) => {
@@ -73,7 +73,7 @@ export default function QuizTable(props: Props) {
         setRowsData(questions)
       }
     }
-  
+
     fetchQuestions(rowsPerPage*page)
   }, [rowsPerPage, page, props.keyword, props.tags])
 
