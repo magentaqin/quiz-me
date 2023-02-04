@@ -14,7 +14,7 @@ interface Props {
 
 export default function UserForm(props: Props) {
   const { open, setOpen } = props
-  const handleClose = () => {
+  const submit = () => {
     setOpen(false)
   }
   return (
@@ -37,8 +37,7 @@ export default function UserForm(props: Props) {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleClose}>Subscribe</Button>
+          <Button onClick={submit}>Login</Button>
         </DialogActions>
       </Dialog>
     </div>
