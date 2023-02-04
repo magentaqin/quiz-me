@@ -5,7 +5,7 @@ import Stack from '@mui/material/Stack';
 import styles from '../styles/Home.module.scss'
 import UserForm from './UserForm'
 
-type FormType = 'signup' | 'login' | 'question'
+export type FormType = 'signup' | 'login' | 'question'
 
 const NavBar = () => {
     const [formType, setFormType] = useState<FormType>()
@@ -27,7 +27,7 @@ const NavBar = () => {
 				  <Button variant="contained" size="small" onClick={handleLogin}>Login</Button>
 				</Stack>
 			</div>
-       <UserForm open={open} setOpen={setOpen} />
+       <UserForm open={open} setOpen={setOpen} formType={formType}/>
       </Fragment>
     )
 }
