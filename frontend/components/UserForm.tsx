@@ -7,12 +7,13 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Alert from '@mui/material/Alert';
 import { FormType } from './Navbar'
-import { signupApi, loginApi } from '../api/user'
+import { signupApi, loginApi, UserRes } from '../api/user'
 
 interface Props {
   open: boolean;
   setOpen: (val: boolean) => void;
   formType: FormType;
+  setUserInfo: (username: UserRes) => void;
 }
 
 export default function UserForm(props: Props) {
@@ -24,8 +25,9 @@ export default function UserForm(props: Props) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  const handleSuccess = () => {
+  const handleSuccess = (data: UserRes) => {
     setShowSuccessMsg(true)
+    props.setUserInfo(data)
     let timer = setTimeout(() => {
       clearTimeout(timer)
       setShowSuccessMsg(false)
@@ -51,7 +53,7 @@ export default function UserForm(props: Props) {
       signupApi(params).then((res) => {
         if (res?.data?.token) {
           localStorage.setItem('quizme_token', res.data.token)
-          handleSuccess()
+          handleSuccess(res?.data)
         }
       }).catch((err) => {
         handleFail(err.response.data.msg)

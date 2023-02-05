@@ -11,7 +11,7 @@ interface LoginReq {
   password: string;
 }
 
-interface LoginRes {
+export interface UserRes {
   token: string;
   userName: string;
   userId: string;
