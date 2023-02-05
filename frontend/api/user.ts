@@ -17,10 +17,10 @@ interface LoginRes {
   userId: string;
 }
 
-export const signupApi = async (params: SignupReq) => {
-  return await axiosInstance.post('/signup', { params })
+export const signupApi = async (data: SignupReq) => {
+  return await axiosInstance.post('/signup', data)
 }
 
-export const loginApi = async (params: LoginReq) => {
-  return await axiosInstance.post('/login', { params })
+export const loginApi = async (data: LoginReq) => {
+  return await axiosInstance.post('/login', data)
 }

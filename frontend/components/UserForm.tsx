@@ -18,15 +18,45 @@ interface Props {
 export default function UserForm(props: Props) {
   const { open, setOpen } = props
   const [title, setTitle] = useState('')
-  const [showAlert, setShowAlert] = useState(false)
+  const [failMsg, setFailMsg] = useState('')
+  const [showSuccessMsg, setShowSuccessMsg] = useState(false)
   const [email, setEmail ] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+
+  const handleSuccess = () => {
+    setShowSuccessMsg(true)
+    let timer = setTimeout(() => {
+      clearTimeout(timer)
+      setShowSuccessMsg(false)
+      setOpen(false)
+    }, 2000)
+  }
+
+  const handleFail = (msg: string) => {
+    setFailMsg(msg)
+    let timer = setTimeout(() => {
+      clearTimeout(timer)
+      setFailMsg('')
+    }, 2000)
+  }
+
   const submit = () => {
     if (props.formType === 'signup') {
-      console.log(email, username, password)
+      const params = {
+        email,
+        userName: username,
+        password
+      }
+      signupApi(params).then((res) => {
+        if (res?.data?.token) {
+          localStorage.setItem('quizme_token', res.data.token)
+          handleSuccess()
+        }
+      }).catch((err) => {
+        handleFail(err.response.data.msg)
+      })
     }
-    setOpen(false)
   }
 
   const handleEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,17 +96,19 @@ export default function UserForm(props: Props) {
             value={email}
             onChange={handleEmail}
           />
-           <TextField
-            autoFocus
-            margin="dense"
-            id="username"
-            label="Username"
-            type="text"
-            fullWidth
-            variant="standard"
-            value={username}
-            onChange={handleUsername}
-          />
+           {props.formType === 'signup' ? (
+            <TextField
+              autoFocus
+              margin="dense"
+              id="username"
+              label="Username"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={username}
+              onChange={handleUsername}
+            />
+           ) : null}
            <TextField
             autoFocus
             margin="dense"
@@ -92,12 +124,17 @@ export default function UserForm(props: Props) {
         <DialogActions>
           <Button onClick={submit}>{title}</Button>
         </DialogActions>
-      </Dialog>
-      {showAlert ? (
-        <Alert severity="success" color="info">
+        {showSuccessMsg ? (
+        <Alert variant="filled" severity="success">
           {title} successfully!
         </Alert>
       ) : null}
+      {failMsg ? (
+         <Alert variant="filled" severity="error">
+         {failMsg}
+       </Alert>
+      ) : null}
+      </Dialog>
     </div>
   );
 }
