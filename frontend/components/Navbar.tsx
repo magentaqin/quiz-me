@@ -9,9 +9,9 @@ import { UserRes } from '../api/user'
 export type FormType = 'signup' | 'login' | 'question'
 
 const NavBar = () => {
-    const [formType, setFormType] = useState<FormType>()
+    const [formType, setFormType] = useState<FormType>('signup')
     const [open, setOpen] = useState(false)
-    const [user, setUser] = useState<UserRes>({})
+    const [user, setUser] = useState<UserRes>({userName: '', token: '', userId: ''})
     const handleSignup = () => {
       setFormType('signup')
       setOpen(true)

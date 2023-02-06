@@ -30,20 +30,20 @@ interface Props {
   fromAnswer?: boolean;
 }
 
-const HOTKEYS = {
+const HOTKEYS: any = {
   'mod+b': 'bold',
   'mod+i': 'italic',
   'mod+u': 'underline',
   'mod+`': 'code',
 }
 
-const getLength = token => {
+const getLength = (token: any) => {
   if (typeof token === 'string') {
     return token.length
   } else if (typeof token.content === 'string') {
     return token.content.length
   } else {
-    return token.content.reduce((l, t) => l + getLength(t), 0)
+    return token.content.reduce((l: any, t: any) => l + getLength(t), 0)
   }
 }
 
@@ -134,7 +134,7 @@ const RichTextEditor = (props: Props) => {
         <Slate
         editor={editor}
         value={value}
-        onChange={value => {
+        onChange={(value: any) => {
         const isAstChange = editor.operations.some(
           op => 'set_selection' !== op.type
         )
@@ -182,10 +182,10 @@ const RichTextEditor = (props: Props) => {
   )
 }
 
-const toggleBlock = (editor, format) => {
+const toggleBlock = (editor: any, format: any) => {
 }
 
-const toggleMark = (editor, format) => {
+const toggleMark = (editor: any, format: any) => {
   const isActive = isMarkActive(editor, format)
 
   if (isActive) {
@@ -195,25 +195,25 @@ const toggleMark = (editor, format) => {
   }
 }
 
-const isBlockActive = (editor, format) => {
+const isBlockActive = (editor: any, format: any) => {
   const { selection } = editor
   if (!selection) return false
 
   const [match] = Editor.nodes(editor, {
     at: Editor.unhangRange(editor, selection),
-    match: n =>
-      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format,
-  })
+    match: (n: any) =>
+      !Editor.isEditor(n) && SlateElement.isElement(n) && ((n as any).type === format),
+  }) as any
 
   return !!match
 }
 
-const isMarkActive = (editor, format) => {
-  const marks = Editor.marks(editor)
+const isMarkActive = (editor: any, format: any) => {
+  const marks = Editor.marks(editor) as any
   return marks ? marks[format] === true : false
 }
 
-const Element = ({ attributes, children, element }) => {
+const Element = ({ attributes, children, element }: any) => {
   switch (element.type) {
     case 'blockQuote':
       return <blockquote {...attributes}><p>{children}</p></blockquote>
@@ -232,7 +232,7 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
-const renderCode = (attributes, children, leaf) => {
+const renderCode = (attributes: any, children: any, leaf: any) => {
   return (
     <span
       {...attributes}
@@ -286,7 +286,7 @@ const renderCode = (attributes, children, leaf) => {
   )
 }
 
-const Leaf = ({ attributes, children, leaf }) => {
+const Leaf = ({ attributes, children, leaf }: any) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }
@@ -310,12 +310,12 @@ const Leaf = ({ attributes, children, leaf }) => {
   return <span {...attributes}>{children}</span>
 }
 
-const BlockButton = ({ format, icon }) => {
+const BlockButton = ({ format, icon }: any) => {
   const editor = useSlate()
   return (
     <Button
       active={isBlockActive(editor, format)}
-      onMouseDown={event => {
+      onMouseDown={(event: any) => {
         event.preventDefault()
         toggleBlock(editor, format)
       }}
@@ -325,12 +325,12 @@ const BlockButton = ({ format, icon }) => {
   )
 }
 
-const MarkButton = ({ format, icon }) => {
+const MarkButton = ({ format, icon }: any) => {
   const editor = useSlate()
   return (
     <Button
       active={isMarkActive(editor, format)}
-      onMouseDown={event => {
+      onMouseDown={(event: any) => {
         event.preventDefault()
         toggleMark(editor, format)
       }}
@@ -340,41 +340,6 @@ const MarkButton = ({ format, icon }) => {
   )
 }
 
-const initialValue: Descendant[] = [
-  {
-    type: 'paragraph',
-    children: [
-      { text: 'This is editable ' },
-      { text: 'rich', bold: true },
-      { text: ' text, ' },
-      { text: 'much', italic: true },
-      { text: ' better than a ' },
-      { text: '<textarea>', 'codeInline': true },
-      { text: '!' },
-    ],
-  },
-  {
-    type: 'paragraph',
-    children: [
-      {
-        text:
-          "Since it's rich text, you can do things like turn a selection of text ",
-      },
-      { text: 'bold', bold: true },
-      {
-        text:
-          ', or add a semantically rendered block quote in the middle of the page, like this:',
-      },
-    ],
-  },
-  {
-    type: 'blockQuote',
-    children: [{ text: 'A wise quote.' }],
-  },
-  {
-    type: 'paragraph',
-    children: [{ text: 'Try it out for yourself!' }],
-  },
-]
+const initialValue: any[] = []
 
 export default RichTextEditor

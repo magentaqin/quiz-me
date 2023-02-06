@@ -10,7 +10,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
-import { listTagsApi, ListTagRes } from '../api/question'
+import { listTagsApi } from '../api/question'
 import styles from '../styles/SearchInput.module.scss'
 
 interface Props {
@@ -20,7 +20,7 @@ interface Props {
 
 export default function SearchInput(props: Props) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [tags, setTags] = useState<ListTagRes[]>([])
+  const [tags, setTags] = useState<{name: string; active: boolean; tagId: string;}[]>([])
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);

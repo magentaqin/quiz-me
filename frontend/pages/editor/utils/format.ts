@@ -1,8 +1,8 @@
 import escapeHtml from 'escape-html'
-import { Text } from 'slate'
+import { Text, Descendant } from 'slate'
 import { jsx } from 'slate-hyperscript'
 
-interface TextNode {
+interface TextNode{
   text: string;
   bold?: boolean;
   italic?: boolean;
@@ -12,13 +12,12 @@ interface TextNode {
 }
 
 interface ElementNode {
-  type: string;
+  type?: string;
   children: TextNode[];
 }
 
 // transform slate json-format to html string
-export const serialize = (node: ElementNode | TextNode) => {
-  console.log('node', node)
+export const serialize = (node: ElementNode | TextNode ) => {
   if (Text.isText(node)) {
     let string = escapeHtml(node.text)
     if (node.bold) {
@@ -50,7 +49,7 @@ export const serialize = (node: ElementNode | TextNode) => {
       return `<h1>${children}</h1>`
     case 'headingTwo':
       return `<h2>${children}</h2>`
-    case 'numberedList': 
+    case 'numberedList':
       return `<ol>${children}</ol>`
     case 'bulletedList':
       return `<ul>${children}</ul>`
@@ -69,14 +68,14 @@ export const toSlateJson = (html: string) => {
 }
 
 // transform DOM body to slate json format
-const deserialize = (el: HTMLElement, markAttributes = {}) => {
+const deserialize = (el: HTMLElement, markAttributes = {}): any => {
   if (el.nodeType === Node.TEXT_NODE) {
     return jsx('text', markAttributes, el.textContent)
   } else if (el.nodeType !== Node.ELEMENT_NODE) {
     return null
   }
 
-  const nodeAttributes = { ...markAttributes }
+  const nodeAttributes: any = { ...markAttributes }
 
   // define attributes for text nodes
   switch (el.nodeName) {
@@ -85,7 +84,7 @@ const deserialize = (el: HTMLElement, markAttributes = {}) => {
   }
 
   const children = Array.from(el.childNodes)
-    .map(node => deserialize(node, nodeAttributes))
+    .map((node: any) => deserialize(node, nodeAttributes))
     .flat()
 
   if (children.length === 0) {
@@ -101,9 +100,9 @@ const deserialize = (el: HTMLElement, markAttributes = {}) => {
       return jsx('element', { type: 'blockQuote' }, children)
     case 'P':
       return jsx('element', { type: 'paragraph' }, children)
-    case 'H1': 
+    case 'H1':
       return jsx('element', { type: 'headinOne'}, children)
-    case 'H2': 
+    case 'H2':
       return jsx('element', { type: 'headeingTwo'}, children)
     case 'OL':
       return jsx('element', { type: 'numberedList'}, children)
