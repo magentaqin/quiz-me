@@ -4,9 +4,7 @@ import Prism from 'prismjs'
 import { Editable, withReact, useSlate, Slate } from 'slate-react'
 import {
   Editor,
-  Transforms,
   createEditor,
-  Descendant,
   Element as SlateElement,
   Text,
 } from 'slate'
@@ -22,9 +20,9 @@ import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import DataObjectIcon from '@mui/icons-material/DataObject';
 import { css } from '@emotion/css'
 
-import { Button, Toolbar } from './components'
+import { Button, Toolbar } from '../../components/components'
 import styles from '../../styles/Editor.module.scss'
-import { serialize, toSlateJson } from './utils/format'
+import { serialize, toSlateJson } from '../../utils/format'
 
 interface Props {
   fromAnswer?: boolean;

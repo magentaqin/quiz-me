@@ -8,7 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import { countQuestionApi, listQuestionsApi, ListQuestionRes, ListTagRes } from '../api/question'
-import { unEscape } from '../pages/editor/utils/html';
+import { unEscape } from '../utils/html';
 
 interface Column {
   id: 'title' | 'description';

@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import React, { Ref, PropsWithChildren } from 'react'
+import { Ref, PropsWithChildren, forwardRef, LegacyRef } from 'react'
 import ReactDOM from 'react-dom'
 import { cx, css } from '@emotion/css'
 
@@ -7,9 +7,8 @@ interface BaseProps {
   className: string
   [key: string]: unknown
 }
-type OrNull<T> = T | null
 
-export const Button = React.forwardRef(
+export const Button = forwardRef(
   (
     {
       className,
@@ -22,7 +21,7 @@ export const Button = React.forwardRef(
         reversed: boolean
       } & BaseProps
     >,
-    ref: React.LegacyRef<HTMLDivElement>
+    ref: LegacyRef<HTMLDivElement>
   ) => (
     <span
       {...props}
@@ -44,7 +43,7 @@ export const Button = React.forwardRef(
   )
 )
 
-export const EditorValue = React.forwardRef(
+export const EditorValue = forwardRef(
   (
     {
       className,
@@ -55,7 +54,7 @@ export const EditorValue = React.forwardRef(
         value: any
       } & BaseProps
     >,
-    ref: React.LegacyRef<HTMLDivElement>
+    ref: LegacyRef<HTMLDivElement>
   ) => {
     const textLines = value.document.nodes
       .map((node: any) => node.text)
@@ -101,10 +100,10 @@ export const EditorValue = React.forwardRef(
   }
 )
 
-export const Icon = React.forwardRef(
+export const Icon = forwardRef(
   (
     { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: React.LegacyRef<HTMLDivElement>
+    ref: LegacyRef<HTMLDivElement>
   ) => (
     <span
       {...props}
@@ -121,10 +120,10 @@ export const Icon = React.forwardRef(
   )
 )
 
-export const Instruction = React.forwardRef(
+export const Instruction = forwardRef(
   (
     { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: React.LegacyRef<HTMLDivElement>
+    ref: LegacyRef<HTMLDivElement>
   ) => (
     <div
       {...props}
@@ -143,10 +142,10 @@ export const Instruction = React.forwardRef(
   )
 )
 
-export const Menu = React.forwardRef(
+export const Menu = forwardRef(
   (
     { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: React.LegacyRef<HTMLDivElement>
+    ref: LegacyRef<HTMLDivElement>
   ) => (
     <div
       {...props}
@@ -173,7 +172,7 @@ export const Portal = ({ children }: any) => {
     : null
 }
 
-export const Toolbar = React.forwardRef(
+export const Toolbar = forwardRef(
   (
     { className, ...props }: PropsWithChildren<BaseProps>,
     ref: Ref<HTMLDivElement>

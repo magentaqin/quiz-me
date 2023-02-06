@@ -1,5 +1,5 @@
 import escapeHtml from 'escape-html'
-import { Text, Descendant } from 'slate'
+import { Text } from 'slate'
 import { jsx } from 'slate-hyperscript'
 
 interface TextNode{
