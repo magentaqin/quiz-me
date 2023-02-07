@@ -8,7 +8,7 @@ export default (appInfo: EggAppInfo) => {
   config.keys = appInfo.name + '_1666843940599_6178';
 
   // add your egg config in here
-  config.middleware = ['log'];
+  config.middleware = [ 'log' ];
 
   // add your special config in here
   const bizConfig = {
@@ -16,8 +16,8 @@ export default (appInfo: EggAppInfo) => {
   };
 
 
-  config.security = {} 
-  config.security.csrf = false
+  config.security = {};
+  config.security.csrf = false;
 
   // the return config will combines to EggAppConfig
   return {

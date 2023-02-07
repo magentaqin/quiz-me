@@ -1,9 +1,9 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 const extendedApp = {
   prisma,
-}
+};
 
-export default extendedApp
+export default extendedApp;
