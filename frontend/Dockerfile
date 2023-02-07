@@ -23,5 +23,6 @@ COPY --from=build /build/.next ./.next/
 COPY --from=build /build/public ./public/
 COPY --from=build /build/node_modules ./node_modules/
 COPY --from=build /build/next.config.js ./
+
 EXPOSE 3000
-CMD [“node_modules/.bin/next”, “start”]
+CMD ["npm", "start"]
