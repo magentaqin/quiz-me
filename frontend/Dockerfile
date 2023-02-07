@@ -3,7 +3,8 @@ FROM node:16.17.0 AS base
 WORKDIR /base
 # Install dependencies
 COPY package.json ./
-RUN npm install
+COPY package-lock.json ./
+RUN npm ci
 # Copy project 
 COPY . .
 
