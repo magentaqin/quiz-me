@@ -6,7 +6,7 @@
     "node_modules*"
   ],
   "compilerOptions": {
-    "outDir": "dist",
+    "outDir": "./",
     "strict": true,
     "lib": ["esnext"],
     "esModuleInterop": true
