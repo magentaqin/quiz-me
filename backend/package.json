@@ -15,8 +15,7 @@
     "test-local": "egg-bin test",
     "test": "npm run lint -- --fix && npm run test-local",
     "cov": "egg-bin cov",
-    "tsc": "ets && tsc -p tsconfig.json",
-    "ci": "npm run lint && npm run tsc",
+    "build": "ets && tsc -p tsconfig.json",
     "autod": "autod",
     "lint": "eslint . --ext .ts --resolve-plugins-relative-to . --fix",
     "clean": "tsc -b --clean"
