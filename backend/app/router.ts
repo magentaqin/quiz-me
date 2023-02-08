@@ -5,6 +5,7 @@ export default (app: Application) => {
   /** User */
   router.post('/signup', controller.user.signup);
   router.post('/login', controller.user.login);
+  router.get('/user/info', controller.user.getUserInfo);
 
   /** Question */
   router.post('/question/add', controller.question.addQuestion);

@@ -55,7 +55,6 @@ export default class UserController extends Controller {
       this.ctx.body = {
         token,
         userName,
-        userId,
       };
 
     } catch (err) {
@@ -103,10 +102,40 @@ export default class UserController extends Controller {
       this.ctx.body = {
         token,
         userName: userResp.userName,
-        userId: userResp.userName,
       };
 
     } catch (err) {
+      this.ctx.status = 500;
+      this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
+    }
+  }
+
+  public async getUserInfo() {
+    try {
+      const { prisma } = this.app;
+      // 01 validate whether userId exists
+      const userId = await this.ctx.service.auth.userAuth.getUserId(this.ctx);
+      if (!userId) {
+        this.ctx.status = 401;
+        this.ctx.body = userErrorCodes.USER_NOT_AUTHORIZED;
+      }
+      const userResp = await prisma.user.findUnique({
+        where: {
+          userId,
+        },
+      });
+      if (!userResp) {
+        this.ctx.status = 401;
+        this.ctx.body = userErrorCodes.USER_NOT_EXIST;
+        return;
+      }
+
+      this.ctx.status = 200;
+      this.ctx.body = {
+        userName: userResp.userName,
+      };
+
+    }  catch (err) {
       this.ctx.status = 500;
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
     }
