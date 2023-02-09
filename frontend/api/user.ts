@@ -12,9 +12,9 @@ interface LoginReq {
 }
 
 export interface UserRes {
-  token: string;
+  token?: string;
   userName: string;
-  userId: string;
+  userId?: string;
 }
 
 export const signupApi = async (data: SignupReq) => {
@@ -23,4 +23,8 @@ export const signupApi = async (data: SignupReq) => {
 
 export const loginApi = async (data: LoginReq) => {
   return await axiosInstance.post('/login', data)
+}
+
+export const getUserInfoApi = async () => {
+  return await axiosInstance.get('/user/info')
 }
