@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "egg-bin dev",
+    "migrate:dev": "prisma migrate dev",
     "start": "egg-scripts start --title=quizme-server-backend",
     "stop": "egg-scripts stop --title=quizme-server-backend",
     "debug": "egg-bin debug",
