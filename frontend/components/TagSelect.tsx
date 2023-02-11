@@ -19,7 +19,7 @@ const MenuProps = {
   },
 };
 
-const names = [
+const tags = [
   'javascript',
   'ecmascript-6',
   'typescript',
@@ -36,24 +36,29 @@ const names = [
   'node.js',
 ];
 
-function getStyles(name: string, personName: readonly string[], theme: Theme) {
+function getStyles(name: string, selectedTags: readonly string[], theme: Theme) {
   return {
     fontWeight:
-      personName.indexOf(name) === -1
+      selectedTags.indexOf(name) === -1
         ? theme.typography.fontWeightRegular
         : theme.typography.fontWeightMedium,
   };
 }
 
-export default function MultipleSelectChip() {
-  const theme = useTheme();
-  const [personName, setPersonName] = React.useState<string[]>([]);
+interface Props {
+  selectedTags: string[];
+  setSelectedTags: (tags: string[]) => void;
+}
 
-  const handleChange = (event: SelectChangeEvent<typeof personName>) => {
+export default function MultipleSelectChip(props: Props) {
+  const theme = useTheme();
+
+
+  const handleChange = (event: SelectChangeEvent<typeof props.selectedTags>) => {
     const {
       target: { value },
     } = event;
-    setPersonName(
+    props.setSelectedTags(
       // On autofill we get a stringified value.
       typeof value === 'string' ? value.split(',') : value,
     );
@@ -67,7 +72,7 @@ export default function MultipleSelectChip() {
           labelId="multiple-chip-label"
           id="multiple-chip"
           multiple
-          value={personName}
+          value={props.selectedTags}
           onChange={handleChange}
           input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
           renderValue={(selected) => (
@@ -79,13 +84,13 @@ export default function MultipleSelectChip() {
           )}
           MenuProps={MenuProps}
         >
-          {names.map((name) => (
+          {tags.map((tag) => (
             <MenuItem
-              key={name}
-              value={name}
-              style={getStyles(name, personName, theme)}
+              key={tag}
+              value={tag}
+              style={getStyles(tag, props.selectedTags, theme)}
             >
-              {name}
+              {tag}
             </MenuItem>
           ))}
         </Select>

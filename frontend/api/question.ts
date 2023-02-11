@@ -20,14 +20,20 @@ export interface ListTagRes {
   tagId: string;
 }
 
+export interface AddQuestionReq {
+  tags: string[];
+  title: string;
+  description: string;
+}
+
 
 export const listTagsApi = async () => {
   return await axiosInstance.get('/tag/list')
 }
 
 export const listQuestionsApi = async (params: ListQuestionReq) => {
-  return await axiosInstance.get('/question/list', { 
-    params,   
+  return await axiosInstance.get('/question/list', {
+    params,
     paramsSerializer: {
       serialize: (params) => {
         return qs.stringify(params)
@@ -38,4 +44,8 @@ export const listQuestionsApi = async (params: ListQuestionReq) => {
 
 export const countQuestionApi = async (params: { keyword: string; }) => {
   return await axiosInstance.get('/question/totalCount', { params })
+}
+
+export const addQuestionApi = async (data: AddQuestionReq) => {
+  return await axiosInstance.post('/question/add', data)
 }
