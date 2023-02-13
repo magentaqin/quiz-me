@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useRouter } from 'next/router'
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -21,13 +22,19 @@ export default function QuestionForm(props: Props) {
   const [showSuccessMsg, setShowSuccessMsg] = useState(false)
   const [description, setDescription] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const router = useRouter()
 
-  const handleSuccess = () => {
+
+  const handleSuccess = (id: string) => {
     setShowSuccessMsg(true)
     let timer = setTimeout(() => {
       clearTimeout(timer)
       setShowSuccessMsg(false)
       setOpen(false)
+      router.push({
+        pathname: '/question/[id]',
+        query: { id },
+      })
     }, 2000)
   }
 
@@ -46,8 +53,7 @@ export default function QuestionForm(props: Props) {
       tags: selectedTags
     }
     addQuestionApi(data).then((res) => {
-      console.log(res.data.questionId)
-      handleSuccess()
+      handleSuccess(res.data.questionId)
     }).catch(err => {
       handleFail(err.response.data.msg)
     })

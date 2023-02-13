@@ -49,3 +49,7 @@ export const countQuestionApi = async (params: { keyword: string; }) => {
 export const addQuestionApi = async (data: AddQuestionReq) => {
   return await axiosInstance.post('/question/add', data)
 }
+
+export const getQuestionApi = async (params: { id: string; }) => {
+  return await axiosInstance.get('/question', { params })
+}

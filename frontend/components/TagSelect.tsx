@@ -66,11 +66,12 @@ export default function MultipleSelectChip(props: Props) {
 
   return (
     <div>
-      <FormControl sx={{ m: 1, width: 300 }}>
-        <InputLabel id="multiple-chip-label">Tags</InputLabel>
+      <FormControl sx={{ m: 1, width: 300 }} style={{ marginTop: '20px', marginLeft: '0px' }}>
+        <InputLabel id="multiple-chip-label" size='small'>Tags</InputLabel>
         <Select
           labelId="multiple-chip-label"
           id="multiple-chip"
+          size='small'
           multiple
           value={props.selectedTags}
           onChange={handleChange}

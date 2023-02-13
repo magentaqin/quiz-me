@@ -41,9 +41,14 @@ const NavBar = () => {
     const renderTopRight = () => {
       if (user.userName) {
         return (
-          <Stack direction="row" spacing={2}>
+          <Stack
+            direction="row"
+            spacing={2}
+            justifyContent="center"
+            alignItems="center"
+          >
             <Button variant="contained" size="small" onClick={addQuestion}>Add Question</Button>
-            <h1>{user.userName}</h1>
+            <p>{user.userName}</p>
           </Stack>
         )
       }
