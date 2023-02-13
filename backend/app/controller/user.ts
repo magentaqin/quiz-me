@@ -133,6 +133,7 @@ export default class UserController extends Controller {
       this.ctx.status = 200;
       this.ctx.body = {
         userName: userResp.userName,
+        role: userResp.role
       };
 
     }  catch (err) {

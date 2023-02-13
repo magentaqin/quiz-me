@@ -12,6 +12,7 @@ export default (app: Application) => {
   router.get('/tag/list', controller.question.listQuestionTag);
   router.get('/question/list', controller.question.listQuestion);
   router.get('/question/totalCount', controller.question.countQuestion);
+  router.get('/question', controller.question.getQuestion);
 
   /**
    * Answer

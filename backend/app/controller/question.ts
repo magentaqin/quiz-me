@@ -212,4 +212,28 @@ export default class QuestionController extends Controller {
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
     }
   }
+
+  // Get question by id
+  public async getQuestion() {
+    try {
+      const { prisma } = this.app;
+      const { id } = this.ctx.query;
+      const resp = await prisma.question.findUnique({
+        where: {
+          questionId: id,
+        },
+      });
+      if (resp) {
+        const { title, description } = resp
+        this.ctx.status = 200;
+        this.ctx.body = {
+          title,
+          description
+        }
+     }
+    } catch (err) {
+      this.ctx.status = 500;
+      this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
+    }
+  }
 }
