@@ -9,7 +9,11 @@ import { UserRes, getUserInfoApi } from '../api/user'
 
 export type FormType = 'signup' | 'login' | 'question'
 
-const NavBar = () => {
+interface Props {
+  shouldHideBtn?: boolean;
+}
+
+const NavBar = (props: Props) => {
     const [formType, setFormType] = useState<FormType>('signup')
     const [open, setOpen] = useState(false)
     const [user, setUser] = useState<UserRes>({userName: '', token: '', userId: ''})
@@ -47,7 +51,9 @@ const NavBar = () => {
             justifyContent="center"
             alignItems="center"
           >
-            <Button variant="contained" size="small" onClick={addQuestion}>Add Question</Button>
+            {props.shouldHideBtn ? null : (
+              <Button variant="contained" size="small" onClick={addQuestion}>Add Question</Button>
+            )}
             <p>{user.userName}</p>
           </Stack>
         )

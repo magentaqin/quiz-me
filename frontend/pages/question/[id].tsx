@@ -7,6 +7,8 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { getQuestionApi } from '../../api/question'
+import NavBar from '../../components/Navbar'
+import styles from '../styles/QuestionDetail.module.scss'
 
 const QuestionPage = () => {
   const router = useRouter()
@@ -15,16 +17,24 @@ const QuestionPage = () => {
   const [description, setDescription] = useState('')
 
   useEffect(() => {
-    getQuestionApi({ id: id as string }).then(res => {
-      const { title, description } = res.data
-      setTitle(title)
-      setDescription(description)
-    })
-  }, [])
+    if (id) {
+      getQuestionApi({ id: id as string }).then(res => {
+        const { title, description } = res.data
+        setTitle(title)
+        setDescription(description)
+      })
+    }
+  }, [router.asPath])
 
   return (
     <div>
-      <Card>
+      <NavBar shouldHideBtn={true} />
+      <Card sx={{
+          boxShadow: 1,
+          borderRadius: 2,
+          p: 2,
+          minWidth: 300,
+        }}>
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
           {title}

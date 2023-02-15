@@ -8,6 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Alert from '@mui/material/Alert';
 import { FormType } from './Navbar'
 import { signupApi, loginApi, UserRes } from '../api/user'
+import { refreshToken } from '../api/axios'
 
 interface Props {
   open: boolean;
@@ -53,6 +54,7 @@ export default function UserForm(props: Props) {
       signupApi(params).then((res) => {
         if (res?.data?.token) {
           localStorage.setItem('quizme_token', res.data.token)
+          refreshToken()
           handleSuccess(res?.data)
         }
       }).catch((err) => {
