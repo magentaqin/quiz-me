@@ -125,7 +125,7 @@ export default class UserController extends Controller {
         },
       });
       if (!userResp) {
-        this.ctx.status = 401;
+        this.ctx.status = 200;
         this.ctx.body = userErrorCodes.USER_NOT_EXIST;
         return;
       }

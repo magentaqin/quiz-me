@@ -218,10 +218,17 @@ export default class QuestionController extends Controller {
     try {
       const { prisma } = this.app;
       const { id } = this.ctx.query;
+      if (!id) {
+        this.ctx.status = 400;
+        this.ctx.body = globalErrorCodes.REQUIRED_PARAMETERS_NOT_PROVIDED;
+       return
+      }
       const resp = await prisma.question.findUnique({
         where: {
           questionId: id,
         },
+      }).catch(e => {
+        throw new Error(e);
       });
       if (resp) {
         const { title, description } = resp
