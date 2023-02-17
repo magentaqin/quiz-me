@@ -1,0 +1,45 @@
+version: "3.9"
+services:
+  web:
+    container_name: quizme_web
+    build:
+      context: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+  backend:
+    container_name: quizme_backend
+    build: 
+      context: ./backend
+    environment:
+      DB_PORT:     "${DB_PORT}"
+      DB_USER:     "${DB_USER}"
+      DB_PASSWORD: "${DB_PASS}"
+      DB_NAME:     "${DB_NAME}"
+      DATABASE_URL: "${DATABASE_URL}"
+    ports:
+      - "7001:7001" # Expose port 7001 on host
+    # depends_on only guarantee database service run before backend service, but not guarantee the database service is ready.
+    depends_on:
+      - db
+    networks:
+      - app-network
+  db:
+    container_name: quizme_db
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASS}"
+      MYSQL_DATABASE: "${DB_NAME}"
+      MYSQL_USER:     "${DB_USER}"
+      MYSQL_PASSWORD: "${DB_PASS}"
+    ports:
+      - "3306:3306" # Expose port 3306
+    networks:
+      - app-network
+
+networks: # Specify the network for bridging
+  app-network:
+    driver: bridge
