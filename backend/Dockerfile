@@ -1,9 +1,12 @@
 # STAGE 1: install
-FROM node:16.17.0 AS base
+FROM node:17 AS base
 WORKDIR /base
 # Install dependencies
 COPY package.json ./
 COPY package-lock.json ./
+# This makes sure to not only copy the schema.prisma into the Docker image,
+# but also includes the migrations directory. 
+# This is necessary as prisma migrate deploy only executes the migration history files.
 COPY prisma ./prisma/ 
 RUN npm ci
 # Copy project 
@@ -23,4 +26,4 @@ WORKDIR /app
 COPY --from=build /build ./
 
 EXPOSE 7001
-CMD ["npm", "start"]
+CMD [ "./run.sh" ]
