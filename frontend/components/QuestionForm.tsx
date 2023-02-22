@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { useRouter } from 'next/router'
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Alert from '@mui/material/Alert';
-import { addQuestionApi } from '../api/question'
-import TagSelect from './TagSelect'
+import { useState } from "react";
+import { useRouter } from "next/router";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Alert from "@mui/material/Alert";
+import { addQuestionApi } from "../api/question";
+import TagSelect from "./TagSelect";
 
 interface Props {
   open: boolean;
@@ -16,53 +16,53 @@ interface Props {
 }
 
 export default function QuestionForm(props: Props) {
-  const { open, setOpen } = props
-  const [title, setTitle] = useState('')
-  const [failMsg, setFailMsg] = useState('')
-  const [showSuccessMsg, setShowSuccessMsg] = useState(false)
-  const [description, setDescription] = useState('')
+  const { open, setOpen } = props;
+  const [title, setTitle] = useState("");
+  const [failMsg, setFailMsg] = useState("");
+  const [showSuccessMsg, setShowSuccessMsg] = useState(false);
+  const [description, setDescription] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const router = useRouter()
-
+  const router = useRouter();
 
   const handleSuccess = (id: string) => {
-    setShowSuccessMsg(true)
+    setShowSuccessMsg(true);
     let timer = setTimeout(() => {
-      clearTimeout(timer)
-      setShowSuccessMsg(false)
-      setOpen(false)
+      clearTimeout(timer);
+      setShowSuccessMsg(false);
+      setOpen(false);
       router.push({
-        pathname: '/question/[id]',
+        pathname: "/question/[id]",
         query: { id },
-      })
-    }, 2000)
-  }
+      });
+    }, 2000);
+  };
 
   const handleFail = (msg: string) => {
-    setFailMsg(msg)
+    setFailMsg(msg);
     let timer = setTimeout(() => {
-      clearTimeout(timer)
-      setFailMsg('')
-    }, 2000)
-  }
+      clearTimeout(timer);
+      setFailMsg("");
+    }, 2000);
+  };
 
   const submit = () => {
     const data = {
       title,
       description,
-      tags: selectedTags
-    }
-    addQuestionApi(data).then((res) => {
-      handleSuccess(res.data.questionId)
-    }).catch(err => {
-      handleFail(err.response.data.msg)
-    })
-  }
+      tags: selectedTags,
+    };
+    addQuestionApi(data)
+      .then((res) => {
+        handleSuccess(res.data.questionId);
+      })
+      .catch((err) => {
+        handleFail(err.response.data.msg);
+      });
+  };
 
   const handleTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
   };
-
 
   const handleDescription = (event: React.ChangeEvent<HTMLInputElement>) => {
     setDescription(event.target.value);
@@ -99,15 +99,15 @@ export default function QuestionForm(props: Props) {
           <Button onClick={submit}>Add Question</Button>
         </DialogActions>
         {showSuccessMsg ? (
-        <Alert variant="filled" severity="success">
-          Add question successfully!
-        </Alert>
-      ) : null}
-      {failMsg ? (
-         <Alert variant="filled" severity="error">
-         {failMsg}
-       </Alert>
-      ) : null}
+          <Alert variant="filled" severity="success">
+            Add question successfully!
+          </Alert>
+        ) : null}
+        {failMsg ? (
+          <Alert variant="filled" severity="error">
+            {failMsg}
+          </Alert>
+        ) : null}
       </Dialog>
     </div>
   );

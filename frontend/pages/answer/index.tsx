@@ -1,11 +1,11 @@
-import Editor from '../editor/Editor'
+import Editor from "../editor/Editor";
 
 const AnswerPage = () => {
   return (
     <div>
-      <Editor fromAnswer={true}/>
+      <Editor fromAnswer={true} />
     </div>
-  )
-}
+  );
+};
 
-export default AnswerPage
+export default AnswerPage;

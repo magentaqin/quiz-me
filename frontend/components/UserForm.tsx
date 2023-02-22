@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import Alert from '@mui/material/Alert';
-import { FormType } from './Navbar'
-import { signupApi, loginApi, UserRes } from '../api/user'
-import { refreshToken } from '../api/axios'
+import { useState, useEffect } from "react";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import Alert from "@mui/material/Alert";
+import { FormType } from "./Navbar";
+import { signupApi, loginApi, UserRes } from "../api/user";
+import { refreshToken } from "../api/axios";
 
 interface Props {
   open: boolean;
@@ -18,50 +18,52 @@ interface Props {
 }
 
 export default function UserForm(props: Props) {
-  const { open, setOpen } = props
-  const [title, setTitle] = useState('')
-  const [failMsg, setFailMsg] = useState('')
-  const [showSuccessMsg, setShowSuccessMsg] = useState(false)
-  const [email, setEmail ] = useState('')
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const { open, setOpen } = props;
+  const [title, setTitle] = useState("");
+  const [failMsg, setFailMsg] = useState("");
+  const [showSuccessMsg, setShowSuccessMsg] = useState(false);
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSuccess = (data: UserRes) => {
-    setShowSuccessMsg(true)
-    props.setUserInfo(data)
+    setShowSuccessMsg(true);
+    props.setUserInfo(data);
     let timer = setTimeout(() => {
-      clearTimeout(timer)
-      setShowSuccessMsg(false)
-      setOpen(false)
-    }, 2000)
-  }
+      clearTimeout(timer);
+      setShowSuccessMsg(false);
+      setOpen(false);
+    }, 2000);
+  };
 
   const handleFail = (msg: string) => {
-    setFailMsg(msg)
+    setFailMsg(msg);
     let timer = setTimeout(() => {
-      clearTimeout(timer)
-      setFailMsg('')
-    }, 2000)
-  }
+      clearTimeout(timer);
+      setFailMsg("");
+    }, 2000);
+  };
 
   const submit = () => {
-    if (props.formType === 'signup') {
+    if (props.formType === "signup") {
       const params = {
         email,
         userName: username,
-        password
-      }
-      signupApi(params).then((res) => {
-        if (res?.data?.token) {
-          localStorage.setItem('quizme_token', res.data.token)
-          refreshToken()
-          handleSuccess(res?.data)
-        }
-      }).catch((err) => {
-        handleFail(err.response.data.msg)
-      })
+        password,
+      };
+      signupApi(params)
+        .then((res) => {
+          if (res?.data?.token) {
+            localStorage.setItem("quizme_token", res.data.token);
+            refreshToken();
+            handleSuccess(res?.data);
+          }
+        })
+        .catch((err) => {
+          handleFail(err.response.data.msg);
+        });
     }
-  }
+  };
 
   const handleEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value);
@@ -77,12 +79,12 @@ export default function UserForm(props: Props) {
 
   useEffect(() => {
     if (props.formType === "signup") {
-      setTitle('Sign Up')
+      setTitle("Sign Up");
     }
     if (props.formType === "login") {
-      setTitle('Login')
+      setTitle("Login");
     }
-  }, [props.formType])
+  }, [props.formType]);
 
   return (
     <div>
@@ -100,7 +102,7 @@ export default function UserForm(props: Props) {
             value={email}
             onChange={handleEmail}
           />
-           {props.formType === 'signup' ? (
+          {props.formType === "signup" ? (
             <TextField
               autoFocus
               margin="dense"
@@ -112,8 +114,8 @@ export default function UserForm(props: Props) {
               value={username}
               onChange={handleUsername}
             />
-           ) : null}
-           <TextField
+          ) : null}
+          <TextField
             autoFocus
             margin="dense"
             id="password"
@@ -129,15 +131,15 @@ export default function UserForm(props: Props) {
           <Button onClick={submit}>{title}</Button>
         </DialogActions>
         {showSuccessMsg ? (
-        <Alert variant="filled" severity="success">
-          {title} successfully!
-        </Alert>
-      ) : null}
-      {failMsg ? (
-         <Alert variant="filled" severity="error">
-         {failMsg}
-       </Alert>
-      ) : null}
+          <Alert variant="filled" severity="success">
+            {title} successfully!
+          </Alert>
+        ) : null}
+        {failMsg ? (
+          <Alert variant="filled" severity="error">
+            {failMsg}
+          </Alert>
+        ) : null}
       </Dialog>
     </div>
   );

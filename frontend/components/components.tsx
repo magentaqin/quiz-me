@@ -1,11 +1,11 @@
 /* eslint-disable react/display-name */
-import { Ref, PropsWithChildren, forwardRef, LegacyRef } from 'react'
-import ReactDOM from 'react-dom'
-import { cx, css } from '@emotion/css'
+import { Ref, PropsWithChildren, forwardRef, LegacyRef } from "react";
+import ReactDOM from "react-dom";
+import { cx, css } from "@emotion/css";
 
 interface BaseProps {
-  className: string
-  [key: string]: unknown
+  className: string;
+  [key: string]: unknown;
 }
 
 export const Button = forwardRef(
@@ -17,8 +17,8 @@ export const Button = forwardRef(
       ...props
     }: PropsWithChildren<
       {
-        active: boolean
-        reversed: boolean
+        active: boolean;
+        reversed: boolean;
       } & BaseProps
     >,
     ref: LegacyRef<HTMLDivElement>
@@ -30,18 +30,12 @@ export const Button = forwardRef(
         className,
         css`
           cursor: pointer;
-          color: ${reversed
-            ? active
-              ? 'white'
-              : '#aaa'
-            : active
-            ? 'black'
-            : '#ccc'};
+          color: ${reversed ? (active ? "white" : "#aaa") : active ? "black" : "#ccc"};
         `
       )}
     />
   )
-)
+);
 
 export const EditorValue = forwardRef(
   (
@@ -51,7 +45,7 @@ export const EditorValue = forwardRef(
       ...props
     }: PropsWithChildren<
       {
-        value: any
+        value: any;
       } & BaseProps
     >,
     ref: LegacyRef<HTMLDivElement>
@@ -59,7 +53,7 @@ export const EditorValue = forwardRef(
     const textLines = value.document.nodes
       .map((node: any) => node.text)
       .toArray()
-      .join('\n')
+      .join("\n");
     return (
       <div
         ref={ref}
@@ -96,20 +90,17 @@ export const EditorValue = forwardRef(
           {textLines}
         </div>
       </div>
-    )
+    );
   }
-)
+);
 
 export const Icon = forwardRef(
-  (
-    { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: LegacyRef<HTMLDivElement>
-  ) => (
+  ({ className, ...props }: PropsWithChildren<BaseProps>, ref: LegacyRef<HTMLDivElement>) => (
     <span
       {...props}
       ref={ref}
       className={cx(
-        'material-icons',
+        "material-icons",
         className,
         css`
           font-size: 18px;
@@ -118,13 +109,10 @@ export const Icon = forwardRef(
       )}
     />
   )
-)
+);
 
 export const Instruction = forwardRef(
-  (
-    { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: LegacyRef<HTMLDivElement>
-  ) => (
+  ({ className, ...props }: PropsWithChildren<BaseProps>, ref: LegacyRef<HTMLDivElement>) => (
     <div
       {...props}
       ref={ref}
@@ -140,13 +128,10 @@ export const Instruction = forwardRef(
       )}
     />
   )
-)
+);
 
 export const Menu = forwardRef(
-  (
-    { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: LegacyRef<HTMLDivElement>
-  ) => (
+  ({ className, ...props }: PropsWithChildren<BaseProps>, ref: LegacyRef<HTMLDivElement>) => (
     <div
       {...props}
       ref={ref}
@@ -164,19 +149,14 @@ export const Menu = forwardRef(
       )}
     />
   )
-)
+);
 
 export const Portal = ({ children }: any) => {
-  return typeof document === 'object'
-    ? ReactDOM.createPortal(children, document.body)
-    : null
-}
+  return typeof document === "object" ? ReactDOM.createPortal(children, document.body) : null;
+};
 
 export const Toolbar = forwardRef(
-  (
-    { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: Ref<HTMLDivElement>
-  ) => (
+  ({ className, ...props }: PropsWithChildren<BaseProps>, ref: Ref<HTMLDivElement>) => (
     <Menu
       {...props}
       ref={ref}
@@ -192,4 +172,4 @@ export const Toolbar = forwardRef(
       )}
     />
   )
-)
+);

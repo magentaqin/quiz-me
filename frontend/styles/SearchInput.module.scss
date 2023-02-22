@@ -1,15 +1,15 @@
 .tagPopup {
-	height: 400px;
-	width: 350px;
-	padding: 16px;
-	overflow-x: hidden;
-	overflow-y: auto;
+  height: 400px;
+  width: 350px;
+  padding: 16px;
+  overflow-x: hidden;
+  overflow-y: auto;
 
-	.tagItem {
-		margin-bottom: 8px;
+  .tagItem {
+    margin-bottom: 8px;
 
-		&:nth-last-of-type(4n+1) {
-			margin-left: 0;
-		}
-	}
+    &:nth-last-of-type(4n + 1) {
+      margin-left: 0;
+    }
+  }
 }

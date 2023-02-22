@@ -1,4 +1,4 @@
-import { axiosInstance } from "./axios"
+import { axiosInstance } from "./axios";
 
 interface SignupReq {
   email: string;
@@ -18,13 +18,13 @@ export interface UserRes {
 }
 
 export const signupApi = async (data: SignupReq) => {
-  return await axiosInstance.post('/signup', data)
-}
+  return await axiosInstance.post("/signup", data);
+};
 
 export const loginApi = async (data: LoginReq) => {
-  return await axiosInstance.post('/login', data)
-}
+  return await axiosInstance.post("/login", data);
+};
 
 export const getUserInfoApi = async () => {
-  return await axiosInstance.get('/user/info')
-}
+  return await axiosInstance.get("/user/info");
+};
