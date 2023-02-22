@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
+import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { getQuestionApi } from '../../api/question'
@@ -31,22 +31,29 @@ const QuestionPage = () => {
       <NavBar shouldHideBtn={true} />
       <Card sx={{
           boxShadow: 1,
-          borderRadius: 2,
+          borderRadius: 0,
           p: 2,
           minWidth: 300,
-        }}>
-      <CardContent>
-        <Typography gutterBottom variant="h5" component="div">
-          {title}
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          {description}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        <Button size="small">Add Answer</Button>
-      </CardActions>
-    </Card>
+          paddingLeft: 45,
+          paddingRight: 45,
+          paddingBottom: 5
+        }}
+       >
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="div">
+            {title}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {description}
+          </Typography>
+        </CardContent>
+        <CardActions style={{ position: 'relative' }}>
+          <Button size="small" variant="contained" style={{ position: 'absolute', left: '16px' }}>Add Answer</Button>
+        </CardActions>
+      </Card>
+      <Container fixed>
+        <h1>empty</h1>
+      </Container>
     </div>
   )
 }
