@@ -6,6 +6,7 @@ import CardContent from "@mui/material/CardContent";
 import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+import dynamic from "next/dynamic";
 import { getQuestionApi } from "../../api/question";
 import NavBar from "../../components/Navbar";
 import styles from "../styles/QuestionDetail.module.scss";
@@ -15,6 +16,8 @@ const QuestionPage = () => {
   const { id } = router.query;
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [showEditor, setShowEditor] = useState(false)
+  const Editor = dynamic(() => import("../../components/editor/Editor"), { ssr: false });
 
   useEffect(() => {
     if (id) {
@@ -25,6 +28,16 @@ const QuestionPage = () => {
       });
     }
   }, [router.asPath, id]);
+
+  const showQuestionEditor = () => {
+    setShowEditor(true)
+  };
+
+  const renderEditor = () => {
+    return (
+      <Editor />
+    )
+  }
 
   return (
     <div>
@@ -49,13 +62,18 @@ const QuestionPage = () => {
           </Typography>
         </CardContent>
         <CardActions style={{ position: "relative" }}>
-          <Button size="small" variant="contained" style={{ position: "absolute", left: "16px" }}>
+          <Button
+            size="small"
+            variant="contained"
+            style={{ position: "absolute", left: "16px" }}
+            onClick={showQuestionEditor}
+          >
             Add Answer
           </Button>
         </CardActions>
       </Card>
       <Container fixed>
-        <h1>empty</h1>
+        {showEditor ? renderEditor() : null}
       </Container>
     </div>
   );

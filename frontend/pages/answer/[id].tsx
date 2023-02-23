@@ -1,4 +1,4 @@
-import Editor from "../editor/Editor";
+import Editor from "../../components/editor/Editor";
 
 const AnswerPage = () => {
   return (
