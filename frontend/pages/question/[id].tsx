@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography";
 import dynamic from "next/dynamic";
 import { getQuestionApi } from "../../api/question";
 import NavBar from "../../components/Navbar";
+import Footer from "../../components/editor/Footer";
 import styles from "../styles/QuestionDetail.module.scss";
 
 const QuestionPage = () => {
@@ -16,7 +17,7 @@ const QuestionPage = () => {
   const { id } = router.query;
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [showEditor, setShowEditor] = useState(false)
+  const [showEditor, setShowEditor] = useState(false);
   const Editor = dynamic(() => import("../../components/editor/Editor"), { ssr: false });
 
   useEffect(() => {
@@ -30,14 +31,17 @@ const QuestionPage = () => {
   }, [router.asPath, id]);
 
   const showQuestionEditor = () => {
-    setShowEditor(true)
+    setShowEditor(true);
   };
 
   const renderEditor = () => {
     return (
-      <Editor />
-    )
-  }
+      <div>
+        <Editor />
+        <Footer />
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -72,9 +76,9 @@ const QuestionPage = () => {
           </Button>
         </CardActions>
       </Card>
-      <Container fixed>
-        {showEditor ? renderEditor() : null}
-      </Container>
+      <div style={{ backgroundColor: "#eee" }}>
+        <Container fixed>{showEditor ? renderEditor() : null}</Container>
+      </div>
     </div>
   );
 };
