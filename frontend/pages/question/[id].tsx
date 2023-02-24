@@ -10,7 +10,6 @@ import dynamic from "next/dynamic";
 import { getQuestionApi } from "../../api/question";
 import NavBar from "../../components/Navbar";
 import Footer from "../../components/editor/Footer";
-import styles from "../styles/QuestionDetail.module.scss";
 
 const QuestionPage = () => {
   const router = useRouter();
@@ -69,7 +68,7 @@ const QuestionPage = () => {
           <Button
             size="small"
             variant="contained"
-            style={{ position: "absolute", left: "16px" }}
+            style={{ position: "absolute", left: "16px", backgroundColor: "#1976d2" }}
             onClick={showQuestionEditor}
           >
             Add Answer

@@ -105,14 +105,9 @@ const RichTextEditor = (props: Props) => {
     [language]
   );
 
-  const submit = () => {
-    console.log("submit!", htmlString);
-  };
-
   const renderToolbar = () => {
     return (
       <Toolbar className={styles.toolbar}>
-        <button onClick={submit}>Submit</button>
         <MarkButton format="bold" icon={() => <FormatBoldIcon />} />
         <MarkButton format="italic" icon={() => <FormatItalicIcon />} />
         <MarkButton format="underline" icon={() => <FormatUnderlinedIcon />} />
