@@ -42,7 +42,6 @@ const getLength = (token: any) => {
 
 const RichTextEditor = (props: Props) => {
   const [language, setLanguage] = useState("js");
-  const [htmlString, setHtmlString] = useState("");
   const [value, setValue] = useState(initialValue);
   const [showSlate, setShowSlate] = useState(false);
 
@@ -140,7 +139,6 @@ const RichTextEditor = (props: Props) => {
               localStorage.setItem("content", content);
               console.log("editor value", value);
               const serializedVal = serialize({ children: value });
-              setHtmlString(serializedVal);
               console.log("htmlstring", serializedVal);
               console.log("slate json", toSlateJson(serializedVal));
             }
