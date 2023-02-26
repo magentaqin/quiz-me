@@ -7,12 +7,18 @@ import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import CardMedia from "@mui/material/CardMedia";
+import ListItemButton from "@mui/material/ListItemButton";
+import { CardActionArea } from "@mui/material";
 import dynamic from "next/dynamic";
 import { getQuestionApi } from "../../api/question";
-import { addAnswerApi } from "../../api/answer"
+import { addAnswerApi } from "../../api/answer";
 import NavBar from "../../components/Navbar";
 import Footer from "../../components/editor/Footer";
 import { serialize } from "../../utils/format";
+import { unEscape } from "../../utils/html";
 
 const QuestionPage = () => {
   const router = useRouter();
@@ -43,24 +49,24 @@ const QuestionPage = () => {
     let timer = setTimeout(() => {
       clearTimeout(timer);
       setShowSuccessMsg(false);
-      setShowEditor(false)
+      setShowEditor(false);
     }, 2000);
   };
 
-
   const submitAnswer = () => {
-    const value: any = localStorage.getItem("content")
+    const value: any = localStorage.getItem("content");
     if (value) {
       const serializedVal = serialize({ children: JSON.parse(value) });
-      console.log('submit', serializedVal)
-      addAnswerApi({ questionId: id as string, content: serializedVal}).then((res) => {
-        handleSuccess()
-      })
-      .catch((err) => {
-        handleFail(err.response.data.msg);
-      });
+      console.log("submit", serializedVal);
+      addAnswerApi({ questionId: id as string, content: serializedVal })
+        .then((res) => {
+          handleSuccess();
+        })
+        .catch((err) => {
+          handleFail(err.response.data.msg);
+        });
     }
-  }
+  };
 
   const handleFail = (msg: string) => {
     setFailMsg(msg);
@@ -74,7 +80,7 @@ const QuestionPage = () => {
     return (
       <div className="flex justify-center relative">
         <Editor />
-        <Footer onSubmit={submitAnswer}/>
+        <Footer onSubmit={submitAnswer} />
         {showSuccessMsg ? (
           <Alert variant="filled" severity="success" className="fixed top-96">
             Add question successfully!
@@ -85,6 +91,35 @@ const QuestionPage = () => {
             {failMsg}
           </Alert>
         ) : null}
+      </div>
+    );
+  };
+
+  const renderList = () => {
+    const content = `&lt;p&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;&lt;/p&gt;`;
+    const html = { __html: unEscape(content.slice(0, 200)) };
+    return (
+      <div className="py-6">
+        <Card sx={{ maxWidth: 345 }}>
+          <CardActionArea className="py-3" >
+            <div className="flex justify-center">
+              <CardMedia
+                component="img"
+                alt="green iguana"
+                style={{ width: "50px" }}
+                image="/pen.jpeg"
+              />
+            </div>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                <div dangerouslySetInnerHTML={html}></div>
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <Button size="small">Details</Button>
+            </CardActions>
+          </CardActionArea>
+        </Card>
       </div>
     );
   };
@@ -122,8 +157,8 @@ const QuestionPage = () => {
           </Button>
         </CardActions>
       </Card>
-      <div style={{ backgroundColor: "#eee" }}>
-        <Container fixed>{showEditor ? renderEditor() : null}</Container>
+      <div style={{ backgroundColor: showEditor ? "#eee" : "rgba(18,18,18,0)", height: "100vh" }}>
+        <Container fixed>{showEditor ? renderEditor() : renderList()}</Container>
       </div>
     </div>
   );
