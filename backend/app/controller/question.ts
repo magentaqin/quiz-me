@@ -221,7 +221,7 @@ export default class QuestionController extends Controller {
       if (!id) {
         this.ctx.status = 400;
         this.ctx.body = globalErrorCodes.REQUIRED_PARAMETERS_NOT_PROVIDED;
-       return
+        return;
       }
       const resp = await prisma.question.findUnique({
         where: {
@@ -231,13 +231,13 @@ export default class QuestionController extends Controller {
         throw new Error(e);
       });
       if (resp) {
-        const { title, description } = resp
+        const { title, description } = resp;
         this.ctx.status = 200;
         this.ctx.body = {
           title,
-          description
-        }
-     }
+          description,
+        };
+      }
     } catch (err) {
       this.ctx.status = 500;
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;

@@ -73,4 +73,28 @@ export default class AnswerController extends Controller {
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
     }
   }
+
+  public async listAnswer() {
+    try {
+      const { prisma } = this.app;
+      const { questionId, offset, count } = this.ctx.query;
+      const resp = await prisma.answer.findMany({
+        where: {
+          questionId,
+        },
+        skip: Number(offset),
+        take: Number(count),
+        select: {
+          answerId: true,
+          content: true,
+        },
+      });
+      if (resp) {
+        console.log('resp', resp);
+      }
+    } catch (err) {
+      this.ctx.status = 500;
+      this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
+    }
+  }
 }

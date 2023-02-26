@@ -19,4 +19,5 @@ export default (app: Application) => {
    */
   router.post('/answer/add', controller.answer.addAnswer);
   router.get('/answer', controller.answer.getAnswer);
+  router.get('/answer/list', controller.answer.listAnswer);
 };
