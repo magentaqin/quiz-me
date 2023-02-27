@@ -11,7 +11,7 @@ import CardMedia from "@mui/material/CardMedia";
 import { CardActionArea } from "@mui/material";
 import dynamic from "next/dynamic";
 import { getQuestionApi } from "../../api/question";
-import { addAnswerApi, listAnswerApi, getAnswerApi } from "../../api/answer";
+import { addAnswerApi, listAnswerApi, getAnswerApi, ListAnswerRes } from "../../api/answer";
 import NavBar from "../../components/Navbar";
 import Footer from "../../components/editor/Footer";
 import { serialize } from "../../utils/format";
@@ -24,7 +24,7 @@ const QuestionPage = () => {
   const [description, setDescription] = useState("");
   const [showEditor, setShowEditor] = useState(false);
   const [failMsg, setFailMsg] = useState("");
-  const [answerList, setAnswerList] = useState([])
+  const [answerList, setAnswerList] = useState<ListAnswerRes[]>([]);
   const [showSuccessMsg, setShowSuccessMsg] = useState(false);
   const Editor = dynamic(() => import("../../components/editor/Editor"), { ssr: false });
 
@@ -35,12 +35,11 @@ const QuestionPage = () => {
         setTitle(title);
         setDescription(description);
       });
-      listAnswerApi({ questionId: id as string, offset: 0, count: 20}).then((res) => {
-        console.log('res∂', res.data)
+      listAnswerApi({ questionId: id as string, offset: 0, count: 20 }).then((res) => {
         if (Array.isArray(res.data)) {
-          setAnswerList(res.data)
+          setAnswerList(res.data);
         }
-      })
+      });
     }
   }, [router.asPath, id]);
 
@@ -54,6 +53,7 @@ const QuestionPage = () => {
       clearTimeout(timer);
       setShowSuccessMsg(false);
       setShowEditor(false);
+      localStorage.removeItem("content");
     }, 2000);
   };
 
@@ -64,9 +64,17 @@ const QuestionPage = () => {
       console.log("submit", serializedVal);
       addAnswerApi({ questionId: id as string, content: serializedVal })
         .then((res) => {
-          getAnswerApi({}).then(() => {
-
-          })
+          const { answerId } = res.data;
+          getAnswerApi({ id: answerId }).then((answerResp) => {
+            if (answerResp?.data) {
+              const newItem = {
+                answerId,
+                content: answerResp?.data.content,
+              };
+              const newAnswerList = [newItem, ...answerList];
+              setAnswerList(newAnswerList);
+            }
+          });
           handleSuccess();
         })
         .catch((err) => {
@@ -105,29 +113,34 @@ const QuestionPage = () => {
   const renderList = () => {
     return (
       <div className="py-6 flex flex-wrap justify-evenly">
-        {
-          answerList.map(item => {
-            return (
-              <Card sx={{ maxWidth: 320 }} key={item.answerId} className="mb-8">
-          <CardActionArea className="py-3" >
-            <div className="flex justify-center">
-              <CardMedia
-                component="img"
-                alt="green iguana"
-                style={{ width: "50px" }}
-                image="/pen.jpeg"
-              />
-            </div>
-            <CardContent style={{ height: '10vh', overflow: 'hidden'}}>
-              <Typography variant="body2" color="text.secondary" component={'span'}>
-                <span dangerouslySetInnerHTML={{__html: unEscape(item.content.slice(0, 300))}}></span>
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-        </Card>
-            )
-          })
-        }
+        {answerList.map((item) => {
+          return (
+            <Card sx={{ width: 320 }} key={item.answerId} className="mb-8">
+              <CardActionArea className="py-3">
+                <div className="flex justify-center">
+                  <CardMedia
+                    component="img"
+                    alt="green iguana"
+                    style={{ width: "50px" }}
+                    image="/pen.jpeg"
+                  />
+                </div>
+                <CardContent>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    component={"span"}
+                    style={{ height: "10vh", overflow: "hidden" }}
+                  >
+                    <span
+                      dangerouslySetInnerHTML={{ __html: unEscape(item.content.slice(0, 300)) }}
+                    ></span>
+                  </Typography>
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          );
+        })}
       </div>
     );
   };
@@ -137,7 +150,7 @@ const QuestionPage = () => {
       <NavBar shouldHideBtn={true} />
       <Card
         sx={{
-          boxShadow: 0,
+          boxShadow: 1,
           borderRadius: 0,
           p: 2,
           minWidth: 300,
