@@ -7,14 +7,11 @@ import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
 import CardMedia from "@mui/material/CardMedia";
-import ListItemButton from "@mui/material/ListItemButton";
 import { CardActionArea } from "@mui/material";
 import dynamic from "next/dynamic";
 import { getQuestionApi } from "../../api/question";
-import { addAnswerApi } from "../../api/answer";
+import { addAnswerApi, listAnswerApi, getAnswerApi } from "../../api/answer";
 import NavBar from "../../components/Navbar";
 import Footer from "../../components/editor/Footer";
 import { serialize } from "../../utils/format";
@@ -27,6 +24,7 @@ const QuestionPage = () => {
   const [description, setDescription] = useState("");
   const [showEditor, setShowEditor] = useState(false);
   const [failMsg, setFailMsg] = useState("");
+  const [answerList, setAnswerList] = useState([])
   const [showSuccessMsg, setShowSuccessMsg] = useState(false);
   const Editor = dynamic(() => import("../../components/editor/Editor"), { ssr: false });
 
@@ -37,6 +35,12 @@ const QuestionPage = () => {
         setTitle(title);
         setDescription(description);
       });
+      listAnswerApi({ questionId: id as string, offset: 0, count: 20}).then((res) => {
+        console.log('res∂', res.data)
+        if (Array.isArray(res.data)) {
+          setAnswerList(res.data)
+        }
+      })
     }
   }, [router.asPath, id]);
 
@@ -60,6 +64,9 @@ const QuestionPage = () => {
       console.log("submit", serializedVal);
       addAnswerApi({ questionId: id as string, content: serializedVal })
         .then((res) => {
+          getAnswerApi({}).then(() => {
+
+          })
           handleSuccess();
         })
         .catch((err) => {
@@ -96,11 +103,12 @@ const QuestionPage = () => {
   };
 
   const renderList = () => {
-    const content = `&lt;p&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;adfadfadfadsfddddddddddddfdadafsdsCan you describe som&lt;strong&gt;ethin? dddaadddadfdafd多123123adfasdf&lt;/strong&gt;&lt;/p&gt;`;
-    const html = { __html: unEscape(content.slice(0, 200)) };
     return (
-      <div className="py-6">
-        <Card sx={{ maxWidth: 345 }}>
+      <div className="py-6 flex flex-wrap justify-evenly">
+        {
+          answerList.map(item => {
+            return (
+              <Card sx={{ maxWidth: 320 }} key={item.answerId} className="mb-8">
           <CardActionArea className="py-3" >
             <div className="flex justify-center">
               <CardMedia
@@ -110,16 +118,16 @@ const QuestionPage = () => {
                 image="/pen.jpeg"
               />
             </div>
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                <div dangerouslySetInnerHTML={html}></div>
+            <CardContent style={{ height: '10vh', overflow: 'hidden'}}>
+              <Typography variant="body2" color="text.secondary" component={'span'}>
+                <span dangerouslySetInnerHTML={{__html: unEscape(item.content.slice(0, 300))}}></span>
               </Typography>
             </CardContent>
-            <CardActions>
-              <Button size="small">Details</Button>
-            </CardActions>
           </CardActionArea>
         </Card>
+            )
+          })
+        }
       </div>
     );
   };
@@ -129,7 +137,7 @@ const QuestionPage = () => {
       <NavBar shouldHideBtn={true} />
       <Card
         sx={{
-          boxShadow: 1,
+          boxShadow: 0,
           borderRadius: 0,
           p: 2,
           minWidth: 300,
@@ -137,6 +145,7 @@ const QuestionPage = () => {
           paddingRight: 45,
           paddingBottom: 5,
         }}
+        className="shadow-md"
       >
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
