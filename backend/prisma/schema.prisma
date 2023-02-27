@@ -68,7 +68,9 @@ model Answer {
   answerId String     @unique
   content    String        @db.Text()
   author User @relation(fields: [authorId], references: [userId])
-  question Question @relation(fields: [questionId], references: [questionId]) 
+  question Question @relation(fields: [questionId], references: [questionId])
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @default(now()) 
   
   @@fulltext([content])
   @@index([authorId], name: "author")

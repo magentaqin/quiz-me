@@ -88,9 +88,13 @@ export default class AnswerController extends Controller {
           answerId: true,
           content: true,
         },
+        orderBy: [
+          { updatedAt: 'desc' },
+        ],
       });
-      if (resp) {
-        console.log('resp', resp);
+      if (Array.isArray(resp)) {
+        this.ctx.status = 200;
+        this.ctx.body = resp;
       }
     } catch (err) {
       this.ctx.status = 500;
