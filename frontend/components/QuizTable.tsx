@@ -1,4 +1,5 @@
 import { useState, ChangeEvent, useEffect } from "react";
+import { useRouter } from "next/router";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -7,11 +8,13 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
+import Chip from "@mui/material/Chip";
+import Stack from "@mui/material/Stack";
 import { countQuestionApi, listQuestionsApi, ListQuestionRes, ListTagRes } from "../api/question";
 import { unEscape } from "../utils/html";
 
 interface Column {
-  id: "title" | "description";
+  id: "title" | "description" | "tags";
   label: string;
   minWidth?: number;
   align?: "right";
@@ -21,6 +24,7 @@ interface Column {
 const columns: readonly Column[] = [
   { id: "title", label: "Question", minWidth: 250 },
   { id: "description", label: "Description", minWidth: 250 },
+  { id: "tags", label: "Tags", minWidth: 250 },
 ];
 
 interface Props {
@@ -29,6 +33,7 @@ interface Props {
 }
 
 export default function QuizTable(props: Props) {
+  const router = useRouter();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [rowsData, setRowsData] = useState<ListQuestionRes[]>([]);
@@ -68,6 +73,7 @@ export default function QuizTable(props: Props) {
             ...item,
             title: unEscape(item.title),
             description: unEscape(item.description),
+            tags: ["javascript", "typescript"],
           };
         });
         setRowsData(questions);
@@ -76,6 +82,13 @@ export default function QuizTable(props: Props) {
 
     fetchQuestions(rowsPerPage * page);
   }, [rowsPerPage, page, props.keyword, props.tags]);
+
+  const toQuestionDetail = (questionId: string) => {
+    router.push({
+      pathname: "/question/[id]",
+      query: { id: questionId },
+    });
+  };
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
@@ -97,9 +110,29 @@ export default function QuizTable(props: Props) {
           <TableBody>
             {rowsData.map((row) => {
               return (
-                <TableRow hover role="checkbox" tabIndex={-1} key={row.questionId}>
+                <TableRow
+                  hover
+                  role="checkbox"
+                  tabIndex={-1}
+                  key={row.questionId}
+                  onClick={() => toQuestionDetail(row.questionId)}
+                  className="cursor-pointer"
+                >
                   {columns.map((column) => {
                     const value = row[column.id];
+                    if (column.id === "tags" && Array.isArray(value)) {
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          <Stack direction="row" spacing={1}>
+                            {value.map((item) => {
+                              return (
+                                <Chip label={item} color="primary" variant="outlined" key={item} />
+                              );
+                            })}
+                          </Stack>
+                        </TableCell>
+                      );
+                    }
                     return (
                       <TableCell key={column.id} align={column.align}>
                         {column.format && typeof value === "number" ? column.format(value) : value}

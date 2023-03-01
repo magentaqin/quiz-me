@@ -47,7 +47,12 @@ const NavBar = (props: Props) => {
       return (
         <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
           {props.shouldHideBtn ? null : (
-            <Button variant="contained" size="small" onClick={addQuestion} style={{ backgroundColor: "#1976d2" }}>
+            <Button
+              variant="contained"
+              size="small"
+              onClick={addQuestion}
+              style={{ backgroundColor: "#1976d2" }}
+            >
               Add Question
             </Button>
           )}
@@ -60,7 +65,12 @@ const NavBar = (props: Props) => {
         <Button variant="text" size="small" onClick={handleSignup}>
           Sign Up
         </Button>
-        <Button variant="contained" size="small" onClick={handleLogin} style={{ backgroundColor: "#1976d2" }}>
+        <Button
+          variant="contained"
+          size="small"
+          onClick={handleLogin}
+          style={{ backgroundColor: "#1976d2" }}
+        >
           Login
         </Button>
       </Stack>

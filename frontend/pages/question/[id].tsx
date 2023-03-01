@@ -91,11 +91,15 @@ const QuestionPage = () => {
     }, 2000);
   };
 
+  const handleCancel = () => {
+    setShowEditor(false);
+  };
+
   const renderEditor = () => {
     return (
       <div className="relative flex justify-center">
         <Editor />
-        <Footer onSubmit={submitAnswer} />
+        <Footer onSubmit={submitAnswer} cancel={handleCancel} />
         {showSuccessMsg ? (
           <Alert variant="filled" severity="success" className="fixed top-96">
             Add question successfully!

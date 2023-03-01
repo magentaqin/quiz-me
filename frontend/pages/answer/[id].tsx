@@ -10,7 +10,6 @@ import { getQuestionApi } from "../../api/question";
 import { getAnswerApi } from "../../api/answer";
 import { toSlateJson } from "../../utils/format";
 
-
 const AnswerPage = () => {
   const router = useRouter();
   const { id, questionId } = router.query;
@@ -29,9 +28,9 @@ const AnswerPage = () => {
     if (id) {
       getAnswerApi({ id: id as string }).then((answerResp) => {
         if (answerResp?.data) {
-          const { content } = answerResp?.data
-          const unEscapedContent = unEscape(content)
-          setSlateJson(toSlateJson(unEscapedContent))
+          const { content } = answerResp?.data;
+          const unEscapedContent = unEscape(content);
+          setSlateJson(toSlateJson(unEscapedContent));
         }
       });
     }
@@ -50,16 +49,14 @@ const AnswerPage = () => {
       >
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            { title }
+            {title}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-           { unEscape(description) }
+            {unEscape(description)}
           </Typography>
         </CardContent>
       </Card>
-      {
-        slateJson ? <Editor fromAnswer={true} slateJson={slateJson}/> : null
-      }
+      {slateJson ? <Editor fromAnswer={true} slateJson={slateJson} /> : null}
     </div>
   );
 };
