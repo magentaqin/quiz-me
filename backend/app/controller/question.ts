@@ -137,6 +137,22 @@ export default class QuestionController extends Controller {
             throw new Error(e);
           });
           if (Array.isArray(perResult)) {
+            for (let item of perResult) {
+              const tagResult = await prisma.questionTag.findMany({
+                select: {
+                  tagId: true,
+                  name: true,
+                },
+                where: {
+                  questions: {
+                    some: {
+                      questionId: item.questionId
+                    },
+                  }
+                }
+              })
+              item.tags = tagResult as any
+            }
             questions = questions.concat(perResult);
           } else {
             throw new Error();
@@ -145,6 +161,7 @@ export default class QuestionController extends Controller {
         // TODO Primsa skip and take not working in many-to-many relation
         questions = questions.slice(Number(offset), Number(count));
       } else {
+        // TODO consider use prisma raw query to do left join query
         const perResult = await prisma.question.findMany({
           select: {
             questionId: true,
@@ -165,7 +182,25 @@ export default class QuestionController extends Controller {
         }).catch(e => {
           throw new Error(e);
         });
+   
         if (Array.isArray(perResult)) {
+          for (let item of perResult) {
+            const tagResult = await prisma.questionTag.findMany({
+              select: {
+                tagId: true,
+                name: true,
+              },
+              where: {
+                questions: {
+                  some: {
+                    questionId: item.questionId
+                  },
+                }
+              }
+            })
+            item.tags = tagResult as any
+          }
+  
           questions = questions.concat(perResult);
         } else {
           throw new Error();
