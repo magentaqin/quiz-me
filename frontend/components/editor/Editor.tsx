@@ -58,9 +58,9 @@ const RichTextEditor = (props: Props) => {
 
   useEffect(() => {
     if (props.slateJson) {
-      setValue(props.slateJson)
+      setValue(props.slateJson);
     }
-  }, [props.slateJson])
+  }, [props.slateJson]);
 
   const renderElement = useCallback((props) => {
     // cutomize elemtents: https://docs.slatejs.org/walkthroughs/03-defining-custom-elements
