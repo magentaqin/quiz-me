@@ -21,6 +21,7 @@ import { serialize, toSlateJson } from "../../utils/format";
 
 interface Props {
   fromAnswer?: boolean;
+  slateJson?: string[];
 }
 
 const HOTKEYS: any = {
@@ -54,6 +55,12 @@ const RichTextEditor = (props: Props) => {
     }
     setShowSlate(true);
   }, []);
+
+  useEffect(() => {
+    if (props.slateJson) {
+      setValue(props.slateJson)
+    }
+  }, [props.slateJson])
 
   const renderElement = useCallback((props) => {
     // cutomize elemtents: https://docs.slatejs.org/walkthroughs/03-defining-custom-elements
@@ -171,7 +178,9 @@ const RichTextEditor = (props: Props) => {
 
   return (
     <div className={styles.editorWrapper}>
-      <div className={styles.editor}>{renderSlate()}</div>
+      <div className={styles.editor} style={{ height: props.fromAnswer ? "90vh" : "70vh" }}>
+        {renderSlate()}
+      </div>
     </div>
   );
 };

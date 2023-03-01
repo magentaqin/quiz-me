@@ -93,7 +93,7 @@ const QuestionPage = () => {
 
   const renderEditor = () => {
     return (
-      <div className="flex justify-center relative">
+      <div className="relative flex justify-center">
         <Editor />
         <Footer onSubmit={submitAnswer} />
         {showSuccessMsg ? (
@@ -110,13 +110,20 @@ const QuestionPage = () => {
     );
   };
 
+  const toAnswerDetail = (answerId: string) => {
+    router.push({
+      pathname: "/answer/[id]",
+      query: { id: answerId, questionId: id },
+    });
+  };
+
   const renderList = () => {
     return (
-      <div className="py-6 flex flex-wrap justify-evenly">
+      <div className="flex flex-wrap py-6 justify-evenly">
         {answerList.map((item) => {
           return (
             <Card sx={{ width: 320 }} key={item.answerId} className="mb-8">
-              <CardActionArea className="py-3">
+              <CardActionArea className="py-3" onClick={() => toAnswerDetail(item.answerId)}>
                 <div className="flex justify-center">
                   <CardMedia
                     component="img"
@@ -165,7 +172,7 @@ const QuestionPage = () => {
             {title}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {description}
+            {unEscape(description)}
           </Typography>
         </CardContent>
         <CardActions style={{ position: "relative" }}>
@@ -179,7 +186,7 @@ const QuestionPage = () => {
           </Button>
         </CardActions>
       </Card>
-      <div style={{ backgroundColor: showEditor ? "#eee" : "rgba(18,18,18,0)", height: "100vh" }}>
+      <div style={{ backgroundColor: showEditor ? "#eee" : "rgba(18,18,18,0)", height: "83vh" }}>
         <Container fixed>{showEditor ? renderEditor() : renderList()}</Container>
       </div>
     </div>
