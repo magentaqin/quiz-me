@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import isHotkey from "is-hotkey";
 import Prism from "prismjs";
 import { Editable, withReact, useSlate, Slate } from "slate-react";
-import { Editor, createEditor, Element as SlateElement, Text } from "slate";
+import { Editor, createEditor, Element as SlateElement, Text, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
 import FormatItalicIcon from "@mui/icons-material/FormatItalic";
@@ -68,7 +68,13 @@ const RichTextEditor = (props: Props) => {
       return (
         <div
           {...props.attributes}
-          style={{ backgroundColor: "#ddd", margin: 0, padding: "4px 8px" }}
+          style={{
+            backgroundColor: "#ddd",
+            margin: 0,
+            padding: "4px 8px",
+            marginTop: "1em",
+            marginBottom: "1em",
+          }}
         >
           {props.children}
         </div>
@@ -185,7 +191,44 @@ const RichTextEditor = (props: Props) => {
   );
 };
 
-const toggleBlock = (editor: any, format: any) => {};
+const toggleBlock = (editor, format) => {
+  const TEXT_ALIGN_TYPES = ["left", "center", "right", "justify"];
+  const LIST_TYPES = ["numberedList", "bulletedList"];
+  const isActive = isBlockActive(
+    editor,
+    format,
+    TEXT_ALIGN_TYPES.includes(format) ? "align" : "type"
+  ) as boolean;
+  const isList = LIST_TYPES.includes(format);
+
+  Transforms.unwrapNodes(editor, {
+    match: (n) => {
+      return (
+        !Editor.isEditor(n) &&
+        SlateElement.isElement(n) &&
+        LIST_TYPES.includes(n.type) &&
+        !TEXT_ALIGN_TYPES.includes(format)
+      );
+    },
+    split: true,
+  });
+  let newProperties = {};
+  if (TEXT_ALIGN_TYPES.includes(format)) {
+    newProperties = {
+      align: isActive ? undefined : format,
+    };
+  } else {
+    newProperties = {
+      type: isActive ? "paragraph" : isList ? "listItem" : format,
+    };
+  }
+  Transforms.setNodes<SlateElement>(editor, newProperties);
+
+  if (!isActive && isList) {
+    const block = { type: format, children: [] };
+    Transforms.wrapNodes(editor, block);
+  }
+};
 
 const toggleMark = (editor: any, format: any) => {
   const isActive = isMarkActive(editor, format);
@@ -197,15 +240,16 @@ const toggleMark = (editor: any, format: any) => {
   }
 };
 
-const isBlockActive = (editor: any, format: any) => {
+const isBlockActive = (editor, format, blockType = "type") => {
   const { selection } = editor;
   if (!selection) return false;
 
-  const [match] = Editor.nodes(editor, {
-    at: Editor.unhangRange(editor, selection),
-    match: (n: any) =>
-      !Editor.isEditor(n) && SlateElement.isElement(n) && (n as any).type === format,
-  }) as any;
+  const [match] = Array.from(
+    Editor.nodes(editor, {
+      at: Editor.unhangRange(editor, selection),
+      match: (n) => !Editor.isEditor(n) && SlateElement.isElement(n) && n[blockType] === format,
+    })
+  );
 
   return !!match;
 };
