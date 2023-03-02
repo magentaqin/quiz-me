@@ -63,6 +63,23 @@ export default function UserForm(props: Props) {
           handleFail(err.response.data.msg);
         });
     }
+    if (props.formType === "login") {
+      const params = {
+        email,
+        password,
+      };
+      loginApi(params)
+        .then((res) => {
+          if (res?.data?.token) {
+            localStorage.setItem("quizme_token", res.data.token);
+            refreshToken();
+            handleSuccess(res?.data);
+          }
+        })
+        .catch((err) => {
+          handleFail(err.response.data.msg);
+        });
+    }
   };
 
   const handleEmail = (event: React.ChangeEvent<HTMLInputElement>) => {
