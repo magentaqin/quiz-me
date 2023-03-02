@@ -8,11 +8,15 @@ export interface ListQuestionReq {
   tags?: string[];
 }
 
+interface Tag {
+  name: string;
+  tagId: string;
+}
 export interface ListQuestionRes {
   title: string;
   description: string;
   questionId: string;
-  tags: string[];
+  tags: Tag[];
 }
 
 export interface ListTagRes {

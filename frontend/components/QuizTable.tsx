@@ -72,8 +72,7 @@ export default function QuizTable(props: Props) {
           return {
             ...item,
             title: unEscape(item.title),
-            description: unEscape(item.description),
-            tags: ["javascript", "typescript"],
+            description: unEscape(item.description)
           };
         });
         setRowsData(questions);
@@ -126,7 +125,7 @@ export default function QuizTable(props: Props) {
                           <Stack direction="row" spacing={1}>
                             {value.map((item) => {
                               return (
-                                <Chip label={item} color="primary" variant="outlined" key={item} />
+                                <Chip label={item.name} color="primary" variant="outlined" key={item.tagId} />
                               );
                             })}
                           </Stack>
