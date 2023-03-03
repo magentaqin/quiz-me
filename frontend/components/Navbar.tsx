@@ -2,6 +2,7 @@ import { useState, Fragment, useEffect } from "react";
 import Image from "next/image";
 import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
+import { useRouter } from "next/router";
 import styles from "../styles/Home.module.scss";
 import UserForm from "./UserForm";
 import QuestionForm from "./QuestionForm";
@@ -16,6 +17,7 @@ interface Props {
 const NavBar = (props: Props) => {
   const [formType, setFormType] = useState<FormType>("signup");
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const [user, setUser] = useState<UserRes>({ userName: "", token: "", userId: "" });
 
   useEffect(() => {
@@ -84,10 +86,23 @@ const NavBar = (props: Props) => {
     return <UserForm open={open} setOpen={setOpen} formType={formType} setUserInfo={setUserInfo} />;
   };
 
+  const toHome = () => {
+    router.push({
+      pathname: "/",
+    });
+  };
+
   return (
     <Fragment>
       <div className={styles.navbar}>
-        <Image src="/logo.png" height={50} width={200} alt="logo" />
+        <Image
+          src="/logo.png"
+          height={50}
+          width={200}
+          alt="logo"
+          onClick={toHome}
+          className="cursor-pointer"
+        />
         {renderTopRight()}
       </div>
       {renderForm()}

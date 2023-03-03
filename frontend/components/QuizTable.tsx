@@ -14,7 +14,7 @@ import { countQuestionApi, listQuestionsApi, ListQuestionRes, ListTagRes } from 
 import { unEscape } from "../utils/html";
 
 interface Column {
-  id: "title" | "description" | "tags";
+  id: "title" | "description" | "tags" | "level";
   label: string;
   minWidth?: number;
   align?: "right";
@@ -23,8 +23,9 @@ interface Column {
 
 const columns: readonly Column[] = [
   { id: "title", label: "Question", minWidth: 250 },
-  { id: "description", label: "Description", minWidth: 250 },
+  { id: "level", label: "Level", minWidth: 250 },
   { id: "tags", label: "Tags", minWidth: 250 },
+  { id: "description", label: "Description", minWidth: 250 },
 ];
 
 interface Props {
@@ -133,6 +134,25 @@ export default function QuizTable(props: Props) {
                                 />
                               );
                             })}
+                          </Stack>
+                        </TableCell>
+                      );
+                    }
+                    if (column.id === "level" && ["ENTRY", "MID", "HIGH"].includes(value)) {
+                      const colorMap: any = {
+                        ENTRY: "success",
+                        MID: "primary",
+                        HIGH: "error",
+                      };
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          <Stack direction="row" spacing={1}>
+                            <Chip
+                              label={value}
+                              color={colorMap[value]}
+                              variant="filled"
+                              key={value}
+                            />
                           </Stack>
                         </TableCell>
                       );

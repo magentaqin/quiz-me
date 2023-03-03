@@ -102,7 +102,7 @@ const QuestionPage = () => {
         <Footer onSubmit={submitAnswer} cancel={handleCancel} />
         {showSuccessMsg ? (
           <Alert variant="filled" severity="success" className="fixed top-96">
-            Add question successfully!
+            Add answer successfully!
           </Alert>
         ) : null}
         {failMsg ? (
