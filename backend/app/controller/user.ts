@@ -48,6 +48,7 @@ export default class UserController extends Controller {
           userId,
           userName,
           password: hashedPassword,
+          role: email === 'quizme@root.com' ? 'ADMIN' : 'USER'
         },
       });
 

@@ -8,6 +8,10 @@ const globalErrorCodes = {
     code: 102,
     msg: 'Something wrong with server. Please wait for a second.',
   },
+  AUTH_NOT_PERMITTED: {
+    code: 103,
+    msg: "You don't have access to process further steps."
+  }
 };
 
 export default globalErrorCodes;
