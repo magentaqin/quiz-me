@@ -8,7 +8,7 @@ export default class QuestionController extends Controller {
   public async addQuestion() {
     try {
       const { prisma } = this.app;
-      const { title, tags, description } = this.ctx.request.body;
+      const { title, tags, description, level } = this.ctx.request.body;
       if (!title || !Array.isArray(tags)) {
         this.ctx.status = 400;
         this.ctx.body = globalErrorCodes.REQUIRED_PARAMETERS_NOT_PROVIDED;
@@ -51,6 +51,7 @@ export default class QuestionController extends Controller {
           tags: {
             create: tagsToCreate,
           },
+          level,
         },
       }).catch(e => {
         throw new Error(e);
