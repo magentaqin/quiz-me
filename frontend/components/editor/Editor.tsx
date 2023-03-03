@@ -240,14 +240,15 @@ const toggleMark = (editor: any, format: any) => {
   }
 };
 
-const isBlockActive = (editor, format, blockType = "type") => {
+const isBlockActive = (editor: any, format: any, blockType = "type") => {
   const { selection } = editor;
   if (!selection) return false;
 
   const [match] = Array.from(
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
-      match: (n) => !Editor.isEditor(n) && SlateElement.isElement(n) && n[blockType] === format,
+      match: (n: any) =>
+        !Editor.isEditor(n) && SlateElement.isElement(n) && n[blockType] === format,
     })
   );
 

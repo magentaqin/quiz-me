@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
 import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
@@ -126,29 +128,37 @@ const QuestionPage = () => {
       <div className="flex flex-wrap py-6 justify-evenly">
         {answerList.map((item) => {
           return (
-            <Card sx={{ width: 320 }} key={item.answerId} className="mb-8">
-              <CardActionArea className="py-3" onClick={() => toAnswerDetail(item.answerId)}>
-                <div className="flex justify-center">
-                  <CardMedia
-                    component="img"
-                    alt="green iguana"
-                    style={{ width: "50px" }}
-                    image="/pen.jpeg"
-                  />
-                </div>
-                <CardContent>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    component={"span"}
-                    style={{ height: "10vh", overflow: "hidden" }}
-                  >
-                    <span
-                      dangerouslySetInnerHTML={{ __html: unEscape(item.content.slice(0, 300)) }}
-                    ></span>
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
+            <Card
+              sx={{ width: 320 }}
+              key={item.answerId}
+              className="mb-8 hover:cursor-pointer"
+              onClick={() => toAnswerDetail(item.answerId)}
+            >
+              <div className="flex justify-center">
+                <CardMedia
+                  component="img"
+                  alt="green iguana"
+                  style={{ width: "50px" }}
+                  image="/pen.jpeg"
+                />
+              </div>
+              <CardContent>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  component={"span"}
+                  style={{ height: "10vh", overflow: "hidden" }}
+                >
+                  <span
+                    dangerouslySetInnerHTML={{ __html: unEscape(item.content.slice(0, 300)) }}
+                  ></span>
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <IconButton color="primary" aria-label="edit answer">
+                  <EditIcon />
+                </IconButton>
+              </CardActions>
             </Card>
           );
         })}

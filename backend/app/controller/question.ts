@@ -118,6 +118,7 @@ export default class QuestionController extends Controller {
               title: true,
               description: true,
               tags: true,
+              level: true,
             },
             where: {
               title: {
@@ -169,6 +170,7 @@ export default class QuestionController extends Controller {
             title: true,
             description: true,
             tags: true,
+            level: true,
           },
           skip: Number(offset),
           take: Number(count),
