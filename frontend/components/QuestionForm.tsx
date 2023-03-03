@@ -9,6 +9,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Alert from "@mui/material/Alert";
 import { addQuestionApi } from "../api/question";
 import TagSelect from "./TagSelect";
+import LevelSelect from "./LevelSelect";
 
 interface Props {
   open: boolean;
@@ -21,6 +22,7 @@ export default function QuestionForm(props: Props) {
   const [failMsg, setFailMsg] = useState("");
   const [showSuccessMsg, setShowSuccessMsg] = useState(false);
   const [description, setDescription] = useState("");
+  const [level, setLevel] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const router = useRouter();
 
@@ -94,6 +96,7 @@ export default function QuestionForm(props: Props) {
             onChange={handleDescription}
           />
           <TagSelect selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
+          <LevelSelect setSelectedLevel={setLevel} level={level} />
         </DialogContent>
         <DialogActions>
           <Button onClick={submit}>Add Question</Button>
