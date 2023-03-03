@@ -191,9 +191,9 @@ const RichTextEditor = (props: Props) => {
   );
 };
 
-const toggleBlock = (editor, format) => {
+const toggleBlock = (editor: any, format: any) => {
   const TEXT_ALIGN_TYPES = ["left", "center", "right", "justify"];
-  const LIST_TYPES = ["numberedList", "bulletedList"];
+  const LIST_TYPES: any = ["numberedList", "bulletedList"];
   const isActive = isBlockActive(
     editor,
     format,
@@ -202,11 +202,11 @@ const toggleBlock = (editor, format) => {
   const isList = LIST_TYPES.includes(format);
 
   Transforms.unwrapNodes(editor, {
-    match: (n) => {
+    match: (n: any) => {
       return (
         !Editor.isEditor(n) &&
         SlateElement.isElement(n) &&
-        LIST_TYPES.includes(n.type) &&
+        LIST_TYPES.includes((n as any).type) &&
         !TEXT_ALIGN_TYPES.includes(format)
       );
     },
@@ -248,7 +248,7 @@ const isBlockActive = (editor: any, format: any, blockType = "type") => {
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
       match: (n: any) =>
-        !Editor.isEditor(n) && SlateElement.isElement(n) && n[blockType] === format,
+        !Editor.isEditor(n) && SlateElement.isElement(n) && (n as any)[blockType] === format,
     })
   );
 

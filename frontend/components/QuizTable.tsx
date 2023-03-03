@@ -10,7 +10,7 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
-import { countQuestionApi, listQuestionsApi, ListQuestionRes, ListTagRes } from "../api/question";
+import { countQuestionApi, listQuestionsApi, ListQuestionRes } from "../api/question";
 import { unEscape } from "../utils/html";
 
 interface Column {

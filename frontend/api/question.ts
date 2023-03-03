@@ -17,6 +17,7 @@ export interface ListQuestionRes {
   description: string;
   questionId: string;
   tags: Tag[];
+  level: string;
 }
 
 export interface ListTagRes {

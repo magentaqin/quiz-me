@@ -10,7 +10,6 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Alert from "@mui/material/Alert";
 import CardMedia from "@mui/material/CardMedia";
-import { CardActionArea } from "@mui/material";
 import dynamic from "next/dynamic";
 import { getQuestionApi } from "../../api/question";
 import { addAnswerApi, listAnswerApi, getAnswerApi, ListAnswerRes } from "../../api/answer";
