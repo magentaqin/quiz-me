@@ -9,6 +9,12 @@ interface AddAnswerReq {
   questionId: string;
   content: string;
 }
+
+interface UpdateAnswerReq {
+  answerId: string;
+  content: string;
+}
+
 export interface ListAnswerReq {
   offset: number;
   count: number;
@@ -23,6 +29,10 @@ export interface ListAnswerRes {
 export const addAnswerApi = async (data: AddAnswerReq) => {
   return await axiosInstance.post("/answer/add", data);
 };
+
+export const updateAnswerApi = async (data: UpdateAnswerReq) => {
+  return await axiosInstance.post("/answer/update", data);
+}
 
 export const listAnswerApi = async (params: ListAnswerReq) => {
   return await axiosInstance.get("/answer/list", {

@@ -12,10 +12,16 @@ import Alert from "@mui/material/Alert";
 import CardMedia from "@mui/material/CardMedia";
 import dynamic from "next/dynamic";
 import { getQuestionApi } from "../../api/question";
-import { addAnswerApi, listAnswerApi, getAnswerApi, ListAnswerRes } from "../../api/answer";
+import {
+  addAnswerApi,
+  listAnswerApi,
+  getAnswerApi,
+  ListAnswerRes,
+  updateAnswerApi,
+} from "../../api/answer";
 import NavBar from "../../components/Navbar";
 import Footer from "../../components/editor/Footer";
-import { serialize } from "../../utils/format";
+import { serialize, toSlateJson } from "../../utils/format";
 import { unEscape } from "../../utils/html";
 
 const QuestionPage = () => {
@@ -24,9 +30,13 @@ const QuestionPage = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [showEditor, setShowEditor] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
   const [failMsg, setFailMsg] = useState("");
   const [answerList, setAnswerList] = useState<ListAnswerRes[]>([]);
+  const [slateJson, setSlateJson] = useState(null);
   const [showSuccessMsg, setShowSuccessMsg] = useState(false);
+  const [currentAnswer, setCurrentAnswer] = useState("");
+
   const Editor = dynamic(() => import("../../components/editor/Editor"), { ssr: false });
 
   useEffect(() => {
@@ -48,35 +58,63 @@ const QuestionPage = () => {
     setShowEditor(true);
   };
 
-  const handleSuccess = () => {
+  const handleSuccess = (res) => {
+    const { answerId } = res.data;
+    getAnswerApi({ id: answerId }).then((answerResp) => {
+      if (answerResp?.data) {
+        if (isUpdate) {
+          const newAnswerList = answerList.map((item) => {
+            if (item.answerId === answerId) {
+              item.content = answerResp?.data.content;
+            }
+            return item;
+          });
+          setAnswerList(newAnswerList);
+        } else {
+          const newItem = {
+            answerId,
+            content: answerResp?.data.content,
+          };
+          const newAnswerList = [newItem, ...answerList];
+          setAnswerList(newAnswerList);
+        }
+      }
+    });
     setShowSuccessMsg(true);
     let timer = setTimeout(() => {
       clearTimeout(timer);
       setShowSuccessMsg(false);
       setShowEditor(false);
       localStorage.removeItem("content");
+      if (isUpdate) {
+        setSlateJson(null);
+        setIsUpdate(false);
+        localStorage.removeItem("content");
+        setCurrentAnswer("");
+      }
     }, 2000);
   };
 
   const submitAnswer = () => {
     const value: any = localStorage.getItem("content");
-    if (value) {
-      const serializedVal = serialize({ children: JSON.parse(value) });
-      console.log("submit", serializedVal);
+    if (!value) {
+      handleFail("No content change detected!");
+      return;
+    }
+    const serializedVal = serialize({ children: JSON.parse(value) });
+    console.log("submit", serializedVal);
+    if (isUpdate) {
+      updateAnswerApi({ answerId: currentAnswer, content: serializedVal })
+        .then((res) => {
+          handleSuccess(res);
+        })
+        .catch((err) => {
+          handleFail(err.response.data.msg);
+        });
+    } else {
       addAnswerApi({ questionId: id as string, content: serializedVal })
         .then((res) => {
-          const { answerId } = res.data;
-          getAnswerApi({ id: answerId }).then((answerResp) => {
-            if (answerResp?.data) {
-              const newItem = {
-                answerId,
-                content: answerResp?.data.content,
-              };
-              const newAnswerList = [newItem, ...answerList];
-              setAnswerList(newAnswerList);
-            }
-          });
-          handleSuccess();
+          handleSuccess(res);
         })
         .catch((err) => {
           handleFail(err.response.data.msg);
@@ -93,17 +131,23 @@ const QuestionPage = () => {
   };
 
   const handleCancel = () => {
+    if (isUpdate) {
+      setSlateJson(null);
+      setIsUpdate(false);
+      localStorage.removeItem("content");
+      setCurrentAnswer("");
+    }
     setShowEditor(false);
   };
 
   const renderEditor = () => {
     return (
       <div className="relative flex justify-center">
-        <Editor />
+        <Editor slateJson={slateJson as any} />
         <Footer onSubmit={submitAnswer} cancel={handleCancel} />
         {showSuccessMsg ? (
           <Alert variant="filled" severity="success" className="fixed top-96">
-            Add answer successfully!
+            {isUpdate ? "Update" : "Add"} answer successfully!
           </Alert>
         ) : null}
         {failMsg ? (
@@ -119,6 +163,24 @@ const QuestionPage = () => {
     router.push({
       pathname: "/answer/[id]",
       query: { id: answerId, questionId: id },
+    });
+  };
+
+  const editAnswer = (event: MouseEvent, answerId: string) => {
+    event.stopPropagation();
+    initAnswerContent(answerId);
+    setCurrentAnswer(answerId);
+  };
+
+  const initAnswerContent = (answerId: string) => {
+    getAnswerApi({ id: answerId }).then((answerResp) => {
+      if (answerResp?.data) {
+        const { content } = answerResp?.data;
+        const unEscapedContent = unEscape(content);
+        setSlateJson(toSlateJson(unEscapedContent));
+        setShowEditor(true);
+        setIsUpdate(true);
+      }
     });
   };
 
@@ -154,7 +216,11 @@ const QuestionPage = () => {
                 </Typography>
               </CardContent>
               <CardActions>
-                <IconButton color="primary" aria-label="edit answer">
+                <IconButton
+                  color="primary"
+                  aria-label="edit answer"
+                  onClick={(event) => editAnswer(event, item.answerId)}
+                >
                   <EditIcon />
                 </IconButton>
               </CardActions>
