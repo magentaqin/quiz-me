@@ -138,7 +138,10 @@ export default function QuizTable(props: Props) {
                         </TableCell>
                       );
                     }
-                    if (column.id === "level" && ["ENTRY", "MID", "HIGH"].includes(value)) {
+                    if (
+                      column.id === "level" &&
+                      ["ENTRY", "MID", "HIGH"].includes(value as string)
+                    ) {
                       const colorMap: any = {
                         ENTRY: "success",
                         MID: "primary",
@@ -149,9 +152,9 @@ export default function QuizTable(props: Props) {
                           <Stack direction="row" spacing={1}>
                             <Chip
                               label={value}
-                              color={colorMap[value]}
+                              color={colorMap[value as string]}
                               variant="filled"
-                              key={value}
+                              key={value as string}
                             />
                           </Stack>
                         </TableCell>

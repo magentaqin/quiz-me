@@ -32,7 +32,7 @@ export const addAnswerApi = async (data: AddAnswerReq) => {
 
 export const updateAnswerApi = async (data: UpdateAnswerReq) => {
   return await axiosInstance.post("/answer/update", data);
-}
+};
 
 export const listAnswerApi = async (params: ListAnswerReq) => {
   return await axiosInstance.get("/answer/list", {

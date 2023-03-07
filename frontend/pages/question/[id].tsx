@@ -58,7 +58,7 @@ const QuestionPage = () => {
     setShowEditor(true);
   };
 
-  const handleSuccess = (res) => {
+  const handleSuccess = (res: any) => {
     const { answerId } = res.data;
     getAnswerApi({ id: answerId }).then((answerResp) => {
       if (answerResp?.data) {
@@ -193,7 +193,7 @@ const QuestionPage = () => {
               sx={{ width: 320 }}
               key={item.answerId}
               className="mb-8 hover:cursor-pointer"
-              onClick={() => toAnswerDetail(item.answerId)}
+              onClick={() => toAnswerDetail(item.answerId as string)}
             >
               <div className="flex justify-center">
                 <CardMedia
@@ -219,7 +219,7 @@ const QuestionPage = () => {
                 <IconButton
                   color="primary"
                   aria-label="edit answer"
-                  onClick={(event) => editAnswer(event, item.answerId)}
+                  onClick={(event: any) => editAnswer(event, item.answerId as string)}
                 >
                   <EditIcon />
                 </IconButton>
