@@ -2,7 +2,7 @@ version: "3.9"
 services:
   web:
     container_name: quizme_web
-    platform:  linux/arm64
+    platform: linux/x86_64
     build:
       context: ./frontend
     ports:
@@ -13,7 +13,7 @@ services:
       - app-network
   backend:
     container_name: quizme_backend
-    platform:  linux/arm64
+    platform: linux/x86_64
     build: 
       context: ./backend
     environment:
@@ -31,7 +31,8 @@ services:
       - app-network
   db:
     container_name: quizme_db
-    image: mysql:latest
+    image: mysql
+    platform: linux/x86_64
     environment:
       MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASS}"
       MYSQL_DATABASE: "${DB_NAME}"
