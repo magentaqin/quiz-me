@@ -2,6 +2,7 @@ version: "3.9"
 services:
   web:
     container_name: quizme_web
+    platform:  linux/arm64
     build:
       context: ./frontend
     ports:
@@ -12,6 +13,7 @@ services:
       - app-network
   backend:
     container_name: quizme_backend
+    platform:  linux/arm64
     build: 
       context: ./backend
     environment:
