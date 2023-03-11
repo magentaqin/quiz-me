@@ -2,6 +2,7 @@ version: "3.9"
 services:
   web:
     container_name: quizme_web
+    image: qmbot/quiz-me-web
     platform: linux/x86_64
     build:
       context: ./frontend
@@ -14,6 +15,7 @@ services:
   backend:
     container_name: quizme_backend
     platform: linux/x86_64
+    image: qmbot/quiz-me-backend
     build: 
       context: ./backend
     environment:
