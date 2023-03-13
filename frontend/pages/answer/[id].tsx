@@ -10,22 +10,16 @@ import { getQuestionApi } from "../../api/question";
 import { getAnswerApi } from "../../api/answer";
 import { toSlateJson } from "../../utils/format";
 
-const AnswerPage = () => {
+const AnswerPage = ({ data }) => {
   const router = useRouter();
-  const { id, questionId } = router.query;
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const { title, description } = data;
+  const { id } = router.query;
   const [slateJson, setSlateJson] = useState(null);
 
   useEffect(() => {
-    if (questionId) {
-      getQuestionApi({ id: questionId as string }).then((res) => {
-        const { title, description } = res.data;
-        setTitle(title);
-        setDescription(description);
-      });
-    }
-    if (id) {
+    if (data.content) {
+      setSlateJson(toSlateJson(data.content));
+    } else if (id) {
       getAnswerApi({ id: id as string }).then((answerResp) => {
         if (answerResp?.data) {
           const { content } = answerResp?.data;
@@ -34,7 +28,10 @@ const AnswerPage = () => {
         }
       });
     }
-  }, [router.asPath, id, questionId]);
+  }, [router.asPath, id, data]);
+
+  // in SSR mode only render html string without editor
+  // in CSR mode, render editor into view
   return (
     <div>
       <Card
@@ -56,9 +53,41 @@ const AnswerPage = () => {
           </Typography>
         </CardContent>
       </Card>
-      {slateJson ? <Editor fromAnswer={true} slateJson={slateJson} /> : null}
+      {slateJson ? (
+        <Editor fromAnswer={true} slateJson={slateJson} />
+      ) : (
+        <div dangerouslySetInnerHTML={{ __html: data.content }}></div>
+      )}
     </div>
   );
 };
+
+export async function getServerSideProps(context: any) {
+  const { id, questionId } = context.query;
+  if (questionId) {
+    let title = "",
+      description = "",
+      content = null;
+    const promises = [getQuestionApi({ id: questionId }), getAnswerApi({ id })];
+    const [questionResp, answerResp] = await Promise.all(promises);
+    if (questionResp) {
+      title = questionResp.data.title;
+      description = questionResp.data.description;
+    }
+    if (answerResp) {
+      content = unEscape(answerResp?.data?.content);
+    }
+    const data = {
+      title,
+      description,
+      content,
+    };
+    return {
+      props: {
+        data,
+      },
+    };
+  }
+}
 
 export default AnswerPage;
