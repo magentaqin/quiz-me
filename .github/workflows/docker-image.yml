@@ -2,17 +2,18 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "feat-docker-image" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "feat-docker-image" ]
 
 jobs:
-
   build:
-
-    runs-on: ubuntu-latest
-
+    runs-on: linux/x86_64
     steps:
     - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+    - name: Login to Docker
+      env:
+        DOCKER_USER: ${{ secrets.DOCKER_USER }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: echo "💡 Print The Docker User ${{ secrets.DOCKER_USER }}"
+      run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
