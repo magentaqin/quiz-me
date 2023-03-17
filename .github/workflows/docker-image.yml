@@ -16,6 +16,8 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: 
           docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - name: Check out code
+        uses: actions/checkout@v3
       - name: Build frontend image and push
         uses: docker/build-push-action@v4
         with:
