@@ -31,7 +31,7 @@ jobs:
           context: ./frontend
           platforms: linux/x86_64
           push: true
-          tags: user/quiz-me-web:latest
+          tags: qmbot/quiz-me-web:latest
   docker-build-backend:
     runs-on: ubuntu-latest
     steps:
@@ -56,4 +56,4 @@ jobs:
           context: ./backend
           platforms: linux/x86_64
           push: true
-          tags: user/quiz-me-backend:latest
+          tags: qmbot/quiz-me-backend:latest
