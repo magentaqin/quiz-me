@@ -8,7 +8,7 @@ on:
 
 jobs:
   docker-build-frontend:
-    runs-on: x86_64
+    runs-on: linux-latest
     steps:
       -
         name: Set up QEMU
@@ -33,7 +33,7 @@ jobs:
           push: true
           tags: qmbot/quiz-me-web:latest
   docker-build-backend:
-    runs-on: x86_64
+    runs-on: linux-latest
     steps:
       -
         name: Set up QEMU
