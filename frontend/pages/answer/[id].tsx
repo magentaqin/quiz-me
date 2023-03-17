@@ -10,7 +10,13 @@ import { getQuestionApi } from "../../api/question";
 import { getAnswerApi } from "../../api/answer";
 import { toSlateJson } from "../../utils/format";
 
-const AnswerPage = ({ data }) => {
+interface ServerData {
+  title: string;
+  description: string;
+  content: string;
+}
+
+const AnswerPage = ({ data }: { data: ServerData }) => {
   const router = useRouter();
   const { title, description } = data;
   const { id } = router.query;
