@@ -23,7 +23,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./frontend
-          platforms: linux/x86_64
           push: true
           tags: qmbot/quiz-me-web:latest
   docker-build-backend:
@@ -42,6 +41,5 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: ./backend
-          platforms: linux/x86_64
           push: true
           tags: qmbot/quiz-me-backend:latest
