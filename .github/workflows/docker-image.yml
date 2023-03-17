@@ -19,7 +19,7 @@ jobs:
       - name: Build frontend image and push
         uses: docker/build-push-action@v4
         with:
-          context: ../../frontend
+          context: ./frontend
           platforms: linux/x86_64
           push: true
           tags: latest
