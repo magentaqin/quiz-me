@@ -40,7 +40,6 @@ jobs:
   docker-build-backend:
     runs-on: ubuntu-latest
     steps:
-      steps:
       - name: Check out code
         uses: actions/checkout@v3
       - name: Docker meta
