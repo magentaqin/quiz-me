@@ -2,11 +2,11 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "feat-docker-image" ]
+    branches: [ "main" ]
     tags:
       - 'v*'
   pull_request:
-    branches: [ "feat-docker-image" ]
+    branches: [ "main" ]
 
 jobs:
   docker-build-frontend:
