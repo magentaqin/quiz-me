@@ -184,7 +184,10 @@ const RichTextEditor = (props: Props) => {
 
   return (
     <div className={styles.editorWrapper}>
-      <div className={styles.editor} style={{ height: props.fromAnswer ? "90vh" : "70vh" }}>
+      <div
+        className={styles.editor}
+        style={{ minHeight: props.fromAnswer ? "85vh" : "63vh", height: "100%" }}
+      >
         {renderSlate()}
       </div>
     </div>
