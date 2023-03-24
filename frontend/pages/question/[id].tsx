@@ -265,7 +265,7 @@ const QuestionPage = () => {
           </Button>
         </CardActions>
       </Card>
-      <div style={{ backgroundColor: showEditor ? "#eee" : "rgba(18,18,18,0)", height: "83vh" }}>
+      <div style={{ backgroundColor: showEditor ? "#eee" : "rgba(18,18,18,0)", height: "100%" }}>
         <Container fixed>{showEditor ? renderEditor() : renderList()}</Container>
       </div>
     </div>
