@@ -66,18 +66,17 @@ const RichTextEditor = (props: Props) => {
     // cutomize elemtents: https://docs.slatejs.org/walkthroughs/03-defining-custom-elements
     if (props.element.children[0].code) {
       return (
-        <div
+        <p
           {...props.attributes}
           style={{
             backgroundColor: "#ddd",
-            margin: 0,
             padding: "4px 8px",
-            marginTop: "1em",
-            marginBottom: "1em",
+            margin: 0,
           }}
+          className="slate-code-block"
         >
           {props.children}
-        </div>
+        </p>
       );
     }
     return <Element {...props} />;
