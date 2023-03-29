@@ -92,7 +92,7 @@ export default function QuizTable(props: Props) {
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
-      <TableContainer sx={{ height: 600 }}>
+      <TableContainer sx={{ height: "75vh" }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
@@ -117,6 +117,7 @@ export default function QuizTable(props: Props) {
                   key={row.questionId}
                   onClick={() => toQuestionDetail(row.questionId)}
                   className="cursor-pointer"
+                  sx={{ maxHeight: "100px" }}
                 >
                   {columns.map((column) => {
                     const value = row[column.id];
@@ -162,7 +163,18 @@ export default function QuizTable(props: Props) {
                     }
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {column.format && typeof value === "number" ? column.format(value) : value}
+                        <div
+                          style={{
+                            display: "-webkit-box",
+                            WebkitLineClamp: 3,
+                            WebkitBoxOrient: "vertical",
+                          }}
+                          className="overflow-hidden text-ellipsis"
+                        >
+                          {column.format && typeof value === "number"
+                            ? column.format(value)
+                            : value}
+                        </div>
                       </TableCell>
                     );
                   })}
