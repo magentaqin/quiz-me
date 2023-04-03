@@ -74,6 +74,7 @@ const QuestionPage = () => {
           const newItem = {
             answerId,
             content: answerResp?.data.content,
+            authorId: answerResp?.data.authorId,
           };
           const newAnswerList = [newItem, ...answerList];
           setAnswerList(newAnswerList);
@@ -185,6 +186,10 @@ const QuestionPage = () => {
   };
 
   const renderList = () => {
+    let userId: string = "";
+    if (typeof window !== "undefined") {
+      userId = localStorage?.getItem("quizme_userId") || "";
+    }
     return (
       <div className="flex flex-wrap py-6 justify-evenly">
         {answerList.map((item) => {
@@ -215,15 +220,17 @@ const QuestionPage = () => {
                   ></span>
                 </Typography>
               </CardContent>
-              <CardActions>
-                <IconButton
-                  color="primary"
-                  aria-label="edit answer"
-                  onClick={(event: any) => editAnswer(event, item.answerId as string)}
-                >
-                  <EditIcon />
-                </IconButton>
-              </CardActions>
+              {userId === item.authorId ? (
+                <CardActions>
+                  <IconButton
+                    color="primary"
+                    aria-label="edit answer"
+                    onClick={(event: any) => editAnswer(event, item.answerId as string)}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </CardActions>
+              ) : null}
             </Card>
           );
         })}
