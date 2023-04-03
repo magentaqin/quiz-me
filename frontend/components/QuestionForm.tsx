@@ -52,6 +52,7 @@ export default function QuestionForm(props: Props) {
       title,
       description,
       tags: selectedTags,
+      level,
     };
     addQuestionApi(data)
       .then((res) => {
