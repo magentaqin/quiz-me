@@ -255,7 +255,7 @@ const QuestionPage = () => {
       >
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            {title}
+            {unEscape(title)}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {unEscape(description)}
