@@ -55,6 +55,7 @@ export default function UserForm(props: Props) {
         .then((res) => {
           if (res?.data?.token) {
             localStorage.setItem("quizme_token", res.data.token);
+            localStorage.setItem("quizme_userId", res.data.userId);
             refreshToken();
             handleSuccess(res?.data);
           }
@@ -72,6 +73,7 @@ export default function UserForm(props: Props) {
         .then((res) => {
           if (res?.data?.token) {
             localStorage.setItem("quizme_token", res.data.token);
+            localStorage.setItem("quizme_userId", res.data.userId);
             refreshToken();
             handleSuccess(res?.data);
           }
