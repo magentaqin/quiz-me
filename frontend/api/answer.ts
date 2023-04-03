@@ -24,6 +24,7 @@ export interface ListAnswerReq {
 export interface ListAnswerRes {
   answerId?: string;
   content: string;
+  authorId: string;
 }
 
 export const addAnswerApi = async (data: AddAnswerReq) => {
