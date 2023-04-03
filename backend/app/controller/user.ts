@@ -56,6 +56,7 @@ export default class UserController extends Controller {
       this.ctx.body = {
         token,
         userName,
+        userId,
       };
 
     } catch (err) {
@@ -103,6 +104,7 @@ export default class UserController extends Controller {
       this.ctx.body = {
         token,
         userName: userResp.userName,
+        userId: userResp.userId,
       };
 
     } catch (err) {

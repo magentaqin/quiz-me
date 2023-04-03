@@ -66,6 +66,7 @@ export default class AnswerController extends Controller {
         this.ctx.status = 200;
         this.ctx.body = {
           content: resp.content,
+          authorId: resp.authorId,
         };
       }
     } catch (err) {
@@ -80,13 +81,14 @@ export default class AnswerController extends Controller {
       const { questionId, offset, count } = this.ctx.query;
       const resp = await prisma.answer.findMany({
         where: {
-          questionId,
+          questionId: questionId.toString(),
         },
         skip: Number(offset),
         take: Number(count),
         select: {
           answerId: true,
           content: true,
+          authorId: true,
         },
         orderBy: [
           { updatedAt: 'desc' },
