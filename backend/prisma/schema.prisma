@@ -43,7 +43,7 @@ model Question {
   questionId  String            @unique
   level       Level             @default(ENTRY)
   status      Status            @default(NORMAL)
-  title       String            @db.VarChar(300)
+  title       String            @unique @db.VarChar(300)
   description String            @db.VarChar(1000)
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @default(now())
