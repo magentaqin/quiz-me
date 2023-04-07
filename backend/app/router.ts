@@ -22,4 +22,11 @@ export default (app: Application) => {
   router.post('/answer/update', controller.answer.updateAnswer);
   router.get('/answer', controller.answer.getAnswer);
   router.get('/answer/list', controller.answer.listAnswer);
+
+  /**
+   * Tag
+   */
+  router.post('/tag/add', controller.tag.addTag);
+  router.post('/tag/update', controller.tag.updateTag);
+  router.get('/answer/list', controller.tag.listTag);
 };
