@@ -10,6 +10,8 @@
   "scripts": {
     "dev": "dotenv -e .env.dev egg-bin dev",
     "migrate:dev": "dotenv -e .env.dev prisma migrate dev",
+    "prisma:db:pull":"dotenv -e .env.dev prisma db pull",
+    "prisma:rollback": "dotenv -e .env.dev prisma migrate resolve --rolled-back 20201231000000_example",
     "migrate:deploy": "prisma migrate deploy",
     "start": "egg-scripts start --title=quizme-server-backend",
     "stop": "egg-scripts stop --title=quizme-server-backend",
