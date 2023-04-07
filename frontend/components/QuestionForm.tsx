@@ -7,13 +7,28 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Alert from "@mui/material/Alert";
-import { addQuestionApi } from "../api/question";
+import { addQuestionApi, updateQuestionApi } from "../api/question";
 import TagSelect from "./TagSelect";
 import LevelSelect from "./LevelSelect";
+
+export enum QuestionHandleType {
+  ADD = "ADD",
+  UPDATE = "UPDATE",
+}
+
+export interface QuestionData {
+  title: string;
+  level: string;
+  tags: string[];
+  description: string;
+}
 
 interface Props {
   open: boolean;
   setOpen: (val: boolean) => void;
+  type: QuestionHandleType;
+  questionId?: string;
+  questionData?: QuestionData;
 }
 
 export default function QuestionForm(props: Props) {
@@ -48,19 +63,30 @@ export default function QuestionForm(props: Props) {
   };
 
   const submit = () => {
-    const data = {
+    const data: any = {
       title,
       description,
       tags: selectedTags,
       level,
     };
-    addQuestionApi(data)
-      .then((res) => {
-        handleSuccess(res.data.questionId);
-      })
-      .catch((err) => {
-        handleFail(err.response.data.msg);
-      });
+    if (props.type === QuestionHandleType.ADD) {
+      addQuestionApi(data)
+        .then((res) => {
+          handleSuccess(res.data.questionId);
+        })
+        .catch((err) => {
+          handleFail(err.response.data.msg);
+        });
+    } else {
+      data.questionId = props.questionId || "";
+      updateQuestionApi(data)
+        .then((res) => {
+          handleSuccess(res.data.questionId);
+        })
+        .catch((err) => {
+          handleFail(err.response.data.msg);
+        });
+    }
   };
 
   const handleTitle = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,7 +100,9 @@ export default function QuestionForm(props: Props) {
   return (
     <div>
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
-        <DialogTitle>Add Question</DialogTitle>
+        <DialogTitle>
+          {props.type === QuestionHandleType.ADD ? "Add Question" : "Update Question"}
+        </DialogTitle>
         <DialogContent>
           <TextField
             margin="dense"
@@ -100,11 +128,15 @@ export default function QuestionForm(props: Props) {
           <LevelSelect setSelectedLevel={setLevel} level={level} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={submit}>Add Question</Button>
+          <Button onClick={submit}>
+            {props.type === QuestionHandleType.ADD ? "Add Question" : "Update Question"}
+          </Button>
         </DialogActions>
         {showSuccessMsg ? (
           <Alert variant="filled" severity="success">
-            Add question successfully!
+            {props.type === QuestionHandleType.ADD
+              ? "Add question successfully!"
+              : "Update question successfully!"}
           </Alert>
         ) : null}
         {failMsg ? (

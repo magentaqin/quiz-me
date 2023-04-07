@@ -31,6 +31,10 @@ export interface AddQuestionReq {
   description: string;
 }
 
+export interface UpdateQuestionReq extends AddQuestionReq {
+  questionId: string;
+}
+
 export const listTagsApi = async () => {
   return await axiosInstance.get("/tag/list");
 };
@@ -52,6 +56,10 @@ export const countQuestionApi = async (params: { keyword: string }) => {
 
 export const addQuestionApi = async (data: AddQuestionReq) => {
   return await axiosInstance.post("/question/add", data);
+};
+
+export const updateQuestionApi = async (data: UpdateQuestionReq) => {
+  return await axiosInstance.post("/question/update", data);
 };
 
 export const getQuestionApi = async (params: { id: string }) => {

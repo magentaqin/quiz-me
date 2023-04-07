@@ -21,6 +21,7 @@ import {
 } from "../../api/answer";
 import NavBar from "../../components/Navbar";
 import Footer from "../../components/editor/Footer";
+import QuestionForm, { QuestionHandleType } from "../../components/QuestionForm";
 import { serialize, toSlateJson } from "../../utils/format";
 import { unEscape } from "../../utils/html";
 
@@ -28,6 +29,7 @@ const QuestionPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const [title, setTitle] = useState("");
+  const [open, setOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [showEditor, setShowEditor] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
@@ -185,6 +187,10 @@ const QuestionPage = () => {
     });
   };
 
+  const updateQuestion = () => {
+    setOpen(true);
+  };
+
   const renderList = () => {
     let userId: string = "";
     if (typeof window !== "undefined") {
@@ -270,11 +276,25 @@ const QuestionPage = () => {
           >
             Add Answer
           </Button>
+          <Button
+            size="small"
+            variant="contained"
+            style={{ position: "absolute", left: "150px", backgroundColor: "#1976d2" }}
+            onClick={updateQuestion}
+          >
+            Update Question
+          </Button>
         </CardActions>
       </Card>
       <div style={{ backgroundColor: showEditor ? "#eee" : "rgba(18,18,18,0)", height: "100%" }}>
         <Container fixed>{showEditor ? renderEditor() : renderList()}</Container>
       </div>
+      <QuestionForm
+        open={open}
+        setOpen={setOpen}
+        type={QuestionHandleType.UPDATE}
+        questionId={id as string}
+      />
     </div>
   );
 };

@@ -9,6 +9,7 @@ export default (app: Application) => {
 
   /** Question */
   router.post('/question/add', controller.question.addQuestion);
+  router.post('/question/update', controller.question.updateQuestion);
   router.get('/tag/list', controller.question.listQuestionTag);
   router.get('/question/list', controller.question.listQuestion);
   router.get('/question/totalCount', controller.question.countQuestion);
@@ -21,4 +22,11 @@ export default (app: Application) => {
   router.post('/answer/update', controller.answer.updateAnswer);
   router.get('/answer', controller.answer.getAnswer);
   router.get('/answer/list', controller.answer.listAnswer);
+
+  /**
+   * Tag
+   */
+  router.post('/tag/add', controller.tag.addTag);
+  router.post('/tag/update', controller.tag.updateTag);
+  router.get('/answer/list', controller.tag.listTag);
 };

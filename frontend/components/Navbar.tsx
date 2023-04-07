@@ -5,7 +5,7 @@ import Stack from "@mui/material/Stack";
 import { useRouter } from "next/router";
 import styles from "../styles/Home.module.scss";
 import UserForm from "./UserForm";
-import QuestionForm from "./QuestionForm";
+import QuestionForm, { QuestionHandleType } from "./QuestionForm";
 import { UserRes, getUserInfoApi } from "../api/user";
 
 export type FormType = "signup" | "login" | "question";
@@ -81,7 +81,7 @@ const NavBar = (props: Props) => {
 
   const renderForm = () => {
     if (formType === "question") {
-      return <QuestionForm open={open} setOpen={setOpen} />;
+      return <QuestionForm open={open} setOpen={setOpen} type={QuestionHandleType.ADD} />;
     }
     return <UserForm open={open} setOpen={setOpen} formType={formType} setUserInfo={setUserInfo} />;
   };

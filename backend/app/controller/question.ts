@@ -261,19 +261,118 @@ export default class QuestionController extends Controller {
         this.ctx.body = globalErrorCodes.REQUIRED_PARAMETERS_NOT_PROVIDED;
         return;
       }
+      // TODO LEFT JOIN
       const resp = await prisma.question.findUnique({
         where: {
           questionId: id,
+        },
+        select: {
+          title: true,
+          description: true,
+          level: true,
+          authorId: true
+        }
+      }).catch(e => {
+        throw new Error(e);
+      });
+      const tagResp = await prisma.questionTag.findMany({
+        where: {
+          questions: {
+            some: {
+              questionId: id,
+            }
+          }
+        }
+      })
+      if (resp) {
+        const { title, description, level, authorId } = resp;
+        this.ctx.status = 200;
+        this.ctx.body = {
+          title,
+          description,
+          level,
+          authorId,
+          tags: tagResp
+        };
+      }
+    } catch (err) {
+      this.ctx.status = 500;
+      this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
+    }
+  }
+
+  // Update Question
+  public async updateQuestion() {
+    try {
+      const { prisma } = this.app;
+      const { title, tags, description, level, questionId } = this.ctx.request.body;
+      if (!title || !Array.isArray(tags) || !questionId) {
+        this.ctx.status = 400;
+        this.ctx.body = globalErrorCodes.REQUIRED_PARAMETERS_NOT_PROVIDED;
+        return;
+      }
+      // 01 validate whether userId exists
+      const userId = await this.ctx.service.auth.userAuth.getUserId(this.ctx);
+      if (!userId) {
+        this.ctx.status = 401;
+        this.ctx.body = userErrorCodes.USER_NOT_AUTHORIZED;
+      }
+      const userResp = await prisma.user.findUnique({
+        where: {
+          userId,
+        },
+      });
+      if (!userResp) {
+        this.ctx.status = 401;
+        this.ctx.body = userErrorCodes.USER_NOT_EXIST;
+        return;
+      }
+
+      // 02 check whether this question is authored by the user
+      const questionResp = await prisma.question.findUnique({
+        where: {
+          questionId,
+        }
+      })
+      if (!questionResp || questionResp.authorId !== userId) {
+        this.ctx.status = 403;
+        this.ctx.body = globalErrorCodes.AUTH_NOT_PERMITTED
+        return;
+      } 
+
+      // 03 escape question title and description
+      const escapedTitle = this.ctx.helper.escape(title);
+      const escapedDescription = description ? this.ctx.helper.escape(description) : '';
+
+      // // 04 use transaction to update one record into Question Table and multiple records into QuestionTag Table
+      // const tagsToUpdate = tags.map(item => {
+      //   if (!item.tagId) {
+      //     return {
+      //       tag: {
+      //         create: { name: item, tagId: generateUuid(item) },
+      //       },
+      //     }
+      //   }
+      //   return item
+      // });
+      const resp = await prisma.question.update({
+        where: {
+          questionId,
+        },
+        data: {
+          title: escapedTitle,
+          description: escapedDescription,
+          level,
         },
       }).catch(e => {
         throw new Error(e);
       });
       if (resp) {
-        const { title, description } = resp;
         this.ctx.status = 200;
         this.ctx.body = {
-          title,
-          description,
+          questionId: resp.questionId,
+          description: resp.description,
+          tags,
         };
       }
     } catch (err) {
