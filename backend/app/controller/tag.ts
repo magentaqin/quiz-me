@@ -31,7 +31,7 @@ export default class TagController extends Controller {
       }
       if (userResp.role !== 'ADMIN') {
         this.ctx.status = 403;
-        this.ctx.body = userErrorCodes.USER_NOT_AUTHORIZED;
+        this.ctx.body = globalErrorCodes.AUTH_NOT_PERMITTED;
         return;
       }
       // 02 escape tag name and description
@@ -46,6 +46,7 @@ export default class TagController extends Controller {
           tagId: generateUuid(escapedName),
         },
       }).catch(e => {
+        console.log('create tag error', e);
         throw new Error(e);
       });
       if (resp) {
@@ -62,7 +63,24 @@ export default class TagController extends Controller {
 
   public async listTag() {
     try {
-
+      const { prisma } = this.app;
+      const { offset, count } = this.ctx.query;
+      const resp = await prisma.questionTag.findMany({
+        skip: Number(offset),
+        take: Number(count),
+        select: {
+          tagId: true,
+          name: true,
+          description: true,
+        },
+        orderBy: [
+          { updatedAt: 'desc' },
+        ],
+      });
+      if (Array.isArray(resp)) {
+        this.ctx.status = 200;
+        this.ctx.body = resp;
+      }
     } catch (err) {
       this.ctx.status = 500;
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
@@ -78,7 +96,7 @@ export default class TagController extends Controller {
     }
   }
 
-  // historical reason: the name of tag duplicated with each. 
+  // historical reason: the name of tag duplicated with each.
   // we want to merge them into one and hard delete rest tags
   // in next version, we could add the unique constraint.
   public async mergeTags() {
