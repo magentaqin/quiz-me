@@ -246,7 +246,7 @@ const QuestionPage = () => {
 
   return (
     <div>
-      <NavBar shouldHideBtn={true} />
+      <NavBar />
       <Card
         sx={{
           boxShadow: 1,

@@ -19,22 +19,7 @@ const MenuProps = {
   },
 };
 
-const tags = [
-  "javascript",
-  "ecmascript-6",
-  "typescript",
-  "reactjs",
-  "vue.js",
-  "html",
-  "css",
-  "dom",
-  "monorepo",
-  "lerna",
-  "webpack",
-  "babeljs",
-  "mysql",
-  "node.js",
-];
+const tags = ["mysql", "node.js"];
 
 function getStyles(name: string, selectedTags: readonly string[], theme: Theme) {
   return {
