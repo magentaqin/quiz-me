@@ -12,8 +12,8 @@ interface LoginReq {
 }
 
 export enum Role {
-  USER = 'USER',
-  ADMIN = 'ADMIN'
+  USER = "USER",
+  ADMIN = "ADMIN",
 }
 
 export interface UserRes {

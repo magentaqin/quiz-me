@@ -1,8 +1,9 @@
 import type { NextPage } from "next";
-import { Fragment, useEffect } from "react";
+import { Fragment, useState, useEffect } from "react";
 import Checkbox from "@mui/material/Checkbox";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import NavBar from "../../components/Navbar";
 
@@ -23,16 +24,80 @@ const TagsManagement: NextPage = () => {
   ];
 
   const backendList = ["nodejs", "mysql", "docker"];
+  const initialTags: any = {}
+  frontendList.concat(backendList).forEach(key => {
+    initialTags[key] = true
+  })
+
+  const [formData, setFormData] = useState({});
+  const [tags, setTags] = useState<{[key: string]: boolean}>(initialTags)
+
+
+  const onChange = (
+    key: string,
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const newFormData = {
+      ...formData,
+      [key]: event.target.value,
+    };
+    setFormData(newFormData);
+  };
+
+  const toggleCheckbox = (key: string,
+    event: React.ChangeEvent<HTMLInputElement>) => {
+      const newTags = {
+        ...tags,
+        [key]: event.target.checked,
+      };
+      setTags(newTags)
+  }
 
   const renderFrontTags = () => {
     return frontendList.map((item) => {
       return (
-        <div key={item}>
-          <FormControlLabel control={<Checkbox defaultChecked />} label={item} />
-          <TextField id="tag-description" label="Description" variant="standard" />
+        <div key={item} className="flex items-center">
+          <FormControlLabel
+            control={<Checkbox checked={tags[item]} onChange={(event) => toggleCheckbox(item, event)} />}
+            label={item}
+            style={{ width: "200px" }}
+          />
+          <TextField
+            id="tag-description"
+            label="Description"
+            variant="standard"
+            style={{ width: "600px" }}
+            onChange={(event) => onChange(item, event)}
+          />
         </div>
       );
     });
+  };
+
+  const renderBackendTags = () => {
+    return backendList.map((item) => {
+      return (
+        <div key={item} className="flex items-center">
+          <FormControlLabel
+            control={<Checkbox checked={tags[item]} onChange={(event) => toggleCheckbox(item, event)} />}
+            label={item}
+            style={{ width: "200px" }}
+          />
+          <TextField
+            id="tag-description"
+            label="Description"
+            variant="standard"
+            style={{ width: "600px" }}
+            onChange={(event) => onChange(item, event)}
+          />
+        </div>
+      );
+    });
+  };
+
+  const submit = () => {
+    console.log('desc', formData);
+    console.log('tags', tags)
   };
 
   return (
@@ -46,10 +111,16 @@ const TagsManagement: NextPage = () => {
         </div>
         <div>
           <p className="text-xl">Backend</p>
-          <FormGroup>
-            <FormControlLabel control={<Checkbox defaultChecked />} label="Label" />
-          </FormGroup>
+          <FormGroup>{renderBackendTags()}</FormGroup>
         </div>
+        <Button
+          variant="contained"
+          size="small"
+          onClick={submit}
+          style={{ backgroundColor: "#1976d2" }}
+        >
+          Submit
+        </Button>
       </div>
     </Fragment>
   );
