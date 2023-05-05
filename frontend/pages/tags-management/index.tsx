@@ -6,6 +6,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import NavBar from "../../components/Navbar";
+import { deleteTagApi } from "../../api/tag"
 
 const TagsManagement: NextPage = () => {
   const frontendList = [
@@ -100,11 +101,23 @@ const TagsManagement: NextPage = () => {
     console.log('tags', tags)
   };
 
+  const deleteOldTags = () => {
+    deleteTagApi()
+  }
+
   return (
     <Fragment>
       <NavBar />
       <div className="container px-4 mx-auto">
         <p className="text-2xl">Manage Tags</p>
+        <Button
+          variant="contained"
+          size="small"
+          onClick={deleteOldTags}
+          style={{ backgroundColor: "#1976d2" }}
+        >
+          Delete Old
+        </Button>
         <div>
           <p className="text-xl">Frontend</p>
           <FormGroup>{renderFrontTags()}</FormGroup>

@@ -64,10 +64,7 @@ export default class TagController extends Controller {
   public async listTag() {
     try {
       const { prisma } = this.app;
-      const { offset, count } = this.ctx.query;
       const resp = await prisma.questionTag.findMany({
-        skip: Number(offset),
-        take: Number(count),
         select: {
           tagId: true,
           name: true,
@@ -87,7 +84,7 @@ export default class TagController extends Controller {
     }
   }
 
-  public async updateTag() {
+  public async batchSetTags() {
     try {
 
     } catch (err) {
@@ -96,10 +93,32 @@ export default class TagController extends Controller {
     }
   }
 
-  // historical reason: the name of tag duplicated with each.
-  // we want to merge them into one and hard delete rest tags
-  // in next version, we could add the unique constraint.
-  public async mergeTags() {
-
+  public async deleteTags() {
+    // old tags have related tags and created_at before 2023-05-06, set the status to DELETED
+    try {
+      const { prisma } = this.app;
+      const resp = await prisma.questionTag.updateMany({
+        where: {
+          createdAt: {
+            lte: new Date('2023-05-06'),
+          },
+          NOT: {
+            questions: undefined,
+          },
+        },
+        data: {
+          status: 'DELETED',
+        },
+      }).catch(err => {
+        console.log('delete tags err', err)
+      });
+      if (resp) {
+        this.ctx.status = 200;
+        this.ctx.body = resp;
+      }
+    } catch (err) {
+      this.ctx.status = 500;
+      this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
+    }
   }
 }

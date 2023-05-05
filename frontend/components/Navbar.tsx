@@ -50,16 +50,16 @@ const NavBar = () => {
     if (user.userName) {
       return (
         <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
-          {user.role === (Role.ADMIN || Role.USER) ? null : (
+          {user.role === (Role.ADMIN || Role.USER) ? (
             <Button
-              variant="contained"
-              size="small"
-              onClick={addQuestion}
-              style={{ backgroundColor: "#1976d2" }}
-            >
-              Add Question
-            </Button>
-          )}
+            variant="contained"
+            size="small"
+            onClick={addQuestion}
+            style={{ backgroundColor: "#1976d2" }}
+          >
+            Add Question
+          </Button>
+          ) : null}
           {user.role === Role.ADMIN ? (
             <Button
               variant="contained"
