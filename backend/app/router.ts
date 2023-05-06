@@ -29,5 +29,5 @@ export default (app: Application) => {
   router.post('/tag/add', controller.tag.addTag);
   router.post('/tag/batchSet', controller.tag.batchSetTags);
   router.post('/tag/delete', controller.tag.deleteTags);
-  router.get('/answer/list', controller.tag.listTag);
+  router.get('/tag/list', controller.tag.listTag);
 };

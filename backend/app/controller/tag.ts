@@ -70,6 +70,9 @@ export default class TagController extends Controller {
     try {
       const { prisma } = this.app;
       const resp = await prisma.questionTag.findMany({
+        where: {
+          status: 'NORMAL'
+        },
         select: {
           tagId: true,
           name: true,

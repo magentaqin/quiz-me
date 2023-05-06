@@ -7,6 +7,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Chip from "@mui/material/Chip";
+import { TagItem } from '../api/tag'
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -18,8 +19,6 @@ const MenuProps = {
     },
   },
 };
-
-const tags = ["mysql", "node.js"];
 
 function getStyles(name: string, selectedTags: readonly string[], theme: Theme) {
   return {
@@ -33,6 +32,7 @@ function getStyles(name: string, selectedTags: readonly string[], theme: Theme) 
 interface Props {
   selectedTags: string[];
   setSelectedTags: (tags: string[]) => void;
+  tags: TagItem[];
 }
 
 export default function MultipleSelectChip(props: Props) {
@@ -71,9 +71,9 @@ export default function MultipleSelectChip(props: Props) {
           )}
           MenuProps={MenuProps}
         >
-          {tags.map((tag) => (
-            <MenuItem key={tag} value={tag} style={getStyles(tag, props.selectedTags, theme)}>
-              {tag}
+          {props.tags.map((tag:TagItem) => (
+            <MenuItem key={tag.tagId} value={tag.name} style={getStyles(tag.name, props.selectedTags, theme)}>
+              {tag.name}
             </MenuItem>
           ))}
         </Select>

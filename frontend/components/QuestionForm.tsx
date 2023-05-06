@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -8,6 +8,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Alert from "@mui/material/Alert";
 import { addQuestionApi, updateQuestionApi } from "../api/question";
+import { listTagsApi, TagItem } from "../api/tag"
 import TagSelect from "./TagSelect";
 import LevelSelect from "./LevelSelect";
 
@@ -39,7 +40,16 @@ export default function QuestionForm(props: Props) {
   const [description, setDescription] = useState("");
   const [level, setLevel] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<TagItem[]>([])
   const router = useRouter();
+
+  useEffect(() => {
+    listTagsApi().then(res => {
+      if (Array.isArray(res?.data?.tags)) {
+        setTags(res?.data?.tags)
+      }
+    })
+  }, [])
 
   const handleSuccess = (id: string) => {
     setShowSuccessMsg(true);
@@ -124,7 +134,7 @@ export default function QuestionForm(props: Props) {
             value={description}
             onChange={handleDescription}
           />
-          <TagSelect selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
+          <TagSelect selectedTags={selectedTags} setSelectedTags={setSelectedTags} tags={tags} />
           <LevelSelect setSelectedLevel={setLevel} level={level} />
         </DialogContent>
         <DialogActions>
