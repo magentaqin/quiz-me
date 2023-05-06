@@ -3,6 +3,11 @@ import globalErrorCodes from '../error_codes/global';
 import userErrorCodes from '../error_codes/user';
 import { generateUuid } from '../utils/hash';
 
+interface TagItem {
+  name: string;
+  description: string;
+}
+
 export default class TagController extends Controller {
   public async addTag() {
     try {
@@ -86,7 +91,53 @@ export default class TagController extends Controller {
 
   public async batchSetTags() {
     try {
+      const { prisma } = this.app;
+      const { tags } = this.ctx.request.body as { tags: TagItem[] };
+      if (!Array.isArray(tags)) {
+        this.ctx.status = 400;
+        this.ctx.body = globalErrorCodes.REQUIRED_PARAMETERS_NOT_PROVIDED;
+        return;
+      }
 
+      const requestTagKeys = tags.map(item => item.name)
+      const existTags = await prisma.questionTag.findMany({
+        where: {
+          status: 'NORMAL',
+        },
+      });
+
+      const updatedTagKeys: string[] = existTags.map(item => item.name)
+      console.log('updatedTagKeys', updatedTagKeys)
+      const tagsToCreate = tags.filter(item => !updatedTagKeys.includes(item.name)).map((item) => {
+        return {
+          name: this.ctx.helper.escape(item.name),
+          description: this.ctx.helper.escape(item.name),
+          tagId: generateUuid(item.name),
+        }
+      })
+      if (tagsToCreate.length) {
+        await prisma.questionTag.createMany({
+          data: tagsToCreate,
+        })
+      }
+
+      for (const tagItem of existTags) {
+        // only update tag description
+        if (requestTagKeys.includes(tagItem.name)) {
+          await prisma.questionTag.update({
+            where: {
+              tagId: tagItem.tagId,
+            },
+            data: {
+              description: tags.find(item => item.name === tagItem.name)?.description || ''
+            },
+          })
+        }
+      }
+      this.ctx.status = 200;
+      this.ctx.body = {
+        msg: 'Batch set tags successfully!',
+      };
     } catch (err) {
       this.ctx.status = 500;
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
@@ -100,6 +151,7 @@ export default class TagController extends Controller {
       const resp = await prisma.questionTag.updateMany({
         where: {
           createdAt: {
+            // date before 2023-05-06
             lte: new Date('2023-05-06'),
           },
           NOT: {

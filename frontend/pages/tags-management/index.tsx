@@ -6,7 +6,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import NavBar from "../../components/Navbar";
-import { deleteTagApi } from "../../api/tag"
+import { deleteTagApi, setTagsApi, TagItem } from "../../api/tag"
 
 const TagsManagement: NextPage = () => {
   const frontendList = [
@@ -30,7 +30,7 @@ const TagsManagement: NextPage = () => {
     initialTags[key] = true
   })
 
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState<{[key: string]: string}>({});
   const [tags, setTags] = useState<{[key: string]: boolean}>(initialTags)
 
 
@@ -99,6 +99,15 @@ const TagsManagement: NextPage = () => {
   const submit = () => {
     console.log('desc', formData);
     console.log('tags', tags)
+    const data: TagItem[] = []
+    Object.keys(tags).forEach((item: string) => {
+      data.push({
+        name: item,
+        description: formData[item] || ''
+      })
+    })
+    console.log('data', data)
+    setTagsApi(data)
   };
 
   const deleteOldTags = () => {
