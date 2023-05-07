@@ -353,17 +353,7 @@ export default class QuestionController extends Controller {
       const escapedTitle = this.ctx.helper.escape(title);
       const escapedDescription = description ? this.ctx.helper.escape(description) : '';
 
-      // // 04 use transaction to update one record into Question Table and multiple records into QuestionTag Table
-      // const tagsToUpdate = tags.map(item => {
-      //   if (!item.tagId) {
-      //     return {
-      //       tag: {
-      //         create: { name: item, tagId: generateUuid(item) },
-      //       },
-      //     }
-      //   }
-      //   return item
-      // });
+      // 04 update question table
       const resp = await prisma.question.update({
         where: {
           questionId,
@@ -376,12 +366,52 @@ export default class QuestionController extends Controller {
       }).catch(e => {
         throw new Error(e);
       });
+
+      // 05 update TagsOnQuestions table
+      const oldTags = await prisma.tagsOnQuestions.findMany({
+        where: {
+          questionId
+        }
+      })
+
+      const tagsToCreate: string[] = []
+      const tagsToDelete: string[] = []
+      const existTags: string[] = []
+      oldTags.forEach(item => {
+        if (tags.includes(item.tagId)) {
+          existTags.push(item.tagId)
+        } else {
+          tagsToDelete.push(item.tagId)
+        }
+      })
+      tags.forEach(id => {
+        if (!existTags.includes(id) && !tagsToDelete.includes(id)) {
+          tagsToCreate.push(id)
+        }
+      })
+      // hard delete tags
+      await prisma.tagsOnQuestions.deleteMany({
+        where: {
+          tagId: {
+            in: tagsToDelete
+          }
+        },
+      })
+      // create new tags
+      const tagsToInsert = tagsToCreate.map(tagId => {
+        return {
+          questionId: resp.questionId,
+          tagId
+        }
+      })
+      await prisma.tagsOnQuestions.createMany({
+        data: tagsToInsert
+      })
       if (resp) {
         this.ctx.status = 200;
         this.ctx.body = {
           questionId: resp.questionId,
           description: resp.description,
-          tags,
         };
       }
     } catch (err) {
