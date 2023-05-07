@@ -3,7 +3,7 @@ import { axiosInstance } from "./axios";
 export interface TagItem {
   name: string;
   description?: string;
-  tagId: string;
+  tagId?: string;
 }
 
 export const deleteTagApi = async () => {
