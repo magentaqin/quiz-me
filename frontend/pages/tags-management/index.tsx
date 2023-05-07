@@ -6,7 +6,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import NavBar from "../../components/Navbar";
-import { deleteTagApi, setTagsApi, TagItem } from "../../api/tag"
+import { deleteTagApi, setTagsApi, TagItem } from "../../api/tag";
 
 const TagsManagement: NextPage = () => {
   const frontendList = [
@@ -25,14 +25,13 @@ const TagsManagement: NextPage = () => {
   ];
 
   const backendList = ["nodejs", "mysql", "docker"];
-  const initialTags: any = {}
-  frontendList.concat(backendList).forEach(key => {
-    initialTags[key] = true
-  })
+  const initialTags: any = {};
+  frontendList.concat(backendList).forEach((key) => {
+    initialTags[key] = true;
+  });
 
-  const [formData, setFormData] = useState<{[key: string]: string}>({});
-  const [tags, setTags] = useState<{[key: string]: boolean}>(initialTags)
-
+  const [formData, setFormData] = useState<{ [key: string]: string }>({});
+  const [tags, setTags] = useState<{ [key: string]: boolean }>(initialTags);
 
   const onChange = (
     key: string,
@@ -45,21 +44,22 @@ const TagsManagement: NextPage = () => {
     setFormData(newFormData);
   };
 
-  const toggleCheckbox = (key: string,
-    event: React.ChangeEvent<HTMLInputElement>) => {
-      const newTags = {
-        ...tags,
-        [key]: event.target.checked,
-      };
-      setTags(newTags)
-  }
+  const toggleCheckbox = (key: string, event: React.ChangeEvent<HTMLInputElement>) => {
+    const newTags = {
+      ...tags,
+      [key]: event.target.checked,
+    };
+    setTags(newTags);
+  };
 
   const renderFrontTags = () => {
     return frontendList.map((item) => {
       return (
         <div key={item} className="flex items-center">
           <FormControlLabel
-            control={<Checkbox checked={tags[item]} onChange={(event) => toggleCheckbox(item, event)} />}
+            control={
+              <Checkbox checked={tags[item]} onChange={(event) => toggleCheckbox(item, event)} />
+            }
             label={item}
             style={{ width: "200px" }}
           />
@@ -80,7 +80,9 @@ const TagsManagement: NextPage = () => {
       return (
         <div key={item} className="flex items-center">
           <FormControlLabel
-            control={<Checkbox checked={tags[item]} onChange={(event) => toggleCheckbox(item, event)} />}
+            control={
+              <Checkbox checked={tags[item]} onChange={(event) => toggleCheckbox(item, event)} />
+            }
             label={item}
             style={{ width: "200px" }}
           />
@@ -97,22 +99,22 @@ const TagsManagement: NextPage = () => {
   };
 
   const submit = () => {
-    console.log('desc', formData);
-    console.log('tags', tags)
-    const data: TagItem[] = []
+    console.log("desc", formData);
+    console.log("tags", tags);
+    const data: TagItem[] = [];
     Object.keys(tags).forEach((item: string) => {
       data.push({
         name: item,
-        description: formData[item] || ''
-      })
-    })
-    console.log('data', data)
-    setTagsApi(data)
+        description: formData[item] || "",
+      });
+    });
+    console.log("data", data);
+    setTagsApi(data);
   };
 
   const deleteOldTags = () => {
-    deleteTagApi()
-  }
+    deleteTagApi();
+  };
 
   return (
     <Fragment>

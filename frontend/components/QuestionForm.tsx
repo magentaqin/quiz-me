@@ -8,7 +8,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Alert from "@mui/material/Alert";
 import { addQuestionApi, updateQuestionApi, getQuestionApi } from "../api/question";
-import { listTagsApi, TagItem } from "../api/tag"
+import { listTagsApi, TagItem } from "../api/tag";
 import TagSelect from "./TagSelect";
 import LevelSelect from "./LevelSelect";
 
@@ -20,7 +20,7 @@ export enum QuestionHandleType {
 export interface QuestionData {
   title: string;
   level: string;
-  tags: string[];
+  tags: TagItem[];
   description: string;
 }
 
@@ -29,7 +29,6 @@ interface Props {
   setOpen: (val: boolean) => void;
   type: QuestionHandleType;
   questionId?: string;
-  questionData?: QuestionData;
 }
 
 export default function QuestionForm(props: Props) {
@@ -40,34 +39,40 @@ export default function QuestionForm(props: Props) {
   const [description, setDescription] = useState("");
   const [level, setLevel] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [tags, setTags] = useState<TagItem[]>([])
-  const [tagMap, setTagMap] = useState<{[index: string]: string}>({})
+  const [tags, setTags] = useState<TagItem[]>([]);
+  const [tagMap, setTagMap] = useState<{ [index: string]: string }>({});
   const router = useRouter();
 
   useEffect(() => {
-    listTagsApi().then(res => {
+    listTagsApi().then((res) => {
       if (Array.isArray(res?.data?.tags)) {
-        const tagsArr = res?.data?.tags
-        setTags(tagsArr)
-        const newTagMap:{[index: string]: string} = {}
+        const tagsArr = res?.data?.tags;
+        setTags(tagsArr);
+        const newTagMap: { [index: string]: string } = {};
         tagsArr.forEach((arrItem: TagItem) => {
           if (arrItem.name) {
-            newTagMap[arrItem.name] = arrItem.tagId
+            newTagMap[arrItem.name] = arrItem.tagId;
           }
-        })
-        setTagMap(newTagMap)
+        });
+        setTagMap(newTagMap);
       }
-    })
-  }, [])
+    });
+  }, []);
 
   useEffect(() => {
-    console.log('111', props.type, props.questionId)
     if (props.type === QuestionHandleType.UPDATE && props.questionId) {
-      getQuestionApi({ id: props.questionId}).then(res => {
-        console.log('res', res.data)
-      })
+      getQuestionApi({ id: props.questionId }).then((res) => {
+        if (res?.data) {
+          const { title, description, level, tags } = res?.data
+          const selectedTags = tags.map((item: TagItem)=> item.name)
+          setTitle(title)
+          setDescription(description)
+          setLevel(level)
+          setSelectedTags(selectedTags)
+        }
+      });
     }
-  }, [props.questionId, props.type])
+  }, [props.questionId, props.type]);
 
   const handleSuccess = (id: string) => {
     setShowSuccessMsg(true);
@@ -91,9 +96,9 @@ export default function QuestionForm(props: Props) {
   };
 
   const submit = () => {
-    const tagIds = selectedTags.map(name => {
-      return tagMap[name]
-    })
+    const tagIds = selectedTags.map((name) => {
+      return tagMap[name];
+    });
     const data: any = {
       title,
       description,
@@ -110,7 +115,7 @@ export default function QuestionForm(props: Props) {
         });
     } else {
       data.questionId = props.questionId || "";
-      console.log('update', data)
+      console.log("update", data);
       // updateQuestionApi(data)
       //   .then((res) => {
       //     handleSuccess(res.data.questionId);
