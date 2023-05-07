@@ -265,7 +265,6 @@ export default class QuestionController extends Controller {
         this.ctx.body = globalErrorCodes.REQUIRED_PARAMETERS_NOT_PROVIDED;
         return;
       }
-      // TODO LEFT JOIN
       const resp = await prisma.question.findUnique({
         where: {
           questionId: id,
@@ -274,29 +273,35 @@ export default class QuestionController extends Controller {
           title: true,
           description: true,
           level: true,
-          authorId: true
+          authorId: true,
+          tags: true,
         }
       }).catch(e => {
         throw new Error(e);
       });
-      const tagResp = await prisma.questionTag.findMany({
+
+      const totalTags = await prisma.questionTag.findMany({
         where: {
-          questions: {
-            some: {
-              questionId: id,
-            }
-          }
+          status: 'NORMAL'
+        },
+        select: {
+          name: true,
+          tagId: true,
+          description: true,
         }
       })
+
       if (resp) {
-        const { title, description, level, authorId } = resp;
+        const { title, description, level, authorId, tags } = resp;
+        const tagIds = tags.map(item => item.tagId)
+        const questionTags = totalTags.filter(item => tagIds.includes(item.tagId))
         this.ctx.status = 200;
         this.ctx.body = {
           title,
           description,
           level,
           authorId,
-          tags: tagResp
+          tags: questionTags
         };
       }
     } catch (err) {

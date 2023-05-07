@@ -7,7 +7,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Alert from "@mui/material/Alert";
-import { addQuestionApi, updateQuestionApi } from "../api/question";
+import { addQuestionApi, updateQuestionApi, getQuestionApi } from "../api/question";
 import { listTagsApi, TagItem } from "../api/tag"
 import TagSelect from "./TagSelect";
 import LevelSelect from "./LevelSelect";
@@ -60,6 +60,15 @@ export default function QuestionForm(props: Props) {
     })
   }, [])
 
+  useEffect(() => {
+    console.log('111', props.type, props.questionId)
+    if (props.type === QuestionHandleType.UPDATE && props.questionId) {
+      getQuestionApi({ id: props.questionId}).then(res => {
+        console.log('res', res.data)
+      })
+    }
+  }, [props.questionId, props.type])
+
   const handleSuccess = (id: string) => {
     setShowSuccessMsg(true);
     let timer = setTimeout(() => {
@@ -101,13 +110,14 @@ export default function QuestionForm(props: Props) {
         });
     } else {
       data.questionId = props.questionId || "";
-      updateQuestionApi(data)
-        .then((res) => {
-          handleSuccess(res.data.questionId);
-        })
-        .catch((err) => {
-          handleFail(err.response.data.msg);
-        });
+      console.log('update', data)
+      // updateQuestionApi(data)
+      //   .then((res) => {
+      //     handleSuccess(res.data.questionId);
+      //   })
+      //   .catch((err) => {
+      //     handleFail(err.response.data.msg);
+      //   });
     }
   };
 
