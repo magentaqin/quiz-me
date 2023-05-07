@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -7,7 +7,8 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Alert from "@mui/material/Alert";
-import { addQuestionApi, updateQuestionApi } from "../api/question";
+import { addQuestionApi, updateQuestionApi, getQuestionApi } from "../api/question";
+import { listTagsApi, TagItem } from "../api/tag";
 import TagSelect from "./TagSelect";
 import LevelSelect from "./LevelSelect";
 
@@ -19,7 +20,7 @@ export enum QuestionHandleType {
 export interface QuestionData {
   title: string;
   level: string;
-  tags: string[];
+  tags: TagItem[];
   description: string;
 }
 
@@ -28,7 +29,6 @@ interface Props {
   setOpen: (val: boolean) => void;
   type: QuestionHandleType;
   questionId?: string;
-  questionData?: QuestionData;
 }
 
 export default function QuestionForm(props: Props) {
@@ -39,7 +39,40 @@ export default function QuestionForm(props: Props) {
   const [description, setDescription] = useState("");
   const [level, setLevel] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<TagItem[]>([]);
+  const [tagMap, setTagMap] = useState<{ [index: string]: string }>({});
   const router = useRouter();
+
+  useEffect(() => {
+    listTagsApi().then((res) => {
+      if (Array.isArray(res?.data?.tags)) {
+        const tagsArr = res?.data?.tags;
+        setTags(tagsArr);
+        const newTagMap: { [index: string]: string } = {};
+        tagsArr.forEach((arrItem: TagItem) => {
+          if (arrItem.name) {
+            newTagMap[arrItem.name] = arrItem.tagId || '';
+          }
+        });
+        setTagMap(newTagMap);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (props.type === QuestionHandleType.UPDATE && props.questionId) {
+      getQuestionApi({ id: props.questionId }).then((res) => {
+        if (res?.data) {
+          const { title, description, level, tags } = res?.data;
+          const selectedTags = tags.map((item: TagItem) => item.name);
+          setTitle(title);
+          setDescription(description);
+          setLevel(level);
+          setSelectedTags(selectedTags);
+        }
+      });
+    }
+  }, [props.questionId, props.type]);
 
   const handleSuccess = (id: string) => {
     setShowSuccessMsg(true);
@@ -63,10 +96,13 @@ export default function QuestionForm(props: Props) {
   };
 
   const submit = () => {
+    const tagIds = selectedTags.map((name) => {
+      return tagMap[name];
+    });
     const data: any = {
       title,
       description,
-      tags: selectedTags,
+      tags: tagIds,
       level,
     };
     if (props.type === QuestionHandleType.ADD) {
@@ -124,7 +160,7 @@ export default function QuestionForm(props: Props) {
             value={description}
             onChange={handleDescription}
           />
-          <TagSelect selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
+          <TagSelect selectedTags={selectedTags} setSelectedTags={setSelectedTags} tags={tags} />
           <LevelSelect setSelectedLevel={setLevel} level={level} />
         </DialogContent>
         <DialogActions>

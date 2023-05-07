@@ -246,7 +246,7 @@ const QuestionPage = () => {
 
   return (
     <div>
-      <NavBar shouldHideBtn={true} />
+      <NavBar />
       <Card
         sx={{
           boxShadow: 1,
@@ -278,8 +278,7 @@ const QuestionPage = () => {
           </Button>
           <Button
             size="small"
-            variant="contained"
-            style={{ position: "absolute", left: "150px", backgroundColor: "#1976d2" }}
+            style={{ position: "absolute", left: "150px" }}
             onClick={updateQuestion}
           >
             Update Question

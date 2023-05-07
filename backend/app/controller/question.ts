@@ -34,35 +34,39 @@ export default class QuestionController extends Controller {
       const escapedTitle = this.ctx.helper.escape(title);
       const escapedDescription = description ? this.ctx.helper.escape(description) : '';
 
-      // // 03 use transaction to insert one record into Question Table and multiple records into QuestionTag Table
-      const tagsToCreate = tags.map(item => {
-        return {
-          tag: {
-            create: { name: item, tagId: generateUuid(item) },
-          },
-        };
-      });
+    
+      // 03 decouple question create and tag create
+      // here, we only insert record into Question and TagsOnQuestions Table
       const resp = await prisma.question.create({
         data: {
           questionId: generateUuid(escapedTitle),
           authorId: userResp.userId,
           title: escapedTitle,
           description: escapedDescription,
-          tags: {
-            create: tagsToCreate,
-          },
           level,
         },
       }).catch(e => {
         throw new Error(e);
       });
-      if (resp) {
-        this.ctx.status = 200;
-        this.ctx.body = {
-          questionId: resp.questionId,
-          description: resp.description,
-          tags,
-        };
+      if (resp.questionId) {
+        const dataToInsert = tags.map(tagId => {
+          return {
+            questionId: resp.questionId,
+            tagId
+          }
+        })
+        const relationResp = await prisma.tagsOnQuestions.createMany({
+          data: dataToInsert,
+        }).catch(e => {
+          throw new Error(e);
+        });
+        if (relationResp) {
+          this.ctx.status = 200;
+          this.ctx.body = {
+            questionId: resp.questionId,
+            description: resp.description
+          };
+        }
       }
     } catch (err) {
       this.ctx.status = 500;
@@ -261,7 +265,6 @@ export default class QuestionController extends Controller {
         this.ctx.body = globalErrorCodes.REQUIRED_PARAMETERS_NOT_PROVIDED;
         return;
       }
-      // TODO LEFT JOIN
       const resp = await prisma.question.findUnique({
         where: {
           questionId: id,
@@ -270,29 +273,35 @@ export default class QuestionController extends Controller {
           title: true,
           description: true,
           level: true,
-          authorId: true
+          authorId: true,
+          tags: true,
         }
       }).catch(e => {
         throw new Error(e);
       });
-      const tagResp = await prisma.questionTag.findMany({
+
+      const totalTags = await prisma.questionTag.findMany({
         where: {
-          questions: {
-            some: {
-              questionId: id,
-            }
-          }
+          status: 'NORMAL'
+        },
+        select: {
+          name: true,
+          tagId: true,
+          description: true,
         }
       })
+
       if (resp) {
-        const { title, description, level, authorId } = resp;
+        const { title, description, level, authorId, tags } = resp;
+        const tagIds = tags.map(item => item.tagId)
+        const questionTags = totalTags.filter(item => tagIds.includes(item.tagId))
         this.ctx.status = 200;
         this.ctx.body = {
           title,
           description,
           level,
           authorId,
-          tags: tagResp
+          tags: questionTags
         };
       }
     } catch (err) {
@@ -344,17 +353,7 @@ export default class QuestionController extends Controller {
       const escapedTitle = this.ctx.helper.escape(title);
       const escapedDescription = description ? this.ctx.helper.escape(description) : '';
 
-      // // 04 use transaction to update one record into Question Table and multiple records into QuestionTag Table
-      // const tagsToUpdate = tags.map(item => {
-      //   if (!item.tagId) {
-      //     return {
-      //       tag: {
-      //         create: { name: item, tagId: generateUuid(item) },
-      //       },
-      //     }
-      //   }
-      //   return item
-      // });
+      // 04 update question table
       const resp = await prisma.question.update({
         where: {
           questionId,
@@ -367,12 +366,52 @@ export default class QuestionController extends Controller {
       }).catch(e => {
         throw new Error(e);
       });
+
+      // 05 update TagsOnQuestions table
+      const oldTags = await prisma.tagsOnQuestions.findMany({
+        where: {
+          questionId
+        }
+      })
+
+      const tagsToCreate: string[] = []
+      const tagsToDelete: string[] = []
+      const existTags: string[] = []
+      oldTags.forEach(item => {
+        if (tags.includes(item.tagId)) {
+          existTags.push(item.tagId)
+        } else {
+          tagsToDelete.push(item.tagId)
+        }
+      })
+      tags.forEach(id => {
+        if (!existTags.includes(id) && !tagsToDelete.includes(id)) {
+          tagsToCreate.push(id)
+        }
+      })
+      // hard delete tags
+      await prisma.tagsOnQuestions.deleteMany({
+        where: {
+          tagId: {
+            in: tagsToDelete
+          }
+        },
+      })
+      // create new tags
+      const tagsToInsert = tagsToCreate.map(tagId => {
+        return {
+          questionId: resp.questionId,
+          tagId
+        }
+      })
+      await prisma.tagsOnQuestions.createMany({
+        data: tagsToInsert
+      })
       if (resp) {
         this.ctx.status = 200;
         this.ctx.body = {
           questionId: resp.questionId,
           description: resp.description,
-          tags,
         };
       }
     } catch (err) {

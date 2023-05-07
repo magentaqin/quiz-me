@@ -11,10 +11,16 @@ interface LoginReq {
   password: string;
 }
 
+export enum Role {
+  USER = "USER",
+  ADMIN = "ADMIN",
+}
+
 export interface UserRes {
   token?: string;
   userName: string;
   userId?: string;
+  role?: Role;
 }
 
 export const signupApi = async (data: SignupReq) => {

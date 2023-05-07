@@ -6,24 +6,20 @@ import { useRouter } from "next/router";
 import styles from "../styles/Home.module.scss";
 import UserForm from "./UserForm";
 import QuestionForm, { QuestionHandleType } from "./QuestionForm";
-import { UserRes, getUserInfoApi } from "../api/user";
+import { UserRes, getUserInfoApi, Role } from "../api/user";
 
 export type FormType = "signup" | "login" | "question";
 
-interface Props {
-  shouldHideBtn?: boolean;
-}
-
-const NavBar = (props: Props) => {
+const NavBar = () => {
   const [formType, setFormType] = useState<FormType>("signup");
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  const [user, setUser] = useState<UserRes>({ userName: "", token: "", userId: "" });
+  const [user, setUser] = useState<UserRes>({ userName: "", role: Role.USER });
 
   useEffect(() => {
-    getUserInfoApi().then((res) => {
-      if (res?.data?.userName) {
-        setUser({ userName: res?.data?.userName });
+    getUserInfoApi().then((res: { data: UserRes }) => {
+      if (res?.data) {
+        setUser(res.data);
       }
     });
   }, []);
@@ -44,11 +40,17 @@ const NavBar = (props: Props) => {
     setOpen(true);
   };
 
+  const toTagsManagement = () => {
+    router.push({
+      pathname: "/tags-management",
+    });
+  };
+
   const renderTopRight = () => {
     if (user.userName) {
       return (
         <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
-          {props.shouldHideBtn ? null : (
+          {user.role === (Role.ADMIN || Role.USER) ? (
             <Button
               variant="contained"
               size="small"
@@ -57,7 +59,12 @@ const NavBar = (props: Props) => {
             >
               Add Question
             </Button>
-          )}
+          ) : null}
+          {user.role === Role.ADMIN ? (
+            <Button size="small" onClick={toTagsManagement}>
+              Manage Tags
+            </Button>
+          ) : null}
           <p>{user.userName}</p>
         </Stack>
       );
