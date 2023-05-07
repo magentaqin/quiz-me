@@ -110,7 +110,6 @@ export default class TagController extends Controller {
       });
 
       const updatedTagKeys: string[] = existTags.map(item => item.name)
-      console.log('updatedTagKeys', updatedTagKeys)
       const tagsToCreate = tags.filter(item => !updatedTagKeys.includes(item.name)).map((item) => {
         return {
           name: this.ctx.helper.escape(item.name),

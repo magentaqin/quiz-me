@@ -34,35 +34,39 @@ export default class QuestionController extends Controller {
       const escapedTitle = this.ctx.helper.escape(title);
       const escapedDescription = description ? this.ctx.helper.escape(description) : '';
 
-      // // 03 use transaction to insert one record into Question Table and multiple records into QuestionTag Table
-      const tagsToCreate = tags.map(item => {
-        return {
-          tag: {
-            create: { name: item, tagId: generateUuid(item) },
-          },
-        };
-      });
+    
+      // 03 decouple question create and tag create
+      // here, we only insert record into Question and TagsOnQuestions Table
       const resp = await prisma.question.create({
         data: {
           questionId: generateUuid(escapedTitle),
           authorId: userResp.userId,
           title: escapedTitle,
           description: escapedDescription,
-          tags: {
-            create: tagsToCreate,
-          },
           level,
         },
       }).catch(e => {
         throw new Error(e);
       });
-      if (resp) {
-        this.ctx.status = 200;
-        this.ctx.body = {
-          questionId: resp.questionId,
-          description: resp.description,
-          tags,
-        };
+      if (resp.questionId) {
+        const dataToInsert = tags.map(tagId => {
+          return {
+            questionId: resp.questionId,
+            tagId
+          }
+        })
+        const relationResp = await prisma.tagsOnQuestions.createMany({
+          data: dataToInsert,
+        }).catch(e => {
+          throw new Error(e);
+        });
+        if (relationResp) {
+          this.ctx.status = 200;
+          this.ctx.body = {
+            questionId: resp.questionId,
+            description: resp.description
+          };
+        }
       }
     } catch (err) {
       this.ctx.status = 500;

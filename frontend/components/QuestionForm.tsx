@@ -41,12 +41,21 @@ export default function QuestionForm(props: Props) {
   const [level, setLevel] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [tags, setTags] = useState<TagItem[]>([])
+  const [tagMap, setTagMap] = useState<{[index: string]: string}>({})
   const router = useRouter();
 
   useEffect(() => {
     listTagsApi().then(res => {
       if (Array.isArray(res?.data?.tags)) {
-        setTags(res?.data?.tags)
+        const tagsArr = res?.data?.tags
+        setTags(tagsArr)
+        const newTagMap:{[index: string]: string} = {}
+        tagsArr.forEach((arrItem: TagItem) => {
+          if (arrItem.name) {
+            newTagMap[arrItem.name] = arrItem.tagId
+          }
+        })
+        setTagMap(newTagMap)
       }
     })
   }, [])
@@ -73,10 +82,13 @@ export default function QuestionForm(props: Props) {
   };
 
   const submit = () => {
+    const tagIds = selectedTags.map(name => {
+      return tagMap[name]
+    })
     const data: any = {
       title,
       description,
-      tags: selectedTags,
+      tags: tagIds,
       level,
     };
     if (props.type === QuestionHandleType.ADD) {
