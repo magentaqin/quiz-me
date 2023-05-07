@@ -61,12 +61,7 @@ const NavBar = () => {
             </Button>
           ) : null}
           {user.role === Role.ADMIN ? (
-            <Button
-              variant="contained"
-              size="small"
-              onClick={toTagsManagement}
-              style={{ backgroundColor: "#1976d2" }}
-            >
+            <Button size="small" onClick={toTagsManagement}>
               Manage Tags
             </Button>
           ) : null}

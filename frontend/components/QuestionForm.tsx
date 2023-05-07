@@ -63,12 +63,12 @@ export default function QuestionForm(props: Props) {
     if (props.type === QuestionHandleType.UPDATE && props.questionId) {
       getQuestionApi({ id: props.questionId }).then((res) => {
         if (res?.data) {
-          const { title, description, level, tags } = res?.data
-          const selectedTags = tags.map((item: TagItem)=> item.name)
-          setTitle(title)
-          setDescription(description)
-          setLevel(level)
-          setSelectedTags(selectedTags)
+          const { title, description, level, tags } = res?.data;
+          const selectedTags = tags.map((item: TagItem) => item.name);
+          setTitle(title);
+          setDescription(description);
+          setLevel(level);
+          setSelectedTags(selectedTags);
         }
       });
     }
@@ -115,14 +115,13 @@ export default function QuestionForm(props: Props) {
         });
     } else {
       data.questionId = props.questionId || "";
-      console.log("update", data);
-      // updateQuestionApi(data)
-      //   .then((res) => {
-      //     handleSuccess(res.data.questionId);
-      //   })
-      //   .catch((err) => {
-      //     handleFail(err.response.data.msg);
-      //   });
+      updateQuestionApi(data)
+        .then((res) => {
+          handleSuccess(res.data.questionId);
+        })
+        .catch((err) => {
+          handleFail(err.response.data.msg);
+        });
     }
   };
 
