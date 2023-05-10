@@ -1,10 +1,10 @@
 # STAGE 1: install
-FROM node:16.17.0 AS base
+FROM node:16.7-alpine AS base
 WORKDIR /base
 # Install dependencies
 COPY package.json ./
 COPY package-lock.json ./
-RUN npm ci
+RUN npm ci -only=prod 
 # Copy project 
 COPY . .
 

@@ -3,7 +3,7 @@ services:
   web:
     container_name: quizme_web
     image: "${FRONTEND_IMAGE}"
-    platform: linux/x86_64
+    platform: ${PLATFORM}
     build:
       context: ./frontend
     ports:
@@ -14,7 +14,7 @@ services:
       - app-network
   backend:
     container_name: quizme_backend
-    platform: linux/x86_64
+    platform: "${PLATFORM}"
     image: "${BACKEND_IMAGE}"
     build: 
       context: ./backend
@@ -34,7 +34,7 @@ services:
   db:
     container_name: quizme_db
     image: mysql
-    platform: linux/x86_64
+    platform: ${PLATFORM}
     environment:
       MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASS}"
       MYSQL_DATABASE: "${DB_NAME}"
