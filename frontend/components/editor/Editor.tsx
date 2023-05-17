@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import isHotkey from "is-hotkey";
 import Prism from "prismjs";
-import { Editable, withReact, useSlate, Slate } from "slate-react";
+import { Editable, withReact, useSlate, Slate, useSlateStatic } from "slate-react";
 import { Editor, createEditor, Element as SlateElement, Text, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
@@ -12,6 +12,7 @@ import TitleIcon from "@mui/icons-material/Title";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import PhotoIcon from "@mui/icons-material/Photo";
 import DataObjectIcon from "@mui/icons-material/DataObject";
 import { css } from "@emotion/css";
 
@@ -29,6 +30,16 @@ const HOTKEYS: any = {
   "mod+i": "italic",
   "mod+u": "underline",
   "mod+`": "code",
+};
+
+export type EmptyText = {
+  text: string;
+};
+
+export type ImageElement = {
+  type: "image";
+  url: string;
+  children: EmptyText[];
 };
 
 const getLength = (token: any) => {
@@ -132,6 +143,7 @@ const RichTextEditor = (props: Props) => {
         <BlockButton format="blockQuote" icon={() => <FormatQuoteIcon />} />
         <BlockButton format="numberedList" icon={() => <FormatListNumberedIcon />} />
         <BlockButton format="bulletedList" icon={() => <FormatListBulletedIcon />} />
+        <InsertImageButton format="image" icon={() => <PhotoIcon />} />
       </Toolbar>
     );
   };
@@ -371,6 +383,37 @@ const BlockButton = ({ format, icon }: any) => {
       onMouseDown={(event: any) => {
         event.preventDefault();
         toggleBlock(editor, format);
+      }}
+    >
+      {icon()}
+    </Button>
+  );
+};
+
+const isImageUrl = (url: string) => {
+  if (!url) return false;
+  const ext: any = new URL(url).pathname.split(".").pop();
+  return ["png", "jpeg", "jpg"].includes(ext);
+};
+
+const insertImage = (editor: any, url: string) => {
+  const text = { text: "" };
+  const image: ImageElement = { type: "image", url, children: [text] };
+  Transforms.insertNodes(editor, image);
+};
+
+const InsertImageButton = ({ format, icon }: any) => {
+  const editor = useSlateStatic();
+  return (
+    <Button
+      onMouseDown={(event: Event) => {
+        event.preventDefault();
+        const url = window.prompt("Enter the URL of the image:");
+        if (url && !isImageUrl(url)) {
+          alert("URL is not an image");
+          return;
+        }
+        url && insertImage(editor, url);
       }}
     >
       {icon()}
