@@ -1,7 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import isHotkey from "is-hotkey";
 import Prism from "prismjs";
-import { Editable, withReact, useSlate, Slate, useSlateStatic } from "slate-react";
+import {
+  Editable,
+  withReact,
+  useSlate,
+  Slate,
+  useSlateStatic,
+  useSelected,
+  useFocused,
+  ReactEditor,
+} from "slate-react";
 import { Editor, createEditor, Element as SlateElement, Text, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
@@ -94,8 +103,43 @@ const RichTextEditor = (props: Props) => {
   }, []);
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
 
+  const withImages = (editor: any) => {
+    const { insertData, isVoid } = editor;
+
+    editor.isVoid = (element) => {
+      return element.type === "image" ? true : isVoid(element);
+    };
+
+    editor.insertData = (data) => {
+      const text = data.getData("text/plain");
+      const { files } = data;
+
+      if (files && files.length > 0) {
+        for (const file of files) {
+          const reader = new FileReader();
+          const [mime] = file.type.split("/");
+
+          if (mime === "image") {
+            reader.addEventListener("load", () => {
+              const url = reader.result;
+              insertImage(editor, url);
+            });
+
+            reader.readAsDataURL(file);
+          }
+        }
+      } else if (isImageUrl(text)) {
+        insertImage(editor, text);
+      } else {
+        insertData(data);
+      }
+    };
+
+    return editor;
+  };
+
   // withHistory: tracks changes to the Slate value state over time, and enables undo and redo functionality.
-  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+  const editor = useMemo(() => withImages(withHistory(withReact(createEditor()))), []);
 
   // decorate function depends on the language selected
   const decorate = useCallback(
@@ -274,7 +318,50 @@ const isMarkActive = (editor: any, format: any) => {
   return marks ? marks[format] === true : false;
 };
 
-const Element = ({ attributes, children, element }: any) => {
+const ImageElement = ({ attributes, children, element }) => {
+  const editor = useSlateStatic();
+  const path = ReactEditor.findPath(editor, element);
+
+  const selected = useSelected();
+  const focused = useFocused();
+  return (
+    <div {...attributes}>
+      {children}
+      <div
+        contentEditable={false}
+        className={css`
+          position: relative;
+        `}
+      >
+        <img
+          src={element.url}
+          className={css`
+            display: block;
+            max-width: 100%;
+            max-height: 20em;
+            box-shadow: ${selected && focused ? "0 0 0 3px #B4D5FF" : "none"};
+          `}
+        />
+        <Button
+          active
+          onClick={() => Transforms.removeNodes(editor, { at: path })}
+          className={css`
+            display: ${selected && focused ? "inline" : "none"};
+            position: absolute;
+            top: 0.5em;
+            left: 0.5em;
+            background-color: white;
+          `}
+        >
+          <p>delete</p>
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const Element = (props: any) => {
+  const { attributes, children, element } = props;
   switch (element.type) {
     case "blockQuote":
       return (
@@ -292,6 +379,8 @@ const Element = ({ attributes, children, element }: any) => {
       return <li {...attributes}>{children}</li>;
     case "numberedList":
       return <ol {...attributes}>{children}</ol>;
+    case "image":
+      return <ImageElement {...props} />;
     default:
       return <p {...attributes}>{children}</p>;
   }
