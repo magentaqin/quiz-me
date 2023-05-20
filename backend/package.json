@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "dotenv -e .env.dev egg-bin dev",
     "migrate:dev": "dotenv -e .env.dev prisma migrate dev",
-    "prisma:db:pull":"dotenv -e .env.dev prisma db pull",
+    "prisma:db:pull": "dotenv -e .env.dev prisma db pull",
     "prisma:rollback": "dotenv -e .env.dev prisma migrate resolve --rolled-back 20201231000000_example",
     "migrate:deploy": "prisma migrate deploy",
     "start": "egg-scripts start --title=quizme-server-backend",
@@ -25,6 +25,7 @@
     "clean": "tsc -b --clean"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.335.0",
     "bcrypt": "^5.0.1",
     "egg": "^2.6.1",
     "egg-scripts": "^2.6.0",
@@ -33,19 +34,19 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@eggjs/tsconfig": "^1.0.0",
+    "@prisma/client": "^3.15.2",
     "@types/mocha": "^2.2.40",
     "@types/node": "^7.0.12",
     "@types/supertest": "^2.0.0",
-    "@eggjs/tsconfig": "^1.0.0",
     "autod": "^3.0.1",
     "autod-egg": "^1.1.0",
-    "egg-ci": "^2.1.0",
     "egg-bin": "^4.11.0",
+    "egg-ci": "^2.1.0",
     "egg-mock": "^3.16.0",
     "eslint": "^8.0.0",
     "eslint-config-egg": "^12.0.0",
-    "typescript": "^4.0.0",
-    "@prisma/client": "^3.15.2"
+    "typescript": "^4.0.0"
   },
   "engines": {
     "node": ">=14.0.0"

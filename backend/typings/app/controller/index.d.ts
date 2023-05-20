@@ -6,6 +6,7 @@ import 'egg';
 import ExportAnswer from '../../../app/controller/answer';
 import ExportQuestion from '../../../app/controller/question';
 import ExportTag from '../../../app/controller/tag';
+import ExportUpload from '../../../app/controller/upload';
 import ExportUser from '../../../app/controller/user';
 
 declare module 'egg' {
@@ -13,6 +14,7 @@ declare module 'egg' {
     answer: ExportAnswer;
     question: ExportQuestion;
     tag: ExportTag;
+    upload: ExportUpload;
     user: ExportUser;
   }
 }
