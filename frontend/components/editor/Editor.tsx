@@ -479,6 +479,7 @@ const BlockButton = ({ format, icon }: any) => {
   );
 };
 
+// test image url: https://i.pinimg.com/originals/bd/01/39/bd0139965d5cf92a73cd374fd8d98c90.jpg
 const isImageUrl = (url: string) => {
   if (!url) return false;
   const ext: any = new URL(url).pathname.split(".").pop();
@@ -491,20 +492,31 @@ const insertImage = (editor: any, url: string) => {
   Transforms.insertNodes(editor, image);
 };
 
+const handleUploadClick = (event: any) => {
+  const file = event.target.files[0];
+};
+
 const InsertImageButton = ({ format, icon }: any) => {
   const editor = useSlateStatic();
   return (
     <Button
+      className="relative"
       onMouseDown={(event: Event) => {
-        event.preventDefault();
-        const url = window.prompt("Enter the URL of the image:");
-        if (url && !isImageUrl(url)) {
-          alert("URL is not an image");
-          return;
-        }
-        url && insertImage(editor, url);
+        // event.preventDefault();
+        // const url = window.prompt("Enter the URL of the image:");
+        // if (url && !isImageUrl(url)) {
+        //   alert("URL is not an image");
+        //   return;
+        // }
+        // url && insertImage(editor, url);
       }}
     >
+      <input
+        accept="image/*"
+        type="file"
+        onChange={handleUploadClick}
+        className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-0"
+      />
       {icon()}
     </Button>
   );
