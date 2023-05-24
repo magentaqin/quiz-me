@@ -30,4 +30,9 @@ export default (app: Application) => {
   router.post('/tag/batchSet', controller.tag.batchSetTags);
   router.post('/tag/delete', controller.tag.deleteTags);
   router.get('/tag/list', controller.tag.listTag);
+
+  /**
+   * Upload
+   */
+   router.post('/upload/image', controller.upload.uploadImage);
 };
