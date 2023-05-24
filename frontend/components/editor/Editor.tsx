@@ -32,6 +32,7 @@ import { serialize, toSlateJson } from "../../utils/format";
 interface Props {
   fromAnswer?: boolean;
   slateJson?: string[];
+  uploadImage?: (file: File) => Promise<any>;
 }
 
 const HOTKEYS: any = {
@@ -189,6 +190,46 @@ const RichTextEditor = (props: Props) => {
         <BlockButton format="bulletedList" icon={() => <FormatListBulletedIcon />} />
         <InsertImageButton format="image" icon={() => <PhotoIcon />} />
       </Toolbar>
+    );
+  };
+
+  const handleUploadClick = (event: any, editor: any) => {
+    const file = event.target.files[0];
+    if (!file) {
+      return;
+    }
+    if (props.uploadImage) {
+      props.uploadImage(file).then((res) => {
+        if (res && res.url) {
+          insertImage(editor, res.url);
+        }
+      });
+    }
+  };
+
+  const InsertImageButton = ({ format, icon }: any) => {
+    const editor = useSlateStatic();
+    return (
+      <Button
+        className="relative"
+        onMouseDown={(event: Event) => {
+          // event.preventDefault();
+          // const url = window.prompt("Enter the URL of the image:");
+          // if (url && !isImageUrl(url)) {
+          //   alert("URL is not an image");
+          //   return;
+          // }
+          // url && insertImage(editor, url);
+        }}
+      >
+        <input
+          accept="image/*"
+          type="file"
+          onChange={(e: event) => handleUploadClick(event, editor)}
+          className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-0"
+        />
+        {icon()}
+      </Button>
     );
   };
 
@@ -490,36 +531,6 @@ const insertImage = (editor: any, url: string) => {
   const text = { text: "" };
   const image: ImageElement = { type: "image", url, children: [text] };
   Transforms.insertNodes(editor, image);
-};
-
-const handleUploadClick = (event: any) => {
-  const file = event.target.files[0];
-};
-
-const InsertImageButton = ({ format, icon }: any) => {
-  const editor = useSlateStatic();
-  return (
-    <Button
-      className="relative"
-      onMouseDown={(event: Event) => {
-        // event.preventDefault();
-        // const url = window.prompt("Enter the URL of the image:");
-        // if (url && !isImageUrl(url)) {
-        //   alert("URL is not an image");
-        //   return;
-        // }
-        // url && insertImage(editor, url);
-      }}
-    >
-      <input
-        accept="image/*"
-        type="file"
-        onChange={handleUploadClick}
-        className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-0"
-      />
-      {icon()}
-    </Button>
-  );
 };
 
 const MarkButton = ({ format, icon }: any) => {

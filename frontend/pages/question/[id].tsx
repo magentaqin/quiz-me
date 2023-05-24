@@ -19,6 +19,7 @@ import {
   ListAnswerRes,
   updateAnswerApi,
 } from "../../api/answer";
+import { uploadImageApi } from "../../api/upload";
 import NavBar from "../../components/Navbar";
 import Footer from "../../components/editor/Footer";
 import QuestionForm, { QuestionHandleType } from "../../components/QuestionForm";
@@ -29,6 +30,7 @@ const QuestionPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const [title, setTitle] = useState("");
+  const [tags, setTags] = useState([]);
   const [open, setOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [showEditor, setShowEditor] = useState(false);
@@ -44,9 +46,10 @@ const QuestionPage = () => {
   useEffect(() => {
     if (id) {
       getQuestionApi({ id: id as string }).then((res) => {
-        const { title, description } = res.data;
+        const { title, description, tags } = res.data;
         setTitle(title);
         setDescription(description);
+        setTags(tags);
       });
       listAnswerApi({ questionId: id as string, offset: 0, count: 20 }).then((res) => {
         if (Array.isArray(res.data)) {
@@ -143,10 +146,27 @@ const QuestionPage = () => {
     setShowEditor(false);
   };
 
+  const uploadImage = (file: File) => {
+    const fileKey = tags[0]?.name + "/" + id + "-" + Date.now() + "-" + file.name;
+    return new Promise((resolve) => {
+      uploadImageApi(file, fileKey)
+        .then((res) => {
+          if (res.data) {
+            const { url, fileKey } = res.data;
+            resolve({ url });
+          }
+        })
+        .catch((err) => {
+          // TODO TOAST
+          console.error(err);
+        });
+    });
+  };
+
   const renderEditor = () => {
     return (
       <div className="relative flex justify-center">
-        <Editor slateJson={slateJson as any} />
+        <Editor slateJson={slateJson as any} uploadImage={uploadImage} />
         <Footer onSubmit={submitAnswer} cancel={handleCancel} />
         {showSuccessMsg ? (
           <Alert variant="filled" severity="success" className="fixed top-96">
