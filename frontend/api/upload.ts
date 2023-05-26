@@ -1,7 +1,6 @@
 import { axiosInstance } from "./axios";
 
 export const uploadImageApi = async (file: File, fileKey: string) => {
-  console.log('file!!!!', file)
   const formData = new FormData()
   formData.append('file', file)
   formData.append('fileKey', fileKey)
@@ -11,3 +10,9 @@ export const uploadImageApi = async (file: File, fileKey: string) => {
     }
   });
 };
+
+
+export const getImageUrlApi = async (data: { fileKey: string }) => {
+  return await axiosInstance.post("/image/url", data);
+};
+
