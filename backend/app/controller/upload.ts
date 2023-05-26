@@ -71,16 +71,9 @@ export default class UploadController extends Controller {
         return;
       }
 
-      // 05 GET temporary Image Url
-      const command = new GetObjectCommand(params);
-      const signedUrl = await getSignedUrl(s3Client as any, command as any, {
-        expiresIn: 3600,
-      });
-
       this.ctx.status = 201;
       this.ctx.body = {
-        url: signedUrl,
-        fileKey: stream.fields.fileKey,
+        url: 'https://' + process.env.AWS_IMAGE_BUCKET + '.s3.' + process.env.AWS_REGION + '.amazonaws.com/' + params.Key,
       };
     } catch (err) {
       this.ctx.status = 500;
