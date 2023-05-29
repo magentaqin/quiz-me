@@ -14,6 +14,7 @@ interface TextNode {
 interface ElementNode {
   type?: string;
   children: TextNode[];
+  url?: string;
 }
 
 // transform slate json-format to html string
@@ -55,6 +56,8 @@ export const serialize = (node: ElementNode | TextNode) => {
       return `<ul>${children}</ul>`;
     case "listItem":
       return `<li>${children}</li>`;
+    case "image":
+      return `<img src=${node.url} />`
     default:
       return children;
   }
@@ -90,7 +93,8 @@ const deserialize = (el: HTMLElement, markAttributes = {}): any => {
   if (children.length === 0) {
     children.push(jsx("text", nodeAttributes, ""));
   }
-  console.log("el.nodeName", el.nodeName, children);
+
+  // console.log("el.nodeName", el.nodeName, children);
   switch (el.nodeName) {
     case "BODY":
       return jsx("fragment", {}, children);
@@ -122,6 +126,8 @@ const deserialize = (el: HTMLElement, markAttributes = {}): any => {
       return jsx("text", { ...children[0], codeInline: true });
     case "CODE-BLOCK": // code block
       return jsx("text", { ...children[0], code: true });
+    case "IMG":
+      return jsx("element", { type: "image", url: (el as any).src }, children );
     default:
       return children;
   }

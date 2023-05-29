@@ -1,7 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import isHotkey from "is-hotkey";
 import Prism from "prismjs";
-import { Editable, withReact, useSlate, Slate } from "slate-react";
+import {
+  Editable,
+  withReact,
+  useSlate,
+  Slate,
+  useSlateStatic,
+  useSelected,
+  useFocused,
+  ReactEditor,
+} from "slate-react";
 import { Editor, createEditor, Element as SlateElement, Text, Transforms } from "slate";
 import { withHistory } from "slate-history";
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
@@ -12,6 +21,7 @@ import TitleIcon from "@mui/icons-material/Title";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import PhotoIcon from "@mui/icons-material/Photo";
 import DataObjectIcon from "@mui/icons-material/DataObject";
 import { css } from "@emotion/css";
 
@@ -22,6 +32,7 @@ import { serialize, toSlateJson } from "../../utils/format";
 interface Props {
   fromAnswer?: boolean;
   slateJson?: string[];
+  uploadImage?: (file: File) => Promise<any>;
 }
 
 const HOTKEYS: any = {
@@ -29,6 +40,16 @@ const HOTKEYS: any = {
   "mod+i": "italic",
   "mod+u": "underline",
   "mod+`": "code",
+};
+
+export type EmptyText = {
+  text: string;
+};
+
+export type ImageElement = {
+  type: "image";
+  url: string;
+  children: EmptyText[];
 };
 
 const getLength = (token: any) => {
@@ -83,8 +104,45 @@ const RichTextEditor = (props: Props) => {
   }, []);
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
 
+  const withImages = (editor: any) => {
+    const { insertData, isVoid } = editor;
+
+    editor.isVoid = (element: any) => {
+      return element.type === "image" ? true : isVoid(element);
+    };
+
+    editor.insertData = (data: any) => {
+      const text = data.getData("text/plain");
+      const { files } = data;
+
+      if (files && files.length > 0) {
+        for (const file of files) {
+          const reader = new FileReader();
+          const [mime] = file.type.split("/");
+
+          if (mime === "image") {
+            reader.addEventListener("load", () => {
+              const url = reader.result;
+              if (url !== null) {
+                insertImage(editor, url as string);
+              }
+            });
+
+            reader.readAsDataURL(file);
+          }
+        }
+      } else if (isImageUrl(text)) {
+        insertImage(editor, text);
+      } else {
+        insertData(data);
+      }
+    };
+
+    return editor;
+  };
+
   // withHistory: tracks changes to the Slate value state over time, and enables undo and redo functionality.
-  const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+  const editor = useMemo(() => withImages(withHistory(withReact(createEditor()))), []);
 
   // decorate function depends on the language selected
   const decorate = useCallback(
@@ -132,7 +190,37 @@ const RichTextEditor = (props: Props) => {
         <BlockButton format="blockQuote" icon={() => <FormatQuoteIcon />} />
         <BlockButton format="numberedList" icon={() => <FormatListNumberedIcon />} />
         <BlockButton format="bulletedList" icon={() => <FormatListBulletedIcon />} />
+        <InsertImageButton format="image" icon={() => <PhotoIcon />} />
       </Toolbar>
+    );
+  };
+
+  const handleUploadClick = (event: any, editor: any) => {
+    const file = event.target.files[0];
+    if (!file) {
+      return;
+    }
+    if (props.uploadImage) {
+      props.uploadImage(file).then((res) => {
+        if (res && res.url) {
+          insertImage(editor, res.url);
+        }
+      });
+    }
+  };
+
+  const InsertImageButton = ({ format, icon }: any) => {
+    const editor = useSlateStatic();
+    return (
+      <Button className="relative">
+        <input
+          accept="image/*"
+          type="file"
+          onChange={(e: any) => handleUploadClick(event, editor)}
+          className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-0"
+        />
+        {icon()}
+      </Button>
     );
   };
 
@@ -144,7 +232,7 @@ const RichTextEditor = (props: Props) => {
           editor={editor}
           value={value}
           onChange={(value: any) => {
-            const isAstChange = editor.operations.some((op) => "set_selection" !== op.type);
+            const isAstChange = editor.operations.some((op: any) => "set_selection" !== op.type);
             if (isAstChange) {
               // Save the value to Local Storage.
               const content = JSON.stringify(value);
@@ -262,7 +350,50 @@ const isMarkActive = (editor: any, format: any) => {
   return marks ? marks[format] === true : false;
 };
 
-const Element = ({ attributes, children, element }: any) => {
+const ImageElement = ({ attributes, children, element }: any) => {
+  const editor = useSlateStatic();
+  const path = ReactEditor.findPath(editor as any, element);
+
+  const selected = useSelected();
+  const focused = useFocused();
+  return (
+    <div {...attributes}>
+      {children}
+      <div
+        contentEditable={false}
+        className={css`
+          position: relative;
+        `}
+      >
+        <img
+          src={element.url}
+          className={css`
+            display: block;
+            max-width: 100%;
+            max-height: 20em;
+            box-shadow: ${selected && focused ? "0 0 0 3px #B4D5FF" : "none"};
+          `}
+        />
+        <Button
+          active
+          onClick={() => Transforms.removeNodes(editor, { at: path })}
+          className={css`
+            display: ${selected && focused ? "inline" : "none"};
+            position: absolute;
+            top: 0.5em;
+            left: 0.5em;
+            background-color: white;
+          `}
+        >
+          <p>delete</p>
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const Element = (props: any) => {
+  const { attributes, children, element } = props;
   switch (element.type) {
     case "blockQuote":
       return (
@@ -280,6 +411,8 @@ const Element = ({ attributes, children, element }: any) => {
       return <li {...attributes}>{children}</li>;
     case "numberedList":
       return <ol {...attributes}>{children}</ol>;
+    case "image":
+      return <ImageElement {...props} />;
     default:
       return <p {...attributes}>{children}</p>;
   }
@@ -376,6 +509,19 @@ const BlockButton = ({ format, icon }: any) => {
       {icon()}
     </Button>
   );
+};
+
+// test image url: https://i.pinimg.com/originals/bd/01/39/bd0139965d5cf92a73cd374fd8d98c90.jpg
+const isImageUrl = (url: string) => {
+  if (!url) return false;
+  const ext: any = new URL(url).pathname.split(".").pop();
+  return ["png", "jpeg", "jpg"].includes(ext);
+};
+
+const insertImage = (editor: any, url: string) => {
+  const text = { text: "" };
+  const image: ImageElement = { type: "image", url, children: [text] };
+  Transforms.insertNodes(editor, image);
 };
 
 const MarkButton = ({ format, icon }: any) => {
