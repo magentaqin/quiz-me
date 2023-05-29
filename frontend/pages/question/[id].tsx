@@ -30,7 +30,7 @@ const QuestionPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const [title, setTitle] = useState("");
-  const [tags, setTags] = useState([]);
+  const [tags, setTags] = useState<any>([]);
   const [open, setOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [showEditor, setShowEditor] = useState(false);
@@ -147,19 +147,21 @@ const QuestionPage = () => {
   };
 
   const uploadImage = (file: File) => {
-    const fileKey = tags[0]?.name + "/" + id + "-" + Date.now() + "-" + file.name;
     return new Promise((resolve) => {
-      uploadImageApi(file, fileKey)
-        .then((res) => {
-          if (res.data) {
-            const { url, fileKey } = res.data;
-            resolve({ url });
-          }
-        })
-        .catch((err) => {
-          // TODO TOAST
-          console.error(err);
-        });
+      if (tags[0] && tags[0].name) {
+        const fileKey = tags[0]?.name + "/" + id + "-" + Date.now() + "-" + file.name;
+        uploadImageApi(file, fileKey)
+          .then((res) => {
+            if (res.data) {
+              const { url, fileKey } = res.data;
+              resolve({ url });
+            }
+          })
+          .catch((err) => {
+            // TODO TOAST
+            console.error(err);
+          });
+      }
     });
   };
 

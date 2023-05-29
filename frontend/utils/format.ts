@@ -14,6 +14,7 @@ interface TextNode {
 interface ElementNode {
   type?: string;
   children: TextNode[];
+  url?: string;
 }
 
 // transform slate json-format to html string
@@ -126,7 +127,7 @@ const deserialize = (el: HTMLElement, markAttributes = {}): any => {
     case "CODE-BLOCK": // code block
       return jsx("text", { ...children[0], code: true });
     case "IMG":
-      return jsx("element", { type: "image", url: el.src }, children );
+      return jsx("element", { type: "image", url: (el as any).src }, children );
     default:
       return children;
   }

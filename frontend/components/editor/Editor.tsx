@@ -107,11 +107,11 @@ const RichTextEditor = (props: Props) => {
   const withImages = (editor: any) => {
     const { insertData, isVoid } = editor;
 
-    editor.isVoid = (element) => {
+    editor.isVoid = (element: any) => {
       return element.type === "image" ? true : isVoid(element);
     };
 
-    editor.insertData = (data) => {
+    editor.insertData = (data: any) => {
       const text = data.getData("text/plain");
       const { files } = data;
 
@@ -123,7 +123,9 @@ const RichTextEditor = (props: Props) => {
           if (mime === "image") {
             reader.addEventListener("load", () => {
               const url = reader.result;
-              insertImage(editor, url);
+              if (url !== null) {
+                insertImage(editor, url as string);
+              }
             });
 
             reader.readAsDataURL(file);
@@ -210,22 +212,11 @@ const RichTextEditor = (props: Props) => {
   const InsertImageButton = ({ format, icon }: any) => {
     const editor = useSlateStatic();
     return (
-      <Button
-        className="relative"
-        onMouseDown={(event: Event) => {
-          // event.preventDefault();
-          // const url = window.prompt("Enter the URL of the image:");
-          // if (url && !isImageUrl(url)) {
-          //   alert("URL is not an image");
-          //   return;
-          // }
-          // url && insertImage(editor, url);
-        }}
-      >
+      <Button className="relative">
         <input
           accept="image/*"
           type="file"
-          onChange={(e: event) => handleUploadClick(event, editor)}
+          onChange={(e: any) => handleUploadClick(event, editor)}
           className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-0"
         />
         {icon()}
@@ -241,7 +232,7 @@ const RichTextEditor = (props: Props) => {
           editor={editor}
           value={value}
           onChange={(value: any) => {
-            const isAstChange = editor.operations.some((op) => "set_selection" !== op.type);
+            const isAstChange = editor.operations.some((op: any) => "set_selection" !== op.type);
             if (isAstChange) {
               // Save the value to Local Storage.
               const content = JSON.stringify(value);
@@ -359,9 +350,9 @@ const isMarkActive = (editor: any, format: any) => {
   return marks ? marks[format] === true : false;
 };
 
-const ImageElement = ({ attributes, children, element }) => {
+const ImageElement = ({ attributes, children, element }: any) => {
   const editor = useSlateStatic();
-  const path = ReactEditor.findPath(editor, element);
+  const path = ReactEditor.findPath(editor as any, element);
 
   const selected = useSelected();
   const focused = useFocused();
