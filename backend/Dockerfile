@@ -20,7 +20,7 @@ COPY --from=base /base ./
 RUN npm run build
 
 # STAGE 3: app
-FROM base AS app
+FROM node:16.7-alpine AS app
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=build /build ./

@@ -24,6 +24,10 @@ services:
       DB_PASSWORD: "${DB_PASS}"
       DB_NAME:     "${DB_NAME}"
       DATABASE_URL: "${DATABASE_URL}"
+      AWS_ACCESS_KEY: "${AWS_ACCESS_KEY}"
+      AWS_ACCESS_SECRET: "${AWS_ACCESS_SECRET}"
+      AWS_REGION: "${AWS_REGION}"
+      AWS_IMAGE_BUCKET: "${AWS_IMAGE_BUCKET}"
     ports:
       - "7001:7001" # Expose port 7001 on host
     # depends_on only guarantee database service run before backend service, but not guarantee the database service is ready.
