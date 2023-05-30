@@ -1,5 +1,5 @@
 # STAGE 1: install
-FROM node:17 AS base
+FROM node:16.7-alpine AS base
 WORKDIR /base
 # Install dependencies
 COPY package.json ./
