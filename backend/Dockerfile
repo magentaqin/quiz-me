@@ -1,5 +1,5 @@
 # STAGE 1: install
-FROM node:16.7-alpine AS base
+FROM node:17 AS base
 WORKDIR /base
 # Install dependencies
 COPY package.json ./
@@ -20,7 +20,7 @@ COPY --from=base /base ./
 RUN npm run build
 
 # STAGE 3: app
-FROM base AS app
+FROM node:16.7-alpine AS app
 ENV NODE_ENV=production
 WORKDIR /app
 COPY --from=build /build ./
