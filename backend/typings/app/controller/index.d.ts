@@ -6,6 +6,7 @@ import 'egg';
 import ExportAnswer from '../../../app/controller/answer';
 import ExportQuestion from '../../../app/controller/question';
 import ExportTag from '../../../app/controller/tag';
+import ExportTask from '../../../app/controller/task';
 import ExportUpload from '../../../app/controller/upload';
 import ExportUser from '../../../app/controller/user';
 
@@ -14,6 +15,7 @@ declare module 'egg' {
     answer: ExportAnswer;
     question: ExportQuestion;
     tag: ExportTag;
+    task: ExportTask;
     upload: ExportUpload;
     user: ExportUser;
   }

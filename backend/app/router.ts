@@ -36,4 +36,9 @@ export default (app: Application) => {
    */
   router.post('/upload/image', controller.upload.uploadImage);
   router.post('/image/url', controller.upload.generateImageUrl);
+
+  /**
+   * task
+   */
+  router.post('/task/compile', controller.task.compile)
 };

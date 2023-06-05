@@ -27,6 +27,8 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.335.0",
     "@aws-sdk/s3-request-presigner": "^3.338.0",
+    "@grpc/grpc-js": "^1.8.14",
+    "@grpc/proto-loader": "^0.7.7",
     "bcrypt": "^5.0.1",
     "egg": "^2.6.1",
     "egg-scripts": "^2.6.0",

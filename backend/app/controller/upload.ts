@@ -81,6 +81,7 @@ export default class UploadController extends Controller {
     }
   }
 
+  // private image url
   public async generateImageUrl() {
     try {
       const { s3Client } = this.app;
