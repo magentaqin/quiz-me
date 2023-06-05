@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package algorithm;
+
+service Algorithm {
+  rpc Compile (stream CompileRequest) returns (CompileReply) {}
+}
+
+message CompileRequest {
+  string lang = 1;
+  bytes  file = 2;
+}
+
+message CompileReply {
+  string message = 1;
+}
