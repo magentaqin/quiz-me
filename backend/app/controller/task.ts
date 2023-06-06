@@ -4,6 +4,7 @@ import * as protoLoader from '@grpc/proto-loader';
 import path from 'path';
 
 import globalErrorCodes from '../error_codes/global';
+import taskErrorCodes from '../error_codes/task';
 
 const protoPath = path.resolve(__dirname, '../../proto', './algorithm.proto')
 // dynamically generates service descriptors and client stub definitions from proto files
@@ -23,29 +24,45 @@ const algorithmProto = grpc.loadPackageDefinition(packageDefinition).algorithm;
 export default class TaskController extends Controller {
     public async compile() {
         try {
-            const client = new (algorithmProto as any).Algorithm(
-                'localhost:50051',
-                grpc.credentials.createInsecure()
-            )
-            const call = client.Compile((err, response) => {
-                if (err) {
-                    console.log('error', err)
-                } else {
-                    console.log('response', response)
+            const compileTask = new Promise(async (resolve, reject) => {
+                const client = new (algorithmProto as any).Algorithm(
+                    'localhost:50051',
+                    grpc.credentials.createInsecure()
+                )
+                const call = client.Compile((err, response) => {
+                    if (err) {
+                        reject(err.details)
+                    } else {
+                        resolve(response)
+                    }
+                }) 
+                call.write({
+                  lang: 'javascript'
+                })
+                const readStream = await this.ctx.getFileStream();
+                readStream.on('data', (chunk: Buffer) => {
+                    call.write({
+                        file: Uint8Array.from(chunk)
+                    })
+                })
+                readStream.on('end', () => {
+                    call.end();
+                });
+            })
+            const res = await compileTask.catch(err => {
+                this.ctx.status = 400
+                this.ctx.body = {
+                    code: taskErrorCodes.COMPILE_ERROR.code,
+                    msg: err,
                 }
             })
-            call.write({
-              lang: 'javascript'
-            })
-            const readStream = await this.ctx.getFileStream();
-            readStream.on('data', (chunk: Buffer) => {
-                call.write({
-                    file: Uint8Array.from(chunk)
-                })
-            })
-            readStream.on('end', () => {
-                call.end();
-            });
+            if (res) {
+                this.ctx.status = 200
+                this.ctx.body = {
+                    msg: 'Compile successfully'
+                }
+            }
+
         } catch (err) {
             this.ctx.status = 500;
             this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
