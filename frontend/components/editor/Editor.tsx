@@ -514,8 +514,8 @@ const BlockButton = ({ format, icon }: any) => {
 // test image url: https://i.pinimg.com/originals/bd/01/39/bd0139965d5cf92a73cd374fd8d98c90.jpg
 const isImageUrl = (url: string) => {
   if (!url) return false;
-  const ext: any = new URL(url).pathname.split(".").pop();
-  return ["png", "jpeg", "jpg"].includes(ext);
+  const regx = /^http[s]{0,1}:\/\/[a-zA-Z0-9-_.\/]+\.(png|jpeg|jpg)$/
+  return regx.test(url);
 };
 
 const insertImage = (editor: any, url: string) => {
