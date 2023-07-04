@@ -34,7 +34,7 @@ export default class QuestionController extends Controller {
       const escapedTitle = this.ctx.helper.escape(title);
       const escapedDescription = description ? this.ctx.helper.escape(description) : '';
 
-    
+
       // 03 decouple question create and tag create
       // here, we only insert record into Question and TagsOnQuestions Table
       const resp = await prisma.question.create({
@@ -52,9 +52,9 @@ export default class QuestionController extends Controller {
         const dataToInsert = tags.map(tagId => {
           return {
             questionId: resp.questionId,
-            tagId
-          }
-        })
+            tagId,
+          };
+        });
         const relationResp = await prisma.tagsOnQuestions.createMany({
           data: dataToInsert,
         }).catch(e => {
@@ -64,11 +64,12 @@ export default class QuestionController extends Controller {
           this.ctx.status = 200;
           this.ctx.body = {
             questionId: resp.questionId,
-            description: resp.description
+            description: resp.description,
           };
         }
       }
     } catch (err) {
+      this.ctx.logger.error(err);
       this.ctx.status = 500;
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
     }
@@ -97,6 +98,7 @@ export default class QuestionController extends Controller {
         };
       }
     } catch (err) {
+      this.ctx.logger.error(err);
       this.ctx.status = 500;
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
     }
@@ -143,7 +145,7 @@ export default class QuestionController extends Controller {
             throw new Error(e);
           });
           if (Array.isArray(perResult)) {
-            for (let item of perResult) {
+            for (const item of perResult) {
               const tagResult = await prisma.questionTag.findMany({
                 select: {
                   tagId: true,
@@ -152,12 +154,12 @@ export default class QuestionController extends Controller {
                 where: {
                   questions: {
                     some: {
-                      questionId: item.questionId
+                      questionId: item.questionId,
                     },
-                  }
-                }
-              })
-              item.tags = tagResult as any
+                  },
+                },
+              });
+              item.tags = tagResult as any;
             }
             questions = questions.concat(perResult);
           } else {
@@ -189,9 +191,9 @@ export default class QuestionController extends Controller {
         }).catch(e => {
           throw new Error(e);
         });
-   
+
         if (Array.isArray(perResult)) {
-          for (let item of perResult) {
+          for (const item of perResult) {
             const tagResult = await prisma.questionTag.findMany({
               select: {
                 tagId: true,
@@ -200,14 +202,14 @@ export default class QuestionController extends Controller {
               where: {
                 questions: {
                   some: {
-                    questionId: item.questionId
+                    questionId: item.questionId,
                   },
-                }
-              }
-            })
-            item.tags = tagResult as any
+                },
+              },
+            });
+            item.tags = tagResult as any;
           }
-  
+
           questions = questions.concat(perResult);
         } else {
           throw new Error();
@@ -219,6 +221,7 @@ export default class QuestionController extends Controller {
         questions,
       };
     } catch (err) {
+      this.ctx.logger.error(err);
       this.ctx.status = 500;
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
     }
@@ -250,6 +253,7 @@ export default class QuestionController extends Controller {
         };
       }
     } catch (err) {
+      this.ctx.logger.error(err);
       this.ctx.status = 500;
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
     }
@@ -275,36 +279,37 @@ export default class QuestionController extends Controller {
           level: true,
           authorId: true,
           tags: true,
-        }
+        },
       }).catch(e => {
         throw new Error(e);
       });
 
       const totalTags = await prisma.questionTag.findMany({
         where: {
-          status: 'NORMAL'
+          status: 'NORMAL',
         },
         select: {
           name: true,
           tagId: true,
           description: true,
-        }
-      })
+        },
+      });
 
       if (resp) {
         const { title, description, level, authorId, tags } = resp;
-        const tagIds = tags.map(item => item.tagId)
-        const questionTags = totalTags.filter(item => tagIds.includes(item.tagId))
+        const tagIds = tags.map(item => item.tagId);
+        const questionTags = totalTags.filter(item => tagIds.includes(item.tagId));
         this.ctx.status = 200;
         this.ctx.body = {
           title,
           description,
           level,
           authorId,
-          tags: questionTags
+          tags: questionTags,
         };
       }
     } catch (err) {
+      this.ctx.logger.error(err);
       this.ctx.status = 500;
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
     }
@@ -341,13 +346,13 @@ export default class QuestionController extends Controller {
       const questionResp = await prisma.question.findUnique({
         where: {
           questionId,
-        }
-      })
+        },
+      });
       if (!questionResp || questionResp.authorId !== userId) {
         this.ctx.status = 403;
-        this.ctx.body = globalErrorCodes.AUTH_NOT_PERMITTED
+        this.ctx.body = globalErrorCodes.AUTH_NOT_PERMITTED;
         return;
-      } 
+      }
 
       // 03 escape question title and description
       const escapedTitle = this.ctx.helper.escape(title);
@@ -370,43 +375,43 @@ export default class QuestionController extends Controller {
       // 05 update TagsOnQuestions table
       const oldTags = await prisma.tagsOnQuestions.findMany({
         where: {
-          questionId
-        }
-      })
+          questionId,
+        },
+      });
 
-      const tagsToCreate: string[] = []
-      const tagsToDelete: string[] = []
-      const existTags: string[] = []
+      const tagsToCreate: string[] = [];
+      const tagsToDelete: string[] = [];
+      const existTags: string[] = [];
       oldTags.forEach(item => {
         if (tags.includes(item.tagId)) {
-          existTags.push(item.tagId)
+          existTags.push(item.tagId);
         } else {
-          tagsToDelete.push(item.tagId)
+          tagsToDelete.push(item.tagId);
         }
-      })
+      });
       tags.forEach(id => {
         if (!existTags.includes(id) && !tagsToDelete.includes(id)) {
-          tagsToCreate.push(id)
+          tagsToCreate.push(id);
         }
-      })
+      });
       // hard delete tags
       await prisma.tagsOnQuestions.deleteMany({
         where: {
           tagId: {
-            in: tagsToDelete
-          }
+            in: tagsToDelete,
+          },
         },
-      })
+      });
       // create new tags
       const tagsToInsert = tagsToCreate.map(tagId => {
         return {
           questionId: resp.questionId,
-          tagId
-        }
-      })
+          tagId,
+        };
+      });
       await prisma.tagsOnQuestions.createMany({
-        data: tagsToInsert
-      })
+        data: tagsToInsert,
+      });
       if (resp) {
         this.ctx.status = 200;
         this.ctx.body = {
@@ -415,6 +420,7 @@ export default class QuestionController extends Controller {
         };
       }
     } catch (err) {
+      this.ctx.logger.error(err);
       this.ctx.status = 500;
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
     }
