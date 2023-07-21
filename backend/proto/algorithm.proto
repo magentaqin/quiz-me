@@ -8,9 +8,12 @@ service Algorithm {
 
 message CompileRequest {
   string lang = 1;
-  bytes  file = 2;
+  bytes file = 2;
+  string params = 3;
 }
 
 message CompileReply {
   string message = 1;
+  string actualOutput = 2;
+  string expectedOutput = 3;
 }
