@@ -1,18 +1,12 @@
 import Editor from "@monaco-editor/react";
 import { useState } from "react";
 
-const mockedVal = `
-/**
-* @param {number[]} nums
-* @param {number} target
-* @return {number[]}
-*/
-var twoSum = function(nums, target) {
- console.log('1111')
-};`;
+interface Props {
+  defaultValue?: string;
+}
 
-const CodeEditor = () => {
-  const [value, setValue] = useState(mockedVal);
+const CodeEditor = (props: Props) => {
+  const [value, setValue] = useState(props.defaultValue);
 
   const handleChange = (val?: string) => {
     console.log("val", val);
