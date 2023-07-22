@@ -36,10 +36,16 @@ export default class TaskController extends Controller {
                         resolve(response)
                     }
                 }) 
-                call.write({
-                  lang: 'javascript'
-                })
                 const readStream = await this.ctx.getFileStream();
+                if (!readStream) {
+                    throw new Error('Read Stream Null')
+                }
+                const { lang, params} = readStream.fields
+                console.log('readStream.fields', readStream.fields)
+                call.write({
+                    lang,
+                    params
+                })
                 readStream.on('data', (chunk: Buffer) => {
                     call.write({
                         file: Uint8Array.from(chunk)
@@ -58,9 +64,7 @@ export default class TaskController extends Controller {
             })
             if (res) {
                 this.ctx.status = 200
-                this.ctx.body = {
-                    msg: 'Compile successfully'
-                }
+                this.ctx.body = res
             }
 
         } catch (err) {
