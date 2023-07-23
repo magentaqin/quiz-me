@@ -35,6 +35,8 @@ services:
       - db
     networks:
       - app-network
+    volumes:
+      - ${BACKEND_LOGDIR}:/app/logs/prod
   db:
     container_name: quizme_db
     image: mysql
