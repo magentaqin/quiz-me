@@ -9,16 +9,18 @@ datasource db {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  email     String     @unique
-  userName  String     @unique
-  userId    String     @unique
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @default(now())
-  password  String     @default("")
-  role      Role       @default(USER)
-  answers   Answer[]
-  questions Question[]
+  id                Int                @id @default(autoincrement())
+  email             String             @unique
+  userName          String             @unique
+  userId            String             @unique
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @default(now())
+  password          String             @default("")
+  role              Role               @default(USER)
+  answers           Answer[]
+  questions         Question[]
+  codeAnswers       CodeAnswer[]
+  codeSubmitRecords CodeSubmitRecord[]
 }
 
 model Question {
@@ -79,6 +81,56 @@ model Answer {
   @@fulltext([content])
 }
 
+model CodeQuestion {
+  id            Int                @id @default(autoincrement())
+  title         String             @unique @db.VarChar(300)
+  lang          Lang               @default(JAVASCRIPT)
+  description   String             @db.VarChar(5000)
+  codeBlock     String             @db.VarChar(1000)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @default(now())
+  questionId    String             @unique
+  level         Level              @default(ENTRY)
+  status        Status             @default(NORMAL)
+  answers       CodeAnswer[]
+  submitRecords CodeSubmitRecord[]
+
+  @@index([questionId], map: "questionId")
+  @@fulltext([title])
+}
+
+model CodeAnswer {
+  id         Int          @id @default(autoincrement())
+  content    String       @db.Text
+  authorId   String
+  questionId String
+  answerId   String       @unique
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @default(now())
+  author     User         @relation(fields: [authorId], references: [userId])
+  question   CodeQuestion @relation(fields: [questionId], references: [questionId])
+
+  @@index([authorId], map: "author")
+  @@index([questionId], map: "question")
+}
+
+model CodeSubmitRecord {
+  id                Int              @id @default(autoincrement())
+  content           String           @db.Text
+  authorId          String
+  questionId        String
+  recordId          String           @unique
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @default(now())
+  result            CodeSubmitResult @default(UNKNOWN)
+  resultDescription String           @db.VarChar(5000)
+  author            User             @relation(fields: [authorId], references: [userId])
+  question          CodeQuestion     @relation(fields: [questionId], references: [questionId])
+
+  @@index([authorId], map: "author")
+  @@index([questionId], map: "question")
+}
+
 enum Role {
   USER
   ADMIN
@@ -93,4 +145,19 @@ enum Level {
 enum Status {
   NORMAL
   DELETED
+}
+
+enum Lang {
+  JAVASCRIPT
+  JAVA
+  CPLUSPLUS
+  GO
+  RUST
+  PYTHON
+}
+
+enum CodeSubmitResult {
+  UNKNOWN
+  PASS
+  FAIL
 }
