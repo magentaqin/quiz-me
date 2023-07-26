@@ -4,6 +4,7 @@ package algorithm;
 
 service Algorithm {
   rpc Compile (stream CompileRequest) returns (CompileReply) {}
+  rpc Test (stream TestRequest) returns (TestReply) {}
 }
 
 message CompileRequest {
@@ -14,6 +15,30 @@ message CompileRequest {
 
 message CompileReply {
   string message = 1;
-  string actualOutput = 2;
-  string expectedOutput = 3;
+  string actual_output = 2;
+  string expected_output = 3;
+}
+
+message TestRequest {
+  string lang = 1;
+  bytes file = 2;
+}
+
+message ExecutionResult {
+  string message = 1;
+  string memory_usage = 2;
+  string exeuction_time = 3;
+}
+
+message TestResult {
+  string reason = 1;
+  string input = 2;
+  string actual_output = 3;
+  string expected_output = 4;
+  bool passed = 5;
+}
+
+message TestReply {
+  ExecutionResult execution_result = 1;
+  repeated TestResult test_results = 2;
 }
