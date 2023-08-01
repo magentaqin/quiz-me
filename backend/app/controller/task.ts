@@ -41,7 +41,6 @@ export default class TaskController extends Controller {
                     throw new Error('Read Stream Null')
                 }
                 const { lang, params} = readStream.fields
-                console.log('readStream.fields', readStream.fields)
                 call.write({
                     lang,
                     params
@@ -55,7 +54,61 @@ export default class TaskController extends Controller {
                     call.end();
                 });
             })
-            const res = await compileTask.catch(err => {
+            const res: any = await compileTask.catch(err => {
+                this.ctx.status = 400
+                this.ctx.body = {
+                    code: taskErrorCodes.COMPILE_ERROR.code,
+                    msg: err,
+                }
+            })
+            if (res) {
+                const { expected_output, actual_output } = res
+                this.ctx.status = 200
+                this.ctx.body = {
+                   expectedOutput: JSON.parse(expected_output),
+                   actualOutput: JSON.parse(actual_output) 
+                }
+            }
+
+        } catch (err) {
+            console.log('err', err)
+            this.ctx.status = 500;
+            this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
+        }
+    }
+
+    public async test() {
+        try {
+            const compileTask = new Promise(async (resolve, reject) => {
+                const client = new (algorithmProto as any).Algorithm(
+                    'localhost:50051',
+                    grpc.credentials.createInsecure()
+                )
+                const call = client.Test((err, response) => {
+                    if (err) {
+                        reject(err.details)
+                    } else {
+                        resolve(response)
+                    }
+                }) 
+                const readStream = await this.ctx.getFileStream();
+                if (!readStream) {
+                    throw new Error('Read Stream Null')
+                }
+                const { lang } = readStream.fields
+                call.write({
+                    lang,
+                })
+                readStream.on('data', (chunk: Buffer) => {
+                    call.write({
+                        file: Uint8Array.from(chunk)
+                    })
+                })
+                readStream.on('end', () => {
+                    call.end();
+                });
+            })
+            const res: any = await compileTask.catch(err => {
                 this.ctx.status = 400
                 this.ctx.body = {
                     code: taskErrorCodes.COMPILE_ERROR.code,

@@ -27,7 +27,7 @@ message TestRequest {
 message ExecutionResult {
   string message = 1;
   string memory_usage = 2;
-  string exeuction_time = 3;
+  string execution_time = 3;
 }
 
 message TestResult {

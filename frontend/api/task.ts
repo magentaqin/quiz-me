@@ -16,3 +16,14 @@ export const compileCodeApi = async (data: CodeTaskParams) => {
     }
   });
 };
+
+export const testCodeApi = async (data: CodeTaskParams) => {
+  const formData = new FormData()
+  formData.append('file', data.file)
+  formData.append('lang', 'javascript')
+  return await axiosInstance.post("/task/test", formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+};

@@ -41,4 +41,5 @@ export default (app: Application) => {
    * task
    */
   router.post('/task/compile', controller.task.compile)
+  router.post('/task/test', controller.task.test)
 };
