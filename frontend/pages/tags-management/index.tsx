@@ -22,9 +22,11 @@ const TagsManagement: NextPage = () => {
     "lerna",
     "webpack",
     "babeljs",
+    "performance",
+    "monitoring"
   ];
 
-  const backendList = ["nodejs", "mysql", "docker"];
+  const backendList = ["nodejs", "mysql", "docker", "go", "system-design", "amazon-web-services", "networking"];
   const initialTags: any = {};
   frontendList.concat(backendList).forEach((key) => {
     initialTags[key] = true;
