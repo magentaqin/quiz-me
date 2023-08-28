@@ -2,6 +2,7 @@
   background-color: #eee;
   display: flex;
   justify-content: center;
+  position: relative;
 }
 
 .editor {
@@ -95,6 +96,10 @@
   .toolbar {
     display: flex;
     align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: white;
     .toolbarSubtitle {
       width: 0.85em;
       height: 0.85em;
