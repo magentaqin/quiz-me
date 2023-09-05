@@ -310,12 +310,14 @@ const QuestionPage = () => {
       <div style={{ backgroundColor: showEditor ? "#eee" : "rgba(18,18,18,0)", height: "100%" }}>
         <Container fixed>{showEditor ? renderEditor() : renderList()}</Container>
       </div>
-      <QuestionForm
+      {open ? (
+        <QuestionForm
         open={open}
         setOpen={setOpen}
         type={QuestionHandleType.UPDATE}
         questionId={id as string}
       />
+      ) : null}
     </div>
   );
 };
