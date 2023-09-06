@@ -20,7 +20,6 @@ import {
   updateAnswerApi,
 } from "../../api/answer";
 import { uploadImageApi } from "../../api/upload";
-import NavBar from "../../components/Navbar";
 import Footer from "../../components/editor/Footer";
 import QuestionForm, { QuestionHandleType } from "../../components/QuestionForm";
 import { serialize, toSlateJson } from "../../utils/format";
@@ -268,7 +267,6 @@ const QuestionPage = () => {
 
   return (
     <div>
-      <NavBar />
       <Card
         sx={{
           boxShadow: 1,

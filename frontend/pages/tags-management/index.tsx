@@ -1,11 +1,11 @@
 import type { NextPage } from "next";
-import { Fragment, useState, useEffect } from "react";
+import { useState } from "react";
 import Checkbox from "@mui/material/Checkbox";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import NavBar from "../../components/Navbar";
+import Layout from "../../components/Layout";
 import { deleteTagApi, setTagsApi, TagItem } from "../../api/tag";
 
 const TagsManagement: NextPage = () => {
@@ -119,8 +119,6 @@ const TagsManagement: NextPage = () => {
   };
 
   return (
-    <Fragment>
-      <NavBar />
       <div className="container px-4 mx-auto">
         <p className="text-2xl">Manage Tags</p>
         <Button
@@ -148,7 +146,6 @@ const TagsManagement: NextPage = () => {
           Submit
         </Button>
       </div>
-    </Fragment>
   );
 };
 
