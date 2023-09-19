@@ -94,7 +94,7 @@ const deserialize = (el: HTMLElement, markAttributes = {}): any => {
     children.push(jsx("text", nodeAttributes, ""));
   }
 
-  // console.log("el.nodeName", el.nodeName, children);
+  // console.log("el.nodeName", el.nodeName);
   switch (el.nodeName) {
     case "BODY":
       return jsx("fragment", {}, children);
@@ -105,9 +105,9 @@ const deserialize = (el: HTMLElement, markAttributes = {}): any => {
     case "P":
       return jsx("element", { type: "paragraph" }, children);
     case "H1":
-      return jsx("element", { type: "headinOne" }, children);
+      return jsx("element", { type: "headingOne" }, children);
     case "H2":
-      return jsx("element", { type: "headeingTwo" }, children);
+      return jsx("element", { type: "headingTwo" }, children);
     case "OL":
       return jsx("element", { type: "numberedList" }, children);
     case "UL":
