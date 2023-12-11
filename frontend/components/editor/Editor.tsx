@@ -84,22 +84,44 @@ const RichTextEditor = (props: Props) => {
   }, [props.slateJson]);
 
   const renderElement = useCallback((props) => {
+    const { attributes, children, element } = props
     // cutomize elemtents: https://docs.slatejs.org/walkthroughs/03-defining-custom-elements
-    if (props.element.children[0].code) {
+    // if (props.element.children[0].code) {
+    //   return (
+    //     <p
+    //       {...props.attributes}
+    //       style={{
+    //         backgroundColor: "#ddd",
+    //         padding: "4px 8px",
+    //         margin: 0,
+    //       }}
+    //       className="slate-code-block"
+    //     >
+    //       {props.children}
+    //     </p>
+    //   );
+    // }
+    if (props.element.type === "codeBlock") {
       return (
-        <p
-          {...props.attributes}
-          style={{
-            backgroundColor: "#ddd",
-            padding: "4px 8px",
-            margin: 0,
-          }}
-          className="slate-code-block"
-        >
-          {props.children}
-        </p>
-      );
+        <div
+        {...attributes}
+        className={css(`
+        font-family: monospace;
+        font-size: 16px;
+        line-height: 20px;
+        margin-top: 0;
+        background: rgba(0, 20, 60, .03);
+        padding: 5px 13px;
+      `)}
+        style={{ position: 'relative' }}
+        spellCheck={false}
+      >
+        <div>language select</div>
+        {children}
+      </div>
+      )
     }
+    console.log('props.element', props.element.type)
     return <Element {...props} />;
   }, []);
   const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
@@ -174,6 +196,7 @@ const RichTextEditor = (props: Props) => {
     [language]
   );
 
+
   const renderToolbar = () => {
     return (
       <Toolbar className={styles.toolbar}>
@@ -181,7 +204,7 @@ const RichTextEditor = (props: Props) => {
         <MarkButton format="italic" icon={() => <FormatItalicIcon />} />
         <MarkButton format="underline" icon={() => <FormatUnderlinedIcon />} />
         <MarkButton format="codeInline" icon={() => <DataObjectIcon />} />
-        <MarkButton format="code" icon={() => <CodeIcon />} />
+        <BlockButton format="codeBlock" icon={() => <CodeIcon />} />
         <BlockButton format="headingOne" icon={() => <TitleIcon />} />
         <BlockButton
           format="headingTwo"
@@ -290,6 +313,40 @@ const toggleBlock = (editor: any, format: any) => {
     TEXT_ALIGN_TYPES.includes(format) ? "align" : "type"
   ) as boolean;
   const isList = LIST_TYPES.includes(format);
+  console.log('isActive', isActive);
+
+    // handle codeBlock type
+    if (format === "codeBlock") {
+      if (!isActive) {
+        Transforms.wrapNodes(
+          editor,
+          { type: "codeBlock", language: 'html', children: [] },
+          {
+            match: n => SlateElement.isElement(n) && n.type === "paragraph",
+            split: true,
+          }
+        )
+        Transforms.setNodes(
+          editor,
+          { type: "codeLine" },
+          { match: n => SlateElement.isElement(n) && n.type === "paragraph" }
+        )
+      } else {
+        Transforms.unwrapNodes(editor, {
+          match: (n: any) => {
+            return (
+              !Editor.isEditor(n) &&
+              SlateElement.isElement(n) &&
+              n.type === "codeBlock"
+            );
+          },
+          split: true,
+        });
+        Transforms.setNodes<SlateElement>(editor, { type: "paragraph" });
+      }
+
+      return;
+    }
 
   Transforms.unwrapNodes(editor, {
     match: (n: any) => {
@@ -318,6 +375,7 @@ const toggleBlock = (editor: any, format: any) => {
     const block = { type: format, children: [] };
     Transforms.wrapNodes(editor, block);
   }
+
 };
 
 const toggleMark = (editor: any, format: any) => {
@@ -337,8 +395,9 @@ const isBlockActive = (editor: any, format: any, blockType = "type") => {
   const [match] = Array.from(
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
-      match: (n: any) =>
-        !Editor.isEditor(n) && SlateElement.isElement(n) && (n as any)[blockType] === format,
+      match: (n: any) => {
+        return !Editor.isEditor(n) && SlateElement.isElement(n) && (n as any)[blockType] === format
+      }
     })
   );
 
