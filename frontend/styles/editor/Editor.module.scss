@@ -1,0 +1,112 @@
+.editorWrapper {
+  background-color: #eee;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.editableWrapper {
+  outline: none;
+}
+
+.editor {
+  background-color: #fff;
+  height: 70vh;
+  max-width: 42rem;
+  width: 42rem;
+  margin: 20px auto;
+  padding: 20px;
+
+  h1 {
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 32px;
+  }
+
+  h2 {
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 24px;
+  }
+
+  ol {
+    display: block;
+    list-style-type: decimal;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 40px;
+    li {
+      display: list-item;
+      text-align: -webkit-match-parent;
+      &::marker {
+        unicode-bidi: isolate;
+        font-variant-numeric: tabular-nums;
+        text-transform: none;
+        text-indent: 0px !important;
+        text-align: start !important;
+        text-align-last: start !important;
+      }
+    }
+  }
+
+  ul {
+    display: block;
+    list-style-type: disc;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 40px;
+    li {
+      display: list-item;
+    }
+  }
+
+  pre {
+    padding: 10px;
+    background-color: #eee;
+    white-space: pre-wrap;
+  }
+
+  :not(pre) > code {
+    font-family: monospace;
+    background-color: #eee;
+    padding: 3px;
+  }
+
+  blockquote {
+    border-left: 2px solid #ddd;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 10px;
+    color: #aaa;
+    font-style: italic;
+  }
+
+  blockquote[dir="rtl"] {
+    border-left: none;
+    padding-left: 0;
+    padding-right: 10px;
+    border-right: 2px solid #ddd;
+  }
+
+  [data-slate-editor] > * + * {
+    margin-top: 0.85em;
+    margin-bottom: 0.85em;
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: white;
+    .toolbarSubtitle {
+      width: 0.85em;
+      height: 0.85em;
+    }
+  }
+}

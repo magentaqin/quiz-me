@@ -35,13 +35,13 @@ import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-java'
 import 'prismjs/components/prism-go'
 import 'prismjs/components/prism-rust'
-import 'prismjs/components/prism-cshtml'
 
 import { Button, Toolbar } from "../components";
-import styles from "../../styles/Editor.module.scss";
+import styles from "../../styles/editor/Editor.module.scss";
 import { serialize, toSlateJson } from "../../utils/format";
 import { CodeBlockElement } from '../../types/editor';
 import { normalizeTokens } from '../../utils/prism';
+import prismThemeCss from '../../styles/editor/prismThemeCss';
 
 interface Props {
   fromAnswer?: boolean;
@@ -294,6 +294,7 @@ const RichTextEditor = (props: Props) => {
               }
             }}
           />
+           <style>{prismThemeCss}</style>
         </Slate>
       );
     }
@@ -722,5 +723,7 @@ const initialValue: any[] = [
     children: [{ text: "Try it out for yourself!" }],
   },
 ];
+
+
 
 export default RichTextEditor;
