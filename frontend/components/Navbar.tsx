@@ -89,11 +89,13 @@ const NavBar = () => {
   const renderForm = () => {
     if (open) {
       if (formType === "question") {
-        return <QuestionForm open={open} setOpen={setOpen} type={QuestionHandleType.ADD} />
+        return <QuestionForm open={open} setOpen={setOpen} type={QuestionHandleType.ADD} />;
       }
-      return <UserForm open={open} setOpen={setOpen} formType={formType} setUserInfo={setUserInfo} />;
+      return (
+        <UserForm open={open} setOpen={setOpen} formType={formType} setUserInfo={setUserInfo} />
+      );
     }
-    return null
+    return null;
   };
 
   const toHome = () => {

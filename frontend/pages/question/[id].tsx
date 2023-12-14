@@ -310,11 +310,11 @@ const QuestionPage = () => {
       </div>
       {open ? (
         <QuestionForm
-        open={open}
-        setOpen={setOpen}
-        type={QuestionHandleType.UPDATE}
-        questionId={id as string}
-      />
+          open={open}
+          setOpen={setOpen}
+          type={QuestionHandleType.UPDATE}
+          questionId={id as string}
+        />
       ) : null}
     </div>
   );

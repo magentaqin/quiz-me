@@ -19,7 +19,7 @@ interface ElementNode {
 
 // transform slate json-format to html string
 export const serialize = (node: ElementNode | TextNode) => {
-  console.log('serialize', node)
+  console.log("serialize", node);
   if (Text.isText(node)) {
     let string = escapeHtml(node.text);
     if (node.bold) {
@@ -38,7 +38,7 @@ export const serialize = (node: ElementNode | TextNode) => {
   }
 
   const children: string = node.children.map((n) => serialize(n)).join("");
-  console.log('node.type', node.type)
+  console.log("node.type", node.type);
   switch (node.type) {
     case "blockQuote":
       return `<blockquote><p>${children}</p></blockquote>`;
@@ -55,7 +55,7 @@ export const serialize = (node: ElementNode | TextNode) => {
     case "listItem":
       return `<li>${children}</li>`;
     case "image":
-      return `<img src=${node.url} />`
+      return `<img src=${node.url} />`;
     default:
       return children;
   }
@@ -123,7 +123,7 @@ const deserialize = (el: HTMLElement, markAttributes = {}): any => {
     case "CODE": // code inline
       return jsx("text", { ...children[0], codeInline: true });
     case "IMG":
-      return jsx("element", { type: "image", url: (el as any).src }, children );
+      return jsx("element", { type: "image", url: (el as any).src }, children);
     default:
       return children;
   }

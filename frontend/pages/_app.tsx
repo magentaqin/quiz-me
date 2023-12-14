@@ -1,4 +1,4 @@
-import Layout from '../components/Layout'
+import Layout from "../components/Layout";
 import Head from "next/head";
 import "../styles/globals.css";
 import "@fontsource/roboto/300.css";
@@ -12,7 +12,7 @@ import Script from "next/script";
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
-    <Head>
+      <Head>
         <title>QuizMe</title>
         <meta name="description" content="Quiz yourself on frontend!" />
         <link rel="icon" href="/favicon.ico" />
