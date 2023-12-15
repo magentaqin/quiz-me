@@ -5,7 +5,6 @@ import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import Layout from "../../components/Layout";
 import { deleteTagApi, setTagsApi, TagItem } from "../../api/tag";
 
 const TagsManagement: NextPage = () => {

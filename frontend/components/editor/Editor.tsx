@@ -132,7 +132,7 @@ const RichTextEditor = (props: Props) => {
           style={{ position: "relative" }}
           spellCheck={false}
         >
-          <FormControl sx={{ m: 1, minWidth: 120, position: 'absolute', right: '16px', bottom: '30px', zIndex: 99 }} size="small">
+          <FormControl sx={{ m: 1, minWidth: 120, position: 'absolute', right: '0px', top: '0px', zIndex: 99 }} size="small">
             <InputLabel id="demo-select-small-label">Language</InputLabel>
             <Select value={element.language} label="Language" onChange={setLanguage}>
               {languages.map((item) => {
