@@ -118,6 +118,42 @@ export const languages = [
     value: "javascript",
   },
   {
+    label: "TypeScript",
+    value: "typescript",
+  },
+  {
+    label: "Go",
+    value: "go",
+  },
+  {
+    label: "Rust",
+    value: "rust",
+  },
+  {
+    label: "CSS",
+    value: "css",
+  },
+  {
+    label: "HTML",
+    value: "html",
+  },
+  {
+    label: "SQL",
+    value: "sql",
+  },
+  {
+    label: "JSX",
+    value: "jsx",
+  },
+  {
+    label: "TSX",
+    value: "tsx",
+  },
+  {
+    label: "Python",
+    value: "python",
+  },
+  {
     label: "Java",
     value: "java",
   },

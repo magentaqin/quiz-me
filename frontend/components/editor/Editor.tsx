@@ -41,12 +41,13 @@ import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-jsx";
 import "prismjs/components/prism-typescript";
 import "prismjs/components/prism-tsx";
-import "prismjs/components/prism-markdown";
 import "prismjs/components/prism-python";
 import "prismjs/components/prism-sql";
 import "prismjs/components/prism-java";
 import "prismjs/components/prism-go";
 import "prismjs/components/prism-rust";
+import "prismjs/components/prism-css";
+import "prismjs/components/prism-cshtml";
 
 import { Button, Toolbar } from "../components";
 import styles from "../../styles/editor/Editor.module.scss";
@@ -89,7 +90,6 @@ const getLength = (token: any) => {
 };
 
 const RichTextEditor = (props: Props) => {
-  const [language, setLanguage] = useState("js");
   const [value, setValue] = useState(initialValue);
   const [showSlate, setShowSlate] = useState(false);
 
@@ -127,7 +127,7 @@ const RichTextEditor = (props: Props) => {
         margin-top: 0;
         background: rgba(0, 20, 60, .03);
         padding: 8px 16px;
-        min-height: 24px;
+        min-height: 64px;
       `)}
           style={{ position: "relative" }}
           spellCheck={false}
