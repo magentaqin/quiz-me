@@ -15,6 +15,7 @@ interface ElementNode {
   type?: string;
   children: TextNode[];
   url?: string;
+  language?: string;
 }
 
 // transform slate json-format to html string
@@ -55,6 +56,10 @@ export const serialize = (node: ElementNode | TextNode) => {
       return `<li>${children}</li>`;
     case "image":
       return `<img src=${node.url} />`;
+    case "codeBlock": 
+      return `<code-block language=${node.language}>${children}</code-block>`;
+    case "codeLine": 
+      return `<code-line>${children}</code-line>`;
     default:
       return children;
   }
@@ -91,7 +96,6 @@ const deserialize = (el: HTMLElement, markAttributes = {}): any => {
     children.push(jsx("text", nodeAttributes, ""));
   }
 
-  // console.log("el.nodeName", el.nodeName);
   switch (el.nodeName) {
     case "BODY":
       return jsx("fragment", {}, children);
@@ -123,6 +127,10 @@ const deserialize = (el: HTMLElement, markAttributes = {}): any => {
       return jsx("text", { ...children[0], codeInline: true });
     case "IMG":
       return jsx("element", { type: "image", url: (el as any).src }, children);
+    case "CODE-BLOCK":
+      return jsx("element", { type: "codeBlock", language: (el as any).getAttribute('language') }, children);
+    case "CODE-LINE":
+        return jsx("element", { type: "codeLine" }, children);
     default:
       return children;
   }
