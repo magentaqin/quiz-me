@@ -85,12 +85,6 @@
     font-style: italic;
   }
 
-  blockquote[dir="rtl"] {
-    border-left: none;
-    padding-left: 0;
-    padding-right: 10px;
-    border-right: 2px solid #ddd;
-  }
 
   [data-slate-editor] > * + * {
     margin-top: 0.85em;

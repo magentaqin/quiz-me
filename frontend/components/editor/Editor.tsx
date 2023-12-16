@@ -55,6 +55,7 @@ import { serialize, toSlateJson } from "../../utils/format";
 import { CodeBlockElement } from "../../types/editor";
 import { normalizeTokens, languages } from "../../utils/prism";
 import prismThemeCss from "../../styles/editor/prismThemeCss";
+import textStyleCss from '../../styles/editor/textStyle';
 
 interface Props {
   fromAnswer?: boolean;
@@ -321,6 +322,7 @@ const RichTextEditor = (props: Props) => {
             }}
           />
           <style>{prismThemeCss}</style>
+          <style>{textStyleCss}</style>
         </Slate>
       );
     }
@@ -331,7 +333,7 @@ const RichTextEditor = (props: Props) => {
     <div className={styles.editorWrapper}>
       <div
         className={styles.editor}
-        style={{ minHeight: props.fromAnswer ? "85vh" : "63vh", height: "100%" }}
+        style={{ minHeight: props.fromAnswer ? "85vh" : "100vh", height: "100%" }}
       >
         {renderSlate()}
       </div>
@@ -711,7 +713,7 @@ const initialValue: any[] = [
       { text: " text, " },
       { text: "much", italic: true },
       { text: " better than a " },
-      { text: "<textarea>", code: true },
+      { text: "<textarea>", codeInline: true },
       { text: "!" },
     ],
   },

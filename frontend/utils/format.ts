@@ -38,7 +38,6 @@ export const serialize = (node: ElementNode | TextNode) => {
   }
 
   const children: string = node.children.map((n) => serialize(n)).join("");
-  console.log("node.type", node.type);
   switch (node.type) {
     case "blockQuote":
       return `<blockquote><p>${children}</p></blockquote>`;
