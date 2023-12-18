@@ -1,4 +1,7 @@
 const TextStyleCss = `
+.editable-area {
+  outline: none;
+}
 .bold {
   font-weight: 500;
 }
