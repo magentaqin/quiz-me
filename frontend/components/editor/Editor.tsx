@@ -110,10 +110,10 @@ const RichTextEditor = (props: Props) => {
     }
   }, [props.slateJson]);
 
-  const renderElement = useCallback((props) => {
-    const { attributes, children, element } = props;
+  const renderElement = useCallback((scopedProps) => {
+    const { attributes, children, element } = scopedProps;
     // cutomize elemtents: https://docs.slatejs.org/walkthroughs/03-defining-custom-elements
-    if (props.element.type === "codeBlock") {
+    if (element.type === "codeBlock") {
       const setLanguage = (event: SelectChangeEvent) => {
         const path = ReactEditor.findPath(editor, element);
         (Transforms as any).setNodes(editor, { language: event.target.value as string }, { at: path });
@@ -133,7 +133,7 @@ const RichTextEditor = (props: Props) => {
           style={{ position: "relative" }}
           spellCheck={false}
         >
-          {props.fromAnswer ? (
+          { props.fromAnswer ? null : (
             <FormControl sx={{ m: 1, minWidth: 120, position: 'absolute', right: '0px', top: '0px', zIndex: 99 }} size="small">
             <InputLabel id="demo-select-small-label">Language</InputLabel>
             <Select value={element.language} label="Language" onChange={setLanguage}>
@@ -146,7 +146,7 @@ const RichTextEditor = (props: Props) => {
               })}
             </Select>
           </FormControl>
-          ) : null }
+          )}
           {children}
         </div>
       );
@@ -160,8 +160,8 @@ const RichTextEditor = (props: Props) => {
         </div>
       );
     }
-    return <Element {...props} />;
-  }, []);
+    return <Element {...scopedProps} />;
+  }, [props.fromAnswer]);
 
   const renderLeaf = (props: RenderLeafProps) => {
     const { attributes, children, leaf } = props;
@@ -290,7 +290,7 @@ const RichTextEditor = (props: Props) => {
       return (
         <Slate
           editor={editor}
-          value={value}
+          initialValue={value}
           onChange={(value: any) => {
             const isAstChange = editor.operations.some((op: any) => "set_selection" !== op.type);
             if (isAstChange) {
@@ -307,6 +307,7 @@ const RichTextEditor = (props: Props) => {
           {props.fromAnswer ? null : renderToolbar()}
           <SetNodeToDecorations />
           <Editable
+            className="editable-area"
             renderElement={renderElement}
             renderLeaf={renderLeaf}
             decorate={decorate}
