@@ -1,3 +1,5 @@
+import Layout from "../components/Layout";
+import Head from "next/head";
 import "../styles/globals.css";
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -10,7 +12,14 @@ import Script from "next/script";
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
-      <Component {...pageProps} />
+      <Head>
+        <title>QuizMe</title>
+        <meta name="description" content="Quiz yourself on frontend!" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
       <Script
         src="https://www.googletagmanager.com/gtag/js?id=G-DQMJH33LP7"
         onLoad={() => {

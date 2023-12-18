@@ -2,6 +2,7 @@
   background-color: #eee;
   display: flex;
   justify-content: center;
+  position: relative;
 }
 
 .editor {
@@ -80,12 +81,6 @@
     font-style: italic;
   }
 
-  blockquote[dir="rtl"] {
-    border-left: none;
-    padding-left: 0;
-    padding-right: 10px;
-    border-right: 2px solid #ddd;
-  }
 
   [data-slate-editor] > * + * {
     margin-top: 0.85em;
@@ -95,6 +90,10 @@
   .toolbar {
     display: flex;
     align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: white;
     .toolbarSubtitle {
       width: 0.85em;
       height: 0.85em;

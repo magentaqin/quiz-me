@@ -10,8 +10,17 @@ import {
   useSelected,
   useFocused,
   ReactEditor,
+  RenderLeafProps,
 } from "slate-react";
-import { Editor, createEditor, Element as SlateElement, Text, Transforms } from "slate";
+import {
+  Editor,
+  createEditor,
+  Element as SlateElement,
+  Text,
+  Transforms,
+  NodeEntry,
+  Node,
+} from "slate";
 import { withHistory } from "slate-history";
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
 import FormatItalicIcon from "@mui/icons-material/FormatItalic";
@@ -23,11 +32,30 @@ import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import PhotoIcon from "@mui/icons-material/Photo";
 import DataObjectIcon from "@mui/icons-material/DataObject";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
 import { css } from "@emotion/css";
+import "prismjs/components/prism-javascript";
+import "prismjs/components/prism-jsx";
+import "prismjs/components/prism-typescript";
+import "prismjs/components/prism-tsx";
+import "prismjs/components/prism-python";
+import "prismjs/components/prism-sql";
+import "prismjs/components/prism-java";
+import "prismjs/components/prism-go";
+import "prismjs/components/prism-rust";
+import "prismjs/components/prism-css";
+import "prismjs/components/prism-cshtml";
 
 import { Button, Toolbar } from "../components";
-import styles from "../../styles/Editor.module.scss";
+import styles from "../../styles/editor/Editor.module.scss";
 import { serialize, toSlateJson } from "../../utils/format";
+import { CodeBlockElement } from "../../types/editor";
+import { normalizeTokens, languages } from "../../utils/prism";
+import prismThemeCss from "../../styles/editor/prismThemeCss";
+import textStyleCss from '../../styles/editor/textStyle';
 
 interface Props {
   fromAnswer?: boolean;
@@ -63,7 +91,6 @@ const getLength = (token: any) => {
 };
 
 const RichTextEditor = (props: Props) => {
-  const [language, setLanguage] = useState("js");
   const [value, setValue] = useState(initialValue);
   const [showSlate, setShowSlate] = useState(false);
 
@@ -83,26 +110,69 @@ const RichTextEditor = (props: Props) => {
     }
   }, [props.slateJson]);
 
-  const renderElement = useCallback((props) => {
+  const renderElement = useCallback((scopedProps) => {
+    const { attributes, children, element } = scopedProps;
     // cutomize elemtents: https://docs.slatejs.org/walkthroughs/03-defining-custom-elements
-    if (props.element.children[0].code) {
+    if (element.type === "codeBlock") {
+      const setLanguage = (event: SelectChangeEvent) => {
+        const path = ReactEditor.findPath(editor, element);
+        (Transforms as any).setNodes(editor, { language: event.target.value as string }, { at: path });
+      };
       return (
-        <p
-          {...props.attributes}
-          style={{
-            backgroundColor: "#ddd",
-            padding: "4px 8px",
-            margin: 0,
-          }}
-          className="slate-code-block"
+        <div
+          {...attributes}
+          className={css(`
+        font-family: monospace;
+        font-size: 16px;
+        line-height: 20px;
+        margin-top: 0;
+        background: rgba(0, 20, 60, .03);
+        padding: 8px 16px;
+        min-height: 64px;
+      `)}
+          style={{ position: "relative" }}
+          spellCheck={false}
         >
-          {props.children}
-        </p>
+          { props.fromAnswer ? null : (
+            <FormControl sx={{ m: 1, minWidth: 120, position: 'absolute', right: '0px', top: '0px', zIndex: 99 }} size="small">
+            <InputLabel id="demo-select-small-label">Language</InputLabel>
+            <Select value={element.language} label="Language" onChange={setLanguage}>
+              {languages.map((item) => {
+                return (
+                  <MenuItem value={item.value} key={item.value}>
+                    {item.label}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+          )}
+          {children}
+        </div>
       );
     }
-    return <Element {...props} />;
-  }, []);
-  const renderLeaf = useCallback((props) => <Leaf {...props} />, []);
+
+    // bind "token" class to codeLine type
+    if (element.type === "codeLine") {
+      return (
+        <div {...attributes} style={{ position: "relative" }}>
+          {children}
+        </div>
+      );
+    }
+    return <Element {...scopedProps} />;
+  }, [props.fromAnswer]);
+
+  const renderLeaf = (props: RenderLeafProps) => {
+    const { attributes, children, leaf } = props;
+    const { text, ...rest } = leaf;
+
+    return (
+      <span {...attributes} className={Object.keys(rest).join(" ")}>
+        {children}
+      </span>
+    );
+  };
 
   const withImages = (editor: any) => {
     const { insertData, isVoid } = editor;
@@ -142,37 +212,24 @@ const RichTextEditor = (props: Props) => {
   };
 
   // withHistory: tracks changes to the Slate value state over time, and enables undo and redo functionality.
-  const editor = useMemo(() => withImages(withHistory(withReact(createEditor()))), []);
+  const [editor] = useState(() => withHistory(withReact(createEditor())));
 
   // decorate function depends on the language selected
-  const decorate = useCallback(
-    ([node, path]) => {
-      const ranges: any = [];
-      if (!Text.isText(node)) {
-        return ranges;
-      }
-      const tokens = Prism.tokenize(node.text, Prism.languages[language]);
-      let start = 0;
-
-      for (const token of tokens) {
-        const length = getLength(token);
-        const end = start + length;
-
-        if (typeof token !== "string") {
-          ranges.push({
-            [token.type]: true,
-            anchor: { path, offset: start },
-            focus: { path, offset: end },
-          });
+  const useDecorate = (editor: Editor) => {
+    return useCallback(
+      ([node, path]) => {
+        if (SlateElement.isElement(node) && (node as any).type === "codeLine") {
+          const ranges = (editor as any).nodeToDecorations.get(node) || [];
+          return ranges;
         }
 
-        start = end;
-      }
+        return [];
+      },
+      [(editor as any).nodeToDecorations]
+    );
+  };
 
-      return ranges;
-    },
-    [language]
-  );
+  const decorate = useDecorate(editor);
 
   const renderToolbar = () => {
     return (
@@ -181,7 +238,7 @@ const RichTextEditor = (props: Props) => {
         <MarkButton format="italic" icon={() => <FormatItalicIcon />} />
         <MarkButton format="underline" icon={() => <FormatUnderlinedIcon />} />
         <MarkButton format="codeInline" icon={() => <DataObjectIcon />} />
-        <MarkButton format="code" icon={() => <CodeIcon />} />
+        <BlockButton format="codeBlock" icon={() => <CodeIcon />} />
         <BlockButton format="headingOne" icon={() => <TitleIcon />} />
         <BlockButton
           format="headingTwo"
@@ -197,7 +254,10 @@ const RichTextEditor = (props: Props) => {
 
   const handleUploadClick = (event: any, editor: any) => {
     const file = event.target.files[0];
-    if (!file) {
+    if (file.name.length > 20) {
+      return;
+    }
+    if (!["image/jpg", "image/png", "image/jpeg"].includes(file.type)) {
       return;
     }
     if (props.uploadImage) {
@@ -230,7 +290,7 @@ const RichTextEditor = (props: Props) => {
       return (
         <Slate
           editor={editor}
-          value={value}
+          initialValue={value}
           onChange={(value: any) => {
             const isAstChange = editor.operations.some((op: any) => "set_selection" !== op.type);
             if (isAstChange) {
@@ -245,7 +305,9 @@ const RichTextEditor = (props: Props) => {
           }}
         >
           {props.fromAnswer ? null : renderToolbar()}
+          <SetNodeToDecorations />
           <Editable
+            className="editable-area"
             renderElement={renderElement}
             renderLeaf={renderLeaf}
             decorate={decorate}
@@ -263,6 +325,8 @@ const RichTextEditor = (props: Props) => {
               }
             }}
           />
+          <style>{prismThemeCss}</style>
+          <style>{textStyleCss}</style>
         </Slate>
       );
     }
@@ -273,7 +337,7 @@ const RichTextEditor = (props: Props) => {
     <div className={styles.editorWrapper}>
       <div
         className={styles.editor}
-        style={{ minHeight: props.fromAnswer ? "85vh" : "63vh", height: "100%" }}
+        style={{ minHeight: props.fromAnswer ? "85vh" : "100vh", height: "100%" }}
       >
         {renderSlate()}
       </div>
@@ -290,6 +354,38 @@ const toggleBlock = (editor: any, format: any) => {
     TEXT_ALIGN_TYPES.includes(format) ? "align" : "type"
   ) as boolean;
   const isList = LIST_TYPES.includes(format);
+
+  // handle codeBlock type
+  if (format === "codeBlock") {
+    if (!isActive) {
+      (Transforms as any).wrapNodes(
+        editor,
+        { type: "codeBlock", language: "typescript", children: [] },
+        {
+          match: (n: any) => SlateElement.isElement(n) && (n as any).type === "paragraph",
+          split: true,
+        }
+      );
+      (Transforms as any).setNodes(
+        editor,
+        { type: "codeLine" },
+        { match: (n: any) => SlateElement.isElement(n) && (n as any).type === "paragraph" }
+      );
+    } else {
+      Transforms.unwrapNodes(editor, {
+        match: (n: any) => {
+          return !Editor.isEditor(n) && SlateElement.isElement(n) && (n as any).type === "codeBlock";
+        },
+        split: true,
+      });
+      (Transforms as any).setNodes(
+        editor, 
+        { type: "paragraph" }
+      );
+    }
+
+    return;
+  }
 
   Transforms.unwrapNodes(editor, {
     match: (n: any) => {
@@ -337,8 +433,9 @@ const isBlockActive = (editor: any, format: any, blockType = "type") => {
   const [match] = Array.from(
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
-      match: (n: any) =>
-        !Editor.isEditor(n) && SlateElement.isElement(n) && (n as any)[blockType] === format,
+      match: (n: any) => {
+        return !Editor.isEditor(n) && SlateElement.isElement(n) && (n as any)[blockType] === format;
+      },
     })
   );
 
@@ -348,6 +445,78 @@ const isBlockActive = (editor: any, format: any, blockType = "type") => {
 const isMarkActive = (editor: any, format: any) => {
   const marks = Editor.marks(editor) as any;
   return marks ? marks[format] === true : false;
+};
+
+const mergeMaps = <K, V>(...maps: Map<K, V>[]) => {
+  const map = new Map<K, V>();
+
+  for (const m of maps) {
+    for (const item of (m as any)) {
+      map.set(item[0], item[1]);
+    }
+  }
+  return map;
+};
+
+const getChildNodeToDecorations = ([block, blockPath]: NodeEntry<CodeBlockElement>) => {
+  const nodeToDecorations = new Map<SlateElement, Range[]>();
+
+  const text = block.children.map((line) => Node.string(line)).join("\n");
+  const language = block.language;
+  const tokens = Prism.tokenize(text, Prism.languages[language]);
+  const normalizedTokens = normalizeTokens(tokens); // make tokens flat and grouped by line
+  const blockChildren = block.children as SlateElement[];
+
+  for (let index = 0; index < normalizedTokens.length; index++) {
+    const tokens = normalizedTokens[index];
+    const element = blockChildren[index];
+
+    if (!nodeToDecorations.has(element)) {
+      nodeToDecorations.set(element, []);
+    }
+
+    let start = 0;
+    for (const token of tokens) {
+      const length = token.content.length;
+      if (!length) {
+        continue;
+      }
+
+      const end = start + length;
+
+      const path = [...blockPath, index, 0];
+      const range = {
+        anchor: { path, offset: start },
+        focus: { path, offset: end },
+        token: true,
+        ...Object.fromEntries(token.types.map((type) => [type, true])),
+      };
+
+      nodeToDecorations.get(element)!.push(range as any);
+
+      start = end;
+    }
+  }
+  return nodeToDecorations;
+};
+
+// precalculate editor.nodeToDecorations map to use it inside decorate function then
+const SetNodeToDecorations = () => {
+  const editor: any = useSlate();
+
+  const blockEntries: any = Array.from(
+    Editor.nodes(editor, {
+      at: [],
+      mode: "highest",
+      match: (n) => SlateElement.isElement(n) && (n as any).type === "codeBlock",
+    })
+  );
+
+  const nodeToDecorations = mergeMaps(...blockEntries.map(getChildNodeToDecorations));
+
+  editor.nodeToDecorations = nodeToDecorations;
+
+  return null;
 };
 
 const ImageElement = ({ attributes, children, element }: any) => {
@@ -514,7 +683,7 @@ const BlockButton = ({ format, icon }: any) => {
 // test image url: https://i.pinimg.com/originals/bd/01/39/bd0139965d5cf92a73cd374fd8d98c90.jpg
 const isImageUrl = (url: string) => {
   if (!url) return false;
-  const regx = /^http[s]{0,1}:\/\/[a-zA-Z0-9-_.\/]+\.(png|jpeg|jpg)$/
+  const regx = /^http[s]{0,1}:\/\/[a-zA-Z0-9-_.\/]+\.(png|jpeg|jpg)$/;
   return regx.test(url);
 };
 
@@ -548,7 +717,7 @@ const initialValue: any[] = [
       { text: " text, " },
       { text: "much", italic: true },
       { text: " better than a " },
-      { text: "<textarea>", code: true },
+      { text: "<textarea>", codeInline: true },
       { text: "!" },
     ],
   },

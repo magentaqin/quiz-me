@@ -15,10 +15,12 @@ interface ElementNode {
   type?: string;
   children: TextNode[];
   url?: string;
+  language?: string;
 }
 
 // transform slate json-format to html string
 export const serialize = (node: ElementNode | TextNode) => {
+  console.log("serialize", node);
   if (Text.isText(node)) {
     let string = escapeHtml(node.text);
     if (node.bold) {
@@ -33,14 +35,10 @@ export const serialize = (node: ElementNode | TextNode) => {
     if (node.codeInline) {
       string = `<code>${string}</code>`;
     }
-    if (node.code) {
-      string = `<code-block>${string}</code-block>`;
-    }
     return string;
   }
 
   const children: string = node.children.map((n) => serialize(n)).join("");
-
   switch (node.type) {
     case "blockQuote":
       return `<blockquote><p>${children}</p></blockquote>`;
@@ -57,7 +55,11 @@ export const serialize = (node: ElementNode | TextNode) => {
     case "listItem":
       return `<li>${children}</li>`;
     case "image":
-      return `<img src=${node.url} />`
+      return `<img src=${node.url} />`;
+    case "codeBlock": 
+      return `<code-block language=${node.language}>${children}</code-block>`;
+    case "codeLine": 
+      return `<code-line>${children}</code-line>`;
     default:
       return children;
   }
@@ -94,7 +96,6 @@ const deserialize = (el: HTMLElement, markAttributes = {}): any => {
     children.push(jsx("text", nodeAttributes, ""));
   }
 
-  // console.log("el.nodeName", el.nodeName, children);
   switch (el.nodeName) {
     case "BODY":
       return jsx("fragment", {}, children);
@@ -105,9 +106,9 @@ const deserialize = (el: HTMLElement, markAttributes = {}): any => {
     case "P":
       return jsx("element", { type: "paragraph" }, children);
     case "H1":
-      return jsx("element", { type: "headinOne" }, children);
+      return jsx("element", { type: "headingOne" }, children);
     case "H2":
-      return jsx("element", { type: "headeingTwo" }, children);
+      return jsx("element", { type: "headingTwo" }, children);
     case "OL":
       return jsx("element", { type: "numberedList" }, children);
     case "UL":
@@ -124,10 +125,12 @@ const deserialize = (el: HTMLElement, markAttributes = {}): any => {
       return jsx("text", { ...children[0], bold: true });
     case "CODE": // code inline
       return jsx("text", { ...children[0], codeInline: true });
-    case "CODE-BLOCK": // code block
-      return jsx("text", { ...children[0], code: true });
     case "IMG":
-      return jsx("element", { type: "image", url: (el as any).src }, children );
+      return jsx("element", { type: "image", url: (el as any).src }, children);
+    case "CODE-BLOCK":
+      return jsx("element", { type: "codeBlock", language: (el as any).getAttribute('language') }, children);
+    case "CODE-LINE":
+        return jsx("element", { type: "codeLine" }, children);
     default:
       return children;
   }
