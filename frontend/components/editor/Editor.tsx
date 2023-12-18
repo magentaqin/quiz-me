@@ -116,7 +116,7 @@ const RichTextEditor = (props: Props) => {
     if (props.element.type === "codeBlock") {
       const setLanguage = (event: SelectChangeEvent) => {
         const path = ReactEditor.findPath(editor, element);
-        Transforms.setNodes(editor, { language: event.target.value as string }, { at: path });
+        (Transforms as any).setNodes(editor, { language: event.target.value as string }, { at: path });
       };
       return (
         <div
@@ -218,14 +218,14 @@ const RichTextEditor = (props: Props) => {
   const useDecorate = (editor: Editor) => {
     return useCallback(
       ([node, path]) => {
-        if (SlateElement.isElement(node) && node.type === "codeLine") {
-          const ranges = editor.nodeToDecorations.get(node) || [];
+        if (SlateElement.isElement(node) && (node as any).type === "codeLine") {
+          const ranges = (editor as any).nodeToDecorations.get(node) || [];
           return ranges;
         }
 
         return [];
       },
-      [editor.nodeToDecorations]
+      [(editor as any).nodeToDecorations]
     );
   };
 
@@ -357,27 +357,30 @@ const toggleBlock = (editor: any, format: any) => {
   // handle codeBlock type
   if (format === "codeBlock") {
     if (!isActive) {
-      Transforms.wrapNodes(
+      (Transforms as any).wrapNodes(
         editor,
         { type: "codeBlock", language: "typescript", children: [] },
         {
-          match: (n) => SlateElement.isElement(n) && n.type === "paragraph",
+          match: (n: any) => SlateElement.isElement(n) && (n as any).type === "paragraph",
           split: true,
         }
       );
-      Transforms.setNodes(
+      (Transforms as any).setNodes(
         editor,
         { type: "codeLine" },
-        { match: (n) => SlateElement.isElement(n) && n.type === "paragraph" }
+        { match: (n: any) => SlateElement.isElement(n) && (n as any).type === "paragraph" }
       );
     } else {
       Transforms.unwrapNodes(editor, {
         match: (n: any) => {
-          return !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === "codeBlock";
+          return !Editor.isEditor(n) && SlateElement.isElement(n) && (n as any).type === "codeBlock";
         },
         split: true,
       });
-      Transforms.setNodes<SlateElement>(editor, { type: "paragraph" });
+      (Transforms as any).setNodes(
+        editor, 
+        { type: "paragraph" }
+      );
     }
 
     return;
@@ -447,11 +450,10 @@ const mergeMaps = <K, V>(...maps: Map<K, V>[]) => {
   const map = new Map<K, V>();
 
   for (const m of maps) {
-    for (const item of m) {
-      map.set(...item);
+    for (const item of (m as any)) {
+      map.set(item[0], item[1]);
     }
   }
-
   return map;
 };
 
@@ -489,7 +491,7 @@ const getChildNodeToDecorations = ([block, blockPath]: NodeEntry<CodeBlockElemen
         ...Object.fromEntries(token.types.map((type) => [type, true])),
       };
 
-      nodeToDecorations.get(element)!.push(range);
+      nodeToDecorations.get(element)!.push(range as any);
 
       start = end;
     }
@@ -501,11 +503,11 @@ const getChildNodeToDecorations = ([block, blockPath]: NodeEntry<CodeBlockElemen
 const SetNodeToDecorations = () => {
   const editor: any = useSlate();
 
-  const blockEntries = Array.from(
+  const blockEntries: any = Array.from(
     Editor.nodes(editor, {
       at: [],
       mode: "highest",
-      match: (n) => SlateElement.isElement(n) && n.type === "codeBlock",
+      match: (n) => SlateElement.isElement(n) && (n as any).type === "codeBlock",
     })
   );
 
