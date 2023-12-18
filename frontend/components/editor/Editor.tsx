@@ -133,7 +133,8 @@ const RichTextEditor = (props: Props) => {
           style={{ position: "relative" }}
           spellCheck={false}
         >
-          <FormControl sx={{ m: 1, minWidth: 120, position: 'absolute', right: '0px', top: '0px', zIndex: 99 }} size="small">
+          {props.fromAnswer ? (
+            <FormControl sx={{ m: 1, minWidth: 120, position: 'absolute', right: '0px', top: '0px', zIndex: 99 }} size="small">
             <InputLabel id="demo-select-small-label">Language</InputLabel>
             <Select value={element.language} label="Language" onChange={setLanguage}>
               {languages.map((item) => {
@@ -145,6 +146,7 @@ const RichTextEditor = (props: Props) => {
               })}
             </Select>
           </FormControl>
+          ) : null }
           {children}
         </div>
       );
@@ -158,8 +160,6 @@ const RichTextEditor = (props: Props) => {
         </div>
       );
     }
-
-    console.log("props.element", props.element.type);
     return <Element {...props} />;
   }, []);
 
@@ -254,7 +254,10 @@ const RichTextEditor = (props: Props) => {
 
   const handleUploadClick = (event: any, editor: any) => {
     const file = event.target.files[0];
-    if (!file) {
+    if (file.name.length > 20) {
+      return;
+    }
+    if (!["image/jpg", "image/png", "image/jpeg"].includes(file.type)) {
       return;
     }
     if (props.uploadImage) {
@@ -350,7 +353,6 @@ const toggleBlock = (editor: any, format: any) => {
     TEXT_ALIGN_TYPES.includes(format) ? "align" : "type"
   ) as boolean;
   const isList = LIST_TYPES.includes(format);
-  console.log("isActive", isActive);
 
   // handle codeBlock type
   if (format === "codeBlock") {
@@ -492,7 +494,6 @@ const getChildNodeToDecorations = ([block, blockPath]: NodeEntry<CodeBlockElemen
       start = end;
     }
   }
-  console.log("nodtodecorations", nodeToDecorations);
   return nodeToDecorations;
 };
 
