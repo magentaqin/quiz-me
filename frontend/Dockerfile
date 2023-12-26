@@ -25,5 +25,5 @@ COPY --from=build /build/public ./public/
 COPY --from=build /build/node_modules ./node_modules/
 COPY --from=build /build/next.config.js ./
 
-EXPOSE 80
+EXPOSE 1306
 CMD ["npm", "start"]
