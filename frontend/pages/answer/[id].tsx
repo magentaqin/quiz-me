@@ -6,8 +6,8 @@ import Editor from "../../components/editor/Editor";
 import Typography from "@mui/material/Typography";
 import { unEscape } from "../../utils/html";
 
-import { getQuestionApi } from "../../api/question";
-import { getAnswerApi } from "../../api/answer";
+import { getQuestionServerApi } from "../../api/question";
+import { getAnswerApi, getAnswerServerApi } from "../../api/answer";
 import { toSlateJson } from "../../utils/format";
 
 interface ServerData {
@@ -74,7 +74,7 @@ export async function getServerSideProps(context: any) {
     let title = "",
       description = "",
       content = null;
-    const promises = [getQuestionApi({ id: questionId }), getAnswerApi({ id })];
+    const promises = [getQuestionServerApi({ id: questionId }), getAnswerServerApi({ id })];
     const [questionResp, answerResp] = await Promise.all(promises);
     if (questionResp) {
       title = questionResp.data.title;
