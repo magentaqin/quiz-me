@@ -7,9 +7,22 @@ services:
     build:
       context: ./frontend
     ports:
-      - "80:80"
+      - "1306:1306"
     depends_on:
       - backend
+    networks:
+      - app-network
+  nginx:
+    container_name: quizme_ngnix
+    image: nginx:latest
+    build:
+      context: ./nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - web
     networks:
       - app-network
   backend:

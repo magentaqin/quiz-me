@@ -1,8 +1,12 @@
-import { axiosInstance } from "./axios";
+import { axiosInstance, axiosServerInstance } from "./axios";
 import qs from "qs";
 
 export const getAnswerApi = async (params: { id: string }) => {
   return await axiosInstance.get("/answer", { params });
+};
+
+export const getAnswerServerApi = async (params: { id: string }) => {
+  return await axiosServerInstance.get("/answer", { params });
 };
 
 interface AddAnswerReq {

@@ -17,6 +17,15 @@ let axiosInstance = axios.create({
   },
 });
 
+const axiosServerInstance = axios.create({
+  baseURL: `${process.env.NEXT_PUBLIC_SERVER_API_URL}`,
+  timeout: 3000,
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
+
+
 export const refreshToken = () => {
   token = localStorage.getItem("quizme_token");
   axiosInstance = axios.create({
@@ -28,4 +37,4 @@ export const refreshToken = () => {
   });
 };
 
-export { axiosInstance };
+export { axiosInstance, axiosServerInstance };
