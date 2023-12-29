@@ -157,4 +157,8 @@ export const languages = [
     label: "Java",
     value: "java",
   },
+  {
+    label: "Bash",
+    value: "bash",
+  }
 ];
