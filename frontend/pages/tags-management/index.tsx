@@ -29,9 +29,16 @@ const TagsManagement: NextPage = () => {
     "nodejs",
     "mysql",
     "docker",
+    "cloud",
+    "rust",
     "go",
+    "shared-memory",
+    "unix",
+    "operating-system",
+    "nginx",
     "system-design",
     "amazon-web-services",
+    "amazon-s3",
     "networking",
   ];
   const initialTags: any = {};
