@@ -48,6 +48,7 @@ import "prismjs/components/prism-go";
 import "prismjs/components/prism-rust";
 import "prismjs/components/prism-css";
 import "prismjs/components/prism-cshtml";
+import "prismjs/components/prism-bash";
 
 import { Button, Toolbar } from "../components";
 import styles from "../../styles/editor/Editor.module.scss";
