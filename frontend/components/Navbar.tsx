@@ -15,6 +15,8 @@ const NavBar = () => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const [user, setUser] = useState<UserRes>({ userName: "", role: Role.USER });
+  // TODO
+  const enableWrite = typeof window === 'undefined' ? false : window.localStorage.getItem('QUIZ_ME_ENABLE_WRITE');
 
   useEffect(() => {
     getUserInfoApi().then((res: { data: UserRes }) => {
@@ -115,7 +117,7 @@ const NavBar = () => {
           onClick={toHome}
           className="cursor-pointer"
         />
-        {renderTopRight()}
+        {enableWrite ? renderTopRight() : null }
       </div>
       {renderForm()}
     </Fragment>

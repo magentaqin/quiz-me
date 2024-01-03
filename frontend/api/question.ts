@@ -1,5 +1,5 @@
 import qs from "qs";
-import { axiosInstance, axiosServerInstance } from "./axios";
+import { axiosInstance } from "./axios";
 
 export interface ListQuestionReq {
   offset: number;
@@ -64,8 +64,4 @@ export const updateQuestionApi = async (data: UpdateQuestionReq) => {
 
 export const getQuestionApi = async (params: { id: string }) => {
   return await axiosInstance.get("/question", { params });
-};
-
-export const getQuestionServerApi = async (params: { id: string }) => {
-  return await axiosServerInstance.get("/question", { params });
 };

@@ -11,6 +11,7 @@ import TableRow from "@mui/material/TableRow";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import { countQuestionApi, listQuestionsApi, ListQuestionRes } from "../api/question";
+import { listAnswerApi } from "../api/answer";
 import { unEscape } from "../utils/html";
 
 interface Column {
@@ -84,10 +85,25 @@ export default function QuizTable(props: Props) {
   }, [rowsPerPage, page, props.keyword, props.tags]);
 
   const toQuestionDetail = (questionId: string) => {
-    router.push({
-      pathname: "/question/[id]",
-      query: { id: questionId },
-    });
+    const enableWrite = typeof window === 'undefined' ? false : window.localStorage.getItem('QUIZ_ME_ENABLE_WRITE');
+    if (enableWrite) {
+      router.push({
+        pathname: "/question/[id]",
+        query: { id: questionId },
+      });
+    } else {
+      listAnswerApi({
+        offset: 0,
+        count: 1,
+        questionId,
+      }).then((res) => {
+        const answerId = res?.data[0].answerId
+        router.push({
+          pathname: "/answer/[id]",
+          query: { id: answerId, questionId },
+        });
+      })
+    }
   };
 
   return (
