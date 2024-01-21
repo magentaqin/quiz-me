@@ -51,7 +51,7 @@ export default function QuestionForm(props: Props) {
         const newTagMap: { [index: string]: string } = {};
         tagsArr.forEach((arrItem: TagItem) => {
           if (arrItem.name) {
-            newTagMap[arrItem.name] = arrItem.tagId || '';
+            newTagMap[arrItem.name] = arrItem.tagId || "";
           }
         });
         setTagMap(newTagMap);

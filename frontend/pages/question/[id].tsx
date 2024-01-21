@@ -20,7 +20,6 @@ import {
   updateAnswerApi,
 } from "../../api/answer";
 import { uploadImageApi } from "../../api/upload";
-import NavBar from "../../components/Navbar";
 import Footer from "../../components/editor/Footer";
 import QuestionForm, { QuestionHandleType } from "../../components/QuestionForm";
 import { serialize, toSlateJson } from "../../utils/format";
@@ -268,7 +267,6 @@ const QuestionPage = () => {
 
   return (
     <div>
-      <NavBar />
       <Card
         sx={{
           boxShadow: 1,
@@ -310,12 +308,14 @@ const QuestionPage = () => {
       <div style={{ backgroundColor: showEditor ? "#eee" : "rgba(18,18,18,0)", height: "100%" }}>
         <Container fixed>{showEditor ? renderEditor() : renderList()}</Container>
       </div>
-      <QuestionForm
-        open={open}
-        setOpen={setOpen}
-        type={QuestionHandleType.UPDATE}
-        questionId={id as string}
-      />
+      {open ? (
+        <QuestionForm
+          open={open}
+          setOpen={setOpen}
+          type={QuestionHandleType.UPDATE}
+          questionId={id as string}
+        />
+      ) : null}
     </div>
   );
 };

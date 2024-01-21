@@ -5,8 +5,7 @@ import CardContent from "@mui/material/CardContent";
 import Editor from "../../components/editor/Editor";
 import Typography from "@mui/material/Typography";
 import { unEscape } from "../../utils/html";
-
-import { getQuestionApi } from "../../api/question";
+import { getAnswerServerApi, getQuestionServerApi } from '../../api/serverSide'
 import { getAnswerApi } from "../../api/answer";
 import { toSlateJson } from "../../utils/format";
 
@@ -52,7 +51,7 @@ const AnswerPage = ({ data }: { data: ServerData }) => {
       >
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            {title}
+            {unEscape(title)}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {unEscape(description)}
@@ -74,19 +73,21 @@ export async function getServerSideProps(context: any) {
     let title = "",
       description = "",
       content = null;
-    const promises = [getQuestionApi({ id: questionId }), getAnswerApi({ id })];
+    const promises = [getQuestionServerApi({ id: questionId }), getAnswerServerApi({ id })];
     const [questionResp, answerResp] = await Promise.all(promises);
-    if (questionResp) {
-      title = questionResp.data.title;
-      description = questionResp.data.description;
+    const questionData = await questionResp.json()
+    const answerData = await answerResp.json()
+    if (questionData) {
+      title = questionData.title;
+      description = questionData.description;
     }
-    if (answerResp) {
-      content = unEscape(answerResp?.data?.content);
+    if (answerData) {
+      content = unEscape(answerData.content);
     }
     const data = {
       title,
       description,
-      content,
+      content
     };
     return {
       props: {

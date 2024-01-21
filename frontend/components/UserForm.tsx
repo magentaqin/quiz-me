@@ -111,7 +111,6 @@ export default function UserForm(props: Props) {
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
           <TextField
-            autoFocus
             margin="dense"
             id="email"
             label="Email Address"
@@ -123,7 +122,6 @@ export default function UserForm(props: Props) {
           />
           {props.formType === "signup" ? (
             <TextField
-              autoFocus
               margin="dense"
               id="username"
               label="Username"
@@ -135,7 +133,6 @@ export default function UserForm(props: Props) {
             />
           ) : null}
           <TextField
-            autoFocus
             margin="dense"
             id="password"
             label="Password"

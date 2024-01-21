@@ -15,6 +15,8 @@ const NavBar = () => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const [user, setUser] = useState<UserRes>({ userName: "", role: Role.USER });
+  // TODO
+  const enableWrite = typeof window === 'undefined' ? false : window.localStorage.getItem('QUIZ_ME_ENABLE_WRITE');
 
   useEffect(() => {
     getUserInfoApi().then((res: { data: UserRes }) => {
@@ -87,10 +89,15 @@ const NavBar = () => {
   };
 
   const renderForm = () => {
-    if (formType === "question") {
-      return <QuestionForm open={open} setOpen={setOpen} type={QuestionHandleType.ADD} />;
+    if (open) {
+      if (formType === "question") {
+        return <QuestionForm open={open} setOpen={setOpen} type={QuestionHandleType.ADD} />;
+      }
+      return (
+        <UserForm open={open} setOpen={setOpen} formType={formType} setUserInfo={setUserInfo} />
+      );
     }
-    return <UserForm open={open} setOpen={setOpen} formType={formType} setUserInfo={setUserInfo} />;
+    return null;
   };
 
   const toHome = () => {
@@ -110,7 +117,7 @@ const NavBar = () => {
           onClick={toHome}
           className="cursor-pointer"
         />
-        {renderTopRight()}
+        {enableWrite ? renderTopRight() : null }
       </div>
       {renderForm()}
     </Fragment>

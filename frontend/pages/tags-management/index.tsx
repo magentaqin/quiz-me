@@ -1,11 +1,10 @@
 import type { NextPage } from "next";
-import { Fragment, useState, useEffect } from "react";
+import { useState } from "react";
 import Checkbox from "@mui/material/Checkbox";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import NavBar from "../../components/Navbar";
 import { deleteTagApi, setTagsApi, TagItem } from "../../api/tag";
 
 const TagsManagement: NextPage = () => {
@@ -22,9 +21,26 @@ const TagsManagement: NextPage = () => {
     "lerna",
     "webpack",
     "babeljs",
+    "performance",
+    "monitoring",
   ];
 
-  const backendList = ["nodejs", "mysql", "docker"];
+  const backendList = [
+    "nodejs",
+    "mysql",
+    "docker",
+    "cloud",
+    "rust",
+    "go",
+    "shared-memory",
+    "unix",
+    "operating-system",
+    "nginx",
+    "system-design",
+    "amazon-web-services",
+    "amazon-s3",
+    "networking",
+  ];
   const initialTags: any = {};
   frontendList.concat(backendList).forEach((key) => {
     initialTags[key] = true;
@@ -117,36 +133,33 @@ const TagsManagement: NextPage = () => {
   };
 
   return (
-    <Fragment>
-      <NavBar />
-      <div className="container px-4 mx-auto">
-        <p className="text-2xl">Manage Tags</p>
-        <Button
-          variant="contained"
-          size="small"
-          onClick={deleteOldTags}
-          style={{ backgroundColor: "#1976d2" }}
-        >
-          Delete Old
-        </Button>
-        <div>
-          <p className="text-xl">Frontend</p>
-          <FormGroup>{renderFrontTags()}</FormGroup>
-        </div>
-        <div>
-          <p className="text-xl">Backend</p>
-          <FormGroup>{renderBackendTags()}</FormGroup>
-        </div>
-        <Button
-          variant="contained"
-          size="small"
-          onClick={submit}
-          style={{ backgroundColor: "#1976d2" }}
-        >
-          Submit
-        </Button>
+    <div className="container px-4 mx-auto">
+      <p className="text-2xl">Manage Tags</p>
+      <Button
+        variant="contained"
+        size="small"
+        onClick={deleteOldTags}
+        style={{ backgroundColor: "#1976d2" }}
+      >
+        Delete Old
+      </Button>
+      <div>
+        <p className="text-xl">Frontend</p>
+        <FormGroup>{renderFrontTags()}</FormGroup>
       </div>
-    </Fragment>
+      <div>
+        <p className="text-xl">Backend</p>
+        <FormGroup>{renderBackendTags()}</FormGroup>
+      </div>
+      <Button
+        variant="contained"
+        size="small"
+        onClick={submit}
+        style={{ backgroundColor: "#1976d2" }}
+      >
+        Submit
+      </Button>
+    </div>
   );
 };
 

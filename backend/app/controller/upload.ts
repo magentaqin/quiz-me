@@ -61,6 +61,7 @@ export default class UploadController extends Controller {
         Body: buffer,
         Key: stream.fields.fileKey,
         ContentType: stream.mimeType,
+        ACL: 'public-read',
       };
       const res = await s3Client.send(new PutObjectCommand(params)).catch(err => {
         throw new Error(err);
@@ -73,7 +74,7 @@ export default class UploadController extends Controller {
 
       this.ctx.status = 201;
       this.ctx.body = {
-        url: 'https://' + process.env.AWS_IMAGE_BUCKET + '.s3.' + process.env.AWS_REGION + '.amazonaws.com/' + params.Key,
+        url: 'https://quizme-image.sfo3.cdn.digitaloceanspaces.com/' + params.Key,
       };
     } catch (err) {
       this.ctx.status = 500;

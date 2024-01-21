@@ -13,6 +13,7 @@
     "prisma:db:pull": "dotenv -e .dev.env prisma db pull",
     "prisma:rollback": "dotenv -e .dev.env prisma migrate resolve --rolled-back 20201231000000_example",
     "migrate:deploy": "prisma migrate deploy",
+    "start:pre": "dotenv -e .dev.env egg-scripts start --title=quizme-server-backend",
     "start": "egg-scripts start --title=quizme-server-backend",
     "stop": "egg-scripts stop --title=quizme-server-backend",
     "debug": "egg-bin debug",

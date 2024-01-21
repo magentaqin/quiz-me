@@ -48,7 +48,7 @@ export default class UserController extends Controller {
           userId,
           userName,
           password: hashedPassword,
-          role: email === 'quizme@root.com' ? 'ADMIN' : 'USER'
+          role: email === 'quizme@root.com' ? 'ADMIN' : 'USER',
         },
       });
 
@@ -60,6 +60,7 @@ export default class UserController extends Controller {
       };
 
     } catch (err) {
+      this.ctx.logger.error(err);
       this.ctx.status = 500;
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
     }
@@ -108,6 +109,7 @@ export default class UserController extends Controller {
       };
 
     } catch (err) {
+      this.ctx.logger.error(err);
       this.ctx.status = 500;
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
     }
@@ -136,10 +138,11 @@ export default class UserController extends Controller {
       this.ctx.status = 200;
       this.ctx.body = {
         userName: userResp.userName,
-        role: userResp.role
+        role: userResp.role,
       };
 
-    }  catch (err) {
+    } catch (err) {
+      this.ctx.logger.error(err);
       this.ctx.status = 500;
       this.ctx.body = globalErrorCodes.SERVER_UNKNOWN_ERROR;
     }

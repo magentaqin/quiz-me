@@ -71,7 +71,7 @@ export default class TagController extends Controller {
       const { prisma } = this.app;
       const resp = await prisma.questionTag.findMany({
         where: {
-          status: 'NORMAL'
+          status: 'NORMAL',
         },
         select: {
           tagId: true,
@@ -102,25 +102,25 @@ export default class TagController extends Controller {
         return;
       }
 
-      const requestTagKeys = tags.map(item => item.name)
+      const requestTagKeys = tags.map(item => item.name);
       const existTags = await prisma.questionTag.findMany({
         where: {
           status: 'NORMAL',
         },
       });
 
-      const updatedTagKeys: string[] = existTags.map(item => item.name)
-      const tagsToCreate = tags.filter(item => !updatedTagKeys.includes(item.name)).map((item) => {
+      const updatedTagKeys: string[] = existTags.map(item => item.name);
+      const tagsToCreate = tags.filter(item => !updatedTagKeys.includes(item.name)).map(item => {
         return {
           name: this.ctx.helper.escape(item.name),
           description: this.ctx.helper.escape(item.name),
           tagId: generateUuid(item.name),
-        }
-      })
+        };
+      });
       if (tagsToCreate.length) {
         await prisma.questionTag.createMany({
           data: tagsToCreate,
-        })
+        });
       }
 
       for (const tagItem of existTags) {
@@ -131,9 +131,9 @@ export default class TagController extends Controller {
               tagId: tagItem.tagId,
             },
             data: {
-              description: tags.find(item => item.name === tagItem.name)?.description || ''
+              description: tags.find(item => item.name === tagItem.name)?.description || '',
             },
-          })
+          });
         }
       }
       this.ctx.status = 200;
@@ -164,7 +164,7 @@ export default class TagController extends Controller {
           status: 'DELETED',
         },
       }).catch(err => {
-        console.log('delete tags err', err)
+        console.log('delete tags err', err);
       });
       if (resp) {
         this.ctx.status = 200;
