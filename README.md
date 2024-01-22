@@ -91,6 +91,8 @@ QuizMe is not a third-part tool, but a online programming learning platform. You
   -  Support both code line and code block.
   -  Support image uploading.
 
+<img src="https://quizme-image.sfo3.cdn.digitaloceanspaces.com/quizme-github-repo/0.1.0/answer-editor.png" />
+
 #### Code exercises(Still building, Not available)
 
 #### Code output deduce(Still building, Not available)
@@ -165,6 +167,6 @@ I'll share the important technical details, decision-making processes and soluti
 
 - [How To Reduce Docker Image Size by 81%](https://medium.com/better-programming/how-to-reduce-docker-image-size-by-81-frontend-next-js-practice-8680bda50fee)
 
-
+- [How to upgrade your website to https in 3 minutes: a step-by-step guide for independent developers(Next.js+Docker+Ngnix+Certbot)](https://medium.com/@magenta2127/how-to-upgrade-your-website-to-https-in-3-minutes-a-step-by-step-guide-for-independent-7444016545ab)
 
 QuizMe is [MIT-licensed](./License).
