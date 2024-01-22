@@ -12,7 +12,7 @@ Elevate your programming skills through quizzes, coding practices, and real-worl
 <p align="center">
   <a href="#why"><strong>Why</strong></a> ·
   <a href="#features"><strong>Features</strong></a> ·
-  <a href="#tech-stack"><strong>Tech Stack</strong></a> ·
+  <a href="#tech-stack"><strong>Tech Stack and Database Schema</strong></a> ·
   <a href="#run"><strong>Run It Locally</strong></a> ·
   <a href="#blogs"><strong>Blogs</strong></a> ·
 </p>
@@ -101,12 +101,16 @@ QuizMe is not a third-part tool, but a online programming learning platform. You
 
 <br />
 
-### Tech Stack 🧰 <a name="tech-stack"></a>
+### Tech Stack and Database Schema 🧰 <a name="tech-stack"></a>
 
 * Frontend: Next.js(React) + Typescript + Slate
 * Backend: Node.js + Egg.js + Prisma + MySQL
 * Deploy: Docker
 * Cloud Service Provider: DigitalOcean
+
+Have a quick look at the database schema:
+
+<img src="https://quizme-image.sfo3.cdn.digitaloceanspaces.com/quizme-github-repo/0.1.0/mysql-schema.png" />
 
 ### Run it Locally 👏🏻 <a name="run"></a>
 
