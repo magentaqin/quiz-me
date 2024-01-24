@@ -38,9 +38,8 @@ export default function QuestionForm(props: Props) {
   const [showSuccessMsg, setShowSuccessMsg] = useState(false);
   const [description, setDescription] = useState("");
   const [level, setLevel] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<TagItem[]>([]);
   const [tags, setTags] = useState<TagItem[]>([]);
-  const [tagMap, setTagMap] = useState<{ [index: string]: string }>({});
   const router = useRouter();
 
   useEffect(() => {
@@ -48,13 +47,6 @@ export default function QuestionForm(props: Props) {
       if (Array.isArray(res?.data?.tags)) {
         const tagsArr = res?.data?.tags;
         setTags(tagsArr);
-        const newTagMap: { [index: string]: string } = {};
-        tagsArr.forEach((arrItem: TagItem) => {
-          if (arrItem.name) {
-            newTagMap[arrItem.name] = arrItem.tagId || "";
-          }
-        });
-        setTagMap(newTagMap);
       }
     });
   }, []);
@@ -64,11 +56,10 @@ export default function QuestionForm(props: Props) {
       getQuestionApi({ id: props.questionId }).then((res) => {
         if (res?.data) {
           const { title, description, level, tags } = res?.data;
-          const selectedTags = tags.map((item: TagItem) => item.name);
           setTitle(title);
           setDescription(description);
           setLevel(level);
-          setSelectedTags(selectedTags);
+          setSelectedTags(tags);
         }
       });
     }
@@ -96,8 +87,8 @@ export default function QuestionForm(props: Props) {
   };
 
   const submit = () => {
-    const tagIds = selectedTags.map((name) => {
-      return tagMap[name];
+    const tagIds = selectedTags.map((item) => {
+      return item.tagId
     });
     const data: any = {
       title,
