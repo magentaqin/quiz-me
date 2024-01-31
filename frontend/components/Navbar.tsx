@@ -15,7 +15,7 @@ const NavBar = () => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const [user, setUser] = useState<UserRes>({ userName: "", role: Role.USER });
-  const [enableWrite, setEnableWrite] = useState(false)
+  const [enableWrite, setEnableWrite] = useState(false);
 
   useEffect(() => {
     getUserInfoApi().then((res: { data: UserRes }) => {
@@ -27,7 +27,8 @@ const NavBar = () => {
 
   // TODO
   useEffect(() => {
-    const val = typeof window === 'undefined' ? false : window.localStorage.getItem('QUIZ_ME_ENABLE_WRITE');
+    const val =
+      typeof window === "undefined" ? false : window.localStorage.getItem("QUIZ_ME_ENABLE_WRITE");
     setEnableWrite(!!val);
   }, []);
 

@@ -1,19 +1,24 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import * as React from "react";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+
+interface FormJson {
+  linkText: string;
+  linkUrl: string;
+}
 
 interface Props {
   open: boolean;
   setOpen: (open: boolean) => void;
+  onSubmit: (formJson: FormJson) => void;
 }
 
 const LinkDialog = (props: Props) => {
-
   const handleClose = () => {
     props.setOpen(false);
   };
@@ -24,10 +29,12 @@ const LinkDialog = (props: Props) => {
         open={props.open}
         onClose={handleClose}
         PaperProps={{
-          component: 'form',
+          component: "form",
           onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
+            const formJson = Object.fromEntries((formData as any).entries()) as FormJson;
+            props.onSubmit(formJson);
           },
         }}
       >
@@ -63,6 +70,6 @@ const LinkDialog = (props: Props) => {
       </Dialog>
     </React.Fragment>
   );
-}
+};
 
 export default LinkDialog;

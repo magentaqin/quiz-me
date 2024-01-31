@@ -16,7 +16,6 @@ import {
   Editor,
   createEditor,
   Element as SlateElement,
-  Text,
   Transforms,
   NodeEntry,
   Node,
@@ -27,6 +26,7 @@ import FormatItalicIcon from "@mui/icons-material/FormatItalic";
 import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
 import CodeIcon from "@mui/icons-material/Code";
 import TitleIcon from "@mui/icons-material/Title";
+import InsertLinkIcon from "@mui/icons-material/InsertLink";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
@@ -36,6 +36,7 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
+import LinkDialog from "./LinkDialog";
 import { css } from "@emotion/css";
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-jsx";
@@ -56,7 +57,7 @@ import { serialize, toSlateJson } from "../../utils/format";
 import { CodeBlockElement } from "../../types/editor";
 import { normalizeTokens, languages } from "../../utils/prism";
 import prismThemeCss from "../../styles/editor/prismThemeCss";
-import textStyleCss from '../../styles/editor/textStyle';
+import textStyleCss from "../../styles/editor/textStyle";
 
 interface Props {
   fromAnswer?: boolean;
@@ -94,6 +95,7 @@ const getLength = (token: any) => {
 const RichTextEditor = (props: Props) => {
   const [value, setValue] = useState(initialValue);
   const [showSlate, setShowSlate] = useState(false);
+  const [showLinkDialog, setShowLinkDialog] = useState(false);
 
   // Update the initial content to be pulled from Local Storage if it exists.
   useEffect(() => {
@@ -111,18 +113,23 @@ const RichTextEditor = (props: Props) => {
     }
   }, [props.slateJson]);
 
-  const renderElement = useCallback((scopedProps) => {
-    const { attributes, children, element } = scopedProps;
-    // cutomize elemtents: https://docs.slatejs.org/walkthroughs/03-defining-custom-elements
-    if (element.type === "codeBlock") {
-      const setLanguage = (event: SelectChangeEvent) => {
-        const path = ReactEditor.findPath(editor, element);
-        (Transforms as any).setNodes(editor, { language: event.target.value as string }, { at: path });
-      };
-      return (
-        <div
-          {...attributes}
-          className={css(`
+  const renderElement = useCallback(
+    (scopedProps) => {
+      const { attributes, children, element } = scopedProps;
+      // cutomize elemtents: https://docs.slatejs.org/walkthroughs/03-defining-custom-elements
+      if (element.type === "codeBlock") {
+        const setLanguage = (event: SelectChangeEvent) => {
+          const path = ReactEditor.findPath(editor, element);
+          (Transforms as any).setNodes(
+            editor,
+            { language: event.target.value as string },
+            { at: path }
+          );
+        };
+        return (
+          <div
+            {...attributes}
+            className={css(`
         font-family: monospace;
         font-size: 16px;
         line-height: 20px;
@@ -131,38 +138,50 @@ const RichTextEditor = (props: Props) => {
         padding: 8px 16px;
         min-height: 64px;
       `)}
-          style={{ position: "relative" }}
-          spellCheck={false}
-        >
-          { props.fromAnswer ? null : (
-            <FormControl sx={{ m: 1, minWidth: 120, position: 'absolute', right: '0px', top: '0px', zIndex: 99 }} size="small">
-            <InputLabel id="demo-select-small-label">Language</InputLabel>
-            <Select value={element.language} label="Language" onChange={setLanguage}>
-              {languages.map((item) => {
-                return (
-                  <MenuItem value={item.value} key={item.value}>
-                    {item.label}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
-          )}
-          {children}
-        </div>
-      );
-    }
+            style={{ position: "relative" }}
+            spellCheck={false}
+          >
+            {props.fromAnswer ? null : (
+              <FormControl
+                sx={{
+                  m: 1,
+                  minWidth: 120,
+                  position: "absolute",
+                  right: "0px",
+                  top: "0px",
+                  zIndex: 99,
+                }}
+                size="small"
+              >
+                <InputLabel id="demo-select-small-label">Language</InputLabel>
+                <Select value={element.language} label="Language" onChange={setLanguage}>
+                  {languages.map((item) => {
+                    return (
+                      <MenuItem value={item.value} key={item.value}>
+                        {item.label}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+            )}
+            {children}
+          </div>
+        );
+      }
 
-    // bind "token" class to codeLine type
-    if (element.type === "codeLine") {
-      return (
-        <div {...attributes} style={{ position: "relative" }}>
-          {children}
-        </div>
-      );
-    }
-    return <Element {...scopedProps} />;
-  }, [props.fromAnswer]);
+      // bind "token" class to codeLine type
+      if (element.type === "codeLine") {
+        return (
+          <div {...attributes} style={{ position: "relative" }}>
+            {children}
+          </div>
+        );
+      }
+      return <Element {...scopedProps} />;
+    },
+    [props.fromAnswer]
+  );
 
   const renderLeaf = (props: RenderLeafProps) => {
     const { attributes, children, leaf } = props;
@@ -173,43 +192,6 @@ const RichTextEditor = (props: Props) => {
         {children}
       </span>
     );
-  };
-
-  const withImages = (editor: any) => {
-    const { insertData, isVoid } = editor;
-
-    editor.isVoid = (element: any) => {
-      return element.type === "image" ? true : isVoid(element);
-    };
-
-    editor.insertData = (data: any) => {
-      const text = data.getData("text/plain");
-      const { files } = data;
-
-      if (files && files.length > 0) {
-        for (const file of files) {
-          const reader = new FileReader();
-          const [mime] = file.type.split("/");
-
-          if (mime === "image") {
-            reader.addEventListener("load", () => {
-              const url = reader.result;
-              if (url !== null) {
-                insertImage(editor, url as string);
-              }
-            });
-
-            reader.readAsDataURL(file);
-          }
-        }
-      } else if (isImageUrl(text)) {
-        insertImage(editor, text);
-      } else {
-        insertData(data);
-      }
-    };
-
-    return editor;
   };
 
   // withHistory: tracks changes to the Slate value state over time, and enables undo and redo functionality.
@@ -248,6 +230,7 @@ const RichTextEditor = (props: Props) => {
         <BlockButton format="blockQuote" icon={() => <FormatQuoteIcon />} />
         <BlockButton format="numberedList" icon={() => <FormatListNumberedIcon />} />
         <BlockButton format="bulletedList" icon={() => <FormatListBulletedIcon />} />
+        <InsertLinkButton format="link" icon={() => <InsertLinkIcon />} />
         <InsertImageButton format="image" icon={() => <PhotoIcon />} />
       </Toolbar>
     );
@@ -280,6 +263,23 @@ const RichTextEditor = (props: Props) => {
           onChange={(e: any) => handleUploadClick(event, editor)}
           className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-0"
         />
+        {icon()}
+      </Button>
+    );
+  };
+
+  const showInsertLinkDialog = (editor: any) => {
+    setShowLinkDialog(true);
+  };
+
+  const insertLink = (editor, form) => {
+    console.log(editor, form);
+  };
+
+  const InsertLinkButton = ({ format, icon }: any) => {
+    const editor = useSlateStatic();
+    return (
+      <Button className="relative" onClick={() => showInsertLinkDialog(editor)}>
         {icon()}
       </Button>
     );
@@ -325,6 +325,11 @@ const RichTextEditor = (props: Props) => {
                 }
               }
             }}
+          />
+          <LinkDialog
+            open={showLinkDialog}
+            setOpen={setShowLinkDialog}
+            onSubmit={(formJson) => insertLink(editor, formJson)}
           />
           <style>{prismThemeCss}</style>
           <style>{textStyleCss}</style>
@@ -375,14 +380,13 @@ const toggleBlock = (editor: any, format: any) => {
     } else {
       Transforms.unwrapNodes(editor, {
         match: (n: any) => {
-          return !Editor.isEditor(n) && SlateElement.isElement(n) && (n as any).type === "codeBlock";
+          return (
+            !Editor.isEditor(n) && SlateElement.isElement(n) && (n as any).type === "codeBlock"
+          );
         },
         split: true,
       });
-      (Transforms as any).setNodes(
-        editor, 
-        { type: "paragraph" }
-      );
+      (Transforms as any).setNodes(editor, { type: "paragraph" });
     }
 
     return;
@@ -452,7 +456,7 @@ const mergeMaps = <K, V>(...maps: Map<K, V>[]) => {
   const map = new Map<K, V>();
 
   for (const m of maps) {
-    for (const item of (m as any)) {
+    for (const item of m as any) {
       map.set(item[0], item[1]);
     }
   }
@@ -642,30 +646,6 @@ const renderCode = (attributes: any, children: any, leaf: any) => {
   );
 };
 
-const Leaf = ({ attributes, children, leaf }: any) => {
-  if (leaf.bold) {
-    children = <strong>{children}</strong>;
-  }
-
-  if (leaf.code) {
-    children = renderCode(attributes, children, leaf);
-  }
-
-  if (leaf.codeInline) {
-    children = <code>{children}</code>;
-  }
-
-  if (leaf.italic) {
-    children = <em>{children}</em>;
-  }
-
-  if (leaf.underline) {
-    children = <u>{children}</u>;
-  }
-
-  return <span {...attributes}>{children}</span>;
-};
-
 const BlockButton = ({ format, icon }: any) => {
   const editor = useSlate();
   return (
@@ -679,13 +659,6 @@ const BlockButton = ({ format, icon }: any) => {
       {icon()}
     </Button>
   );
-};
-
-// test image url: https://i.pinimg.com/originals/bd/01/39/bd0139965d5cf92a73cd374fd8d98c90.jpg
-const isImageUrl = (url: string) => {
-  if (!url) return false;
-  const regx = /^http[s]{0,1}:\/\/[a-zA-Z0-9-_.\/]+\.(png|jpeg|jpg)$/;
-  return regx.test(url);
 };
 
 const insertImage = (editor: any, url: string) => {

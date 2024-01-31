@@ -88,7 +88,7 @@ export default function QuestionForm(props: Props) {
 
   const submit = () => {
     const tagIds = selectedTags.map((item) => {
-      return item.tagId
+      return item.tagId;
     });
     const data: any = {
       title,

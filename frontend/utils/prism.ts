@@ -160,5 +160,5 @@ export const languages = [
   {
     label: "Bash",
     value: "bash",
-  }
+  },
 ];

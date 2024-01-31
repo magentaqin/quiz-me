@@ -1,4 +1,4 @@
-const baseUrl = process.env.NEXT_PUBLIC_SERVER_API_URL
+const baseUrl = process.env.NEXT_PUBLIC_SERVER_API_URL;
 
 export const getQuestionServerApi = async (params: { id: string }) => {
   return await fetch(`${baseUrl}/question?id=${params.id}`);
