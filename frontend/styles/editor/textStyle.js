@@ -10,6 +10,12 @@ const TextStyleCss = `
   background-color: #eee;
   padding: 3px;
 }
+.anchor {
+  color: rgb(25, 118, 210);
+  &:hover {
+    cursor: pointer;
+  }
+}
 `;
 
 export default TextStyleCss;

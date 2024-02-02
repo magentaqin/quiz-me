@@ -15,8 +15,7 @@ const NavBar = () => {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const [user, setUser] = useState<UserRes>({ userName: "", role: Role.USER });
-  // TODO
-  const enableWrite = typeof window === 'undefined' ? false : window.localStorage.getItem('QUIZ_ME_ENABLE_WRITE');
+  const [enableWrite, setEnableWrite] = useState(false);
 
   useEffect(() => {
     getUserInfoApi().then((res: { data: UserRes }) => {
@@ -24,6 +23,13 @@ const NavBar = () => {
         setUser(res.data);
       }
     });
+  }, []);
+
+  // TODO
+  useEffect(() => {
+    const val =
+      typeof window === "undefined" ? false : window.localStorage.getItem("QUIZ_ME_ENABLE_WRITE");
+    setEnableWrite(!!val);
   }, []);
 
   const handleSignup = () => {
@@ -49,6 +55,7 @@ const NavBar = () => {
   };
 
   const renderTopRight = () => {
+    if (!enableWrite) return null;
     if (user.userName) {
       return (
         <Stack direction="row" spacing={2} justifyContent="center" alignItems="center">
@@ -117,7 +124,7 @@ const NavBar = () => {
           onClick={toHome}
           className="cursor-pointer"
         />
-        {enableWrite ? renderTopRight() : null }
+        {renderTopRight()}
       </div>
       {renderForm()}
     </Fragment>
