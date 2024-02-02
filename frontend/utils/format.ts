@@ -60,6 +60,8 @@ export const serialize = (node: ElementNode | TextNode) => {
       return `<code-block language=${node.language}>${children}</code-block>`;
     case "codeLine":
       return `<code-line>${children}</code-line>`;
+    case "link":
+      return `<a href="${node.url}" target="_blank">${children}</a>`;
     default:
       return children;
   }
@@ -133,7 +135,7 @@ const deserialize = (el: HTMLElement, markAttributes = {}): any => {
         { type: "codeBlock", language: (el as any).getAttribute("language") },
         children
       );
-    case "CODE-LINE":
+    case "CODE-LINE": // each line in CodeBlock
       return jsx("element", { type: "codeLine" }, children);
     default:
       return children;

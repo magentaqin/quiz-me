@@ -12,14 +12,7 @@ import {
   ReactEditor,
   RenderLeafProps,
 } from "slate-react";
-import {
-  Editor,
-  createEditor,
-  Element as SlateElement,
-  Transforms,
-  NodeEntry,
-  Node,
-} from "slate";
+import { Editor, createEditor, Element as SlateElement, Transforms, NodeEntry, Node } from "slate";
 import { withHistory } from "slate-history";
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
 import FormatItalicIcon from "@mui/icons-material/FormatItalic";
@@ -36,7 +29,7 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import LinkDialog from "./LinkDialog";
+import LinkDialog, { LinkFormJson } from "./LinkDialog";
 import { css } from "@emotion/css";
 import "prismjs/components/prism-javascript";
 import "prismjs/components/prism-jsx";
@@ -78,6 +71,12 @@ export type EmptyText = {
 
 export type ImageElement = {
   type: "image";
+  url: string;
+  children: EmptyText[];
+};
+
+export type LinkElement = {
+  type: "link";
   url: string;
   children: EmptyText[];
 };
@@ -178,6 +177,16 @@ const RichTextEditor = (props: Props) => {
           </div>
         );
       }
+
+      if (element.type === "link") {
+        return (
+          // eslint-disable-next-line react/jsx-no-target-blank
+          <a {...attributes} href={element.url} target="_blank" style={{ color: "#1976D2" }}>
+            {children}
+          </a>
+        );
+      }
+
       return <Element {...scopedProps} />;
     },
     [props.fromAnswer]
@@ -268,18 +277,20 @@ const RichTextEditor = (props: Props) => {
     );
   };
 
-  const showInsertLinkDialog = (editor: any) => {
+  const showInsertLinkDialog = () => {
     setShowLinkDialog(true);
   };
 
-  const insertLink = (editor, form) => {
-    console.log(editor, form);
+  const insertLink = (editor: any, form: LinkFormJson) => {
+    const { linkText, linkUrl } = form;
+    const link: LinkElement = { url: linkUrl, type: "link", children: [{ text: linkText }] };
+    Transforms.insertNodes(editor, link);
+    setShowLinkDialog(false);
   };
 
   const InsertLinkButton = ({ format, icon }: any) => {
-    const editor = useSlateStatic();
     return (
-      <Button className="relative" onClick={() => showInsertLinkDialog(editor)}>
+      <Button className="relative" onClick={() => showInsertLinkDialog}>
         {icon()}
       </Button>
     );
@@ -288,6 +299,12 @@ const RichTextEditor = (props: Props) => {
   const renderSlate = () => {
     // Only render editor on client side.
     if (showSlate) {
+      // By Default, elements are "block".
+      // Inline Elements shoule be excluded.
+      const { isInline } = editor;
+      editor.isInline = (element: any) => {
+        return element.type === "link" ? true : isInline(element);
+      };
       return (
         <Slate
           editor={editor}
@@ -592,60 +609,6 @@ const Element = (props: any) => {
   }
 };
 
-const renderCode = (attributes: any, children: any, leaf: any) => {
-  return (
-    <span
-      {...attributes}
-      className={css`
-        font-family: monospace;
-        background: #ddd;
-
-        ${leaf.comment &&
-        css`
-          color: slategray;
-        `}
-
-        ${(leaf.operator || leaf.url) &&
-        css`
-          color: #9a6e3a;
-        `}
-      ${leaf.keyword &&
-        css`
-          color: #07a;
-        `}
-      ${(leaf.variable || leaf.regex) &&
-        css`
-          color: #e90;
-        `}
-      ${(leaf.number ||
-          leaf.boolean ||
-          leaf.tag ||
-          leaf.constant ||
-          leaf.symbol ||
-          leaf["attr-name"] ||
-          leaf.selector) &&
-        css`
-          color: #905;
-        `}
-      ${leaf.punctuation &&
-        css`
-          color: #999;
-        `}
-      ${(leaf.string || leaf.char) &&
-        css`
-          color: #690;
-        `}
-      ${(leaf.function || leaf["class-name"]) &&
-        css`
-          color: #dd4a68;
-        `}
-      `}
-    >
-      {children}
-    </span>
-  );
-};
-
 const BlockButton = ({ format, icon }: any) => {
   const editor = useSlate();
   return (
@@ -708,7 +671,7 @@ const initialValue: any[] = [
     ],
   },
   {
-    type: "block-quote",
+    type: "blockQuote",
     children: [{ text: "A wise quote." }],
   },
   {

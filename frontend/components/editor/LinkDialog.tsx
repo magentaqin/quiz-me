@@ -7,7 +7,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
-interface FormJson {
+export interface LinkFormJson {
   linkText: string;
   linkUrl: string;
 }
@@ -15,7 +15,7 @@ interface FormJson {
 interface Props {
   open: boolean;
   setOpen: (open: boolean) => void;
-  onSubmit: (formJson: FormJson) => void;
+  onSubmit: (formJson: LinkFormJson) => void;
 }
 
 const LinkDialog = (props: Props) => {
@@ -33,7 +33,7 @@ const LinkDialog = (props: Props) => {
           onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
-            const formJson = Object.fromEntries((formData as any).entries()) as FormJson;
+            const formJson = Object.fromEntries((formData as any).entries()) as LinkFormJson;
             props.onSubmit(formJson);
           },
         }}

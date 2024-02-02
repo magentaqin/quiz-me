@@ -11,7 +11,7 @@ interface Props {
 }
 
 export default function MultipleSelectChip(props: Props) {
-  const handleChange = (_, newValue: TagItem[]) => {
+  const handleChange = (_: any, newValue: TagItem[]) => {
     props.setSelectedTags(newValue);
   };
 
