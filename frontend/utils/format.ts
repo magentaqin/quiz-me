@@ -56,10 +56,12 @@ export const serialize = (node: ElementNode | TextNode) => {
       return `<li>${children}</li>`;
     case "image":
       return `<img src=${node.url} />`;
-    case "codeBlock": 
+    case "codeBlock":
       return `<code-block language=${node.language}>${children}</code-block>`;
-    case "codeLine": 
+    case "codeLine":
       return `<code-line>${children}</code-line>`;
+    case "link":
+      return `<a href="${node.url}" target="_blank">${children}</a>`;
     default:
       return children;
   }
@@ -128,9 +130,13 @@ const deserialize = (el: HTMLElement, markAttributes = {}): any => {
     case "IMG":
       return jsx("element", { type: "image", url: (el as any).src }, children);
     case "CODE-BLOCK":
-      return jsx("element", { type: "codeBlock", language: (el as any).getAttribute('language') }, children);
-    case "CODE-LINE":
-        return jsx("element", { type: "codeLine" }, children);
+      return jsx(
+        "element",
+        { type: "codeBlock", language: (el as any).getAttribute("language") },
+        children
+      );
+    case "CODE-LINE": // each line in CodeBlock
+      return jsx("element", { type: "codeLine" }, children);
     default:
       return children;
   }

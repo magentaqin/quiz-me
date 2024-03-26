@@ -29,6 +29,7 @@ export default function MultipleSelectChip(props: Props) {
           value={props.level}
           label="Level"
           onChange={handleChange}
+          sx={{ width: 540 }}
         >
           {levels.map((item) => {
             return (
