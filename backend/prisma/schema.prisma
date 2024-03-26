@@ -62,6 +62,7 @@ model TagsOnQuestions {
 
   @@id([questionId, tagId])
   @@index([tagId], map: "TagsOnQuestions_tagId_fkey")
+  @@index([questionId], map: "TagsOnQuestions_questionId_fkey")
 }
 
 model Answer {
@@ -83,20 +84,90 @@ model Answer {
 
 model CodeQuestion {
   id            Int                @id @default(autoincrement())
-  title         String             @unique @db.VarChar(300)
-  lang          Lang               @default(JAVASCRIPT)
-  description   String             @db.VarChar(5000)
-  codeBlock     String             @db.VarChar(1000)
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @default(now())
   questionId    String             @unique
+  title         String             @unique @db.VarChar(300)
+  content       String             @db.Text
   level         Level              @default(ENTRY)
   status        Status             @default(NORMAL)
+  defaultParams Json?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @default(now())
+  authorId      String
+
+  author        User               @relation(fields: [authorId], references: [userId])
+  templates     CodeTemplate[]
+  testSuite     CodeTestSuite?
+  tags          TagsOnCode[]
   answers       CodeAnswer[]
   submitRecords CodeSubmitRecord[]
 
-  @@index([questionId], map: "questionId")
-  @@fulltext([title])
+  @@index([questionId, title])
+}
+
+model CodeTag {
+  id          Int               @id @default(autoincrement())
+  name        String            @db.VarChar(20)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @default(now())
+  tagId       String            @unique
+  description String            @default("") @db.VarChar(200)
+  status      Status            @default(NORMAL)
+  questions   TagsOnCode[]
+}
+
+model TagsOnCode {
+  questionId String
+  tagId      String
+  createdAt  DateTime    @default(now())
+  question   CodeQuestion    @relation(fields: [questionId], references: [questionId])
+  tag        CodeTag @relation(fields: [tagId], references: [tagId])
+
+  @@id([questionId, tagId])
+  @@index([tagId, questionId])
+}
+
+
+model CodeTemplate {
+  id           Int          @id @default(autoincrement())
+  templateId   String       @unique
+  lang         Lang         @default(JAVASCRIPT)
+  content      String       @db.VarChar(5000)
+  questionId   String       @unique
+
+  question     CodeQuestion @relation(fields: [questionId], references: [questionId])
+
+  @@index([questionId])
+}
+
+model CodeTestSuite {
+  id           Int          @id @default(autoincrement())
+  testSuiteId  String       @unique
+  name         String       @db.VarChar(500)
+  questionId   String
+
+  question     CodeQuestion @relation(fields: [questionId], references: [questionId])
+  
+  @@index([questionId])
+}
+
+
+model CodeSubmitRecord {
+  id                Int              @id @default(autoincrement())
+  submissionId      String           @unique
+  result            CodeSubmitResult @default(UNKNOWN)
+  lang              Lang             @default(JAVASCRIPT)
+  executionTime     Int          
+  memory            Int
+  message           String           @db.VarChar(3000)
+  data              Json?            // code that the user submmited and other metaData
+  createdAt         DateTime         @default(now())
+
+  authorId          String
+  questionId        String
+  author            User             @relation(fields: [authorId], references: [userId])
+  question          CodeQuestion     @relation(fields: [questionId], references: [questionId])
+
+  @@index([submissionId, questionId])
 }
 
 model CodeAnswer {
@@ -110,25 +181,7 @@ model CodeAnswer {
   author     User         @relation(fields: [authorId], references: [userId])
   question   CodeQuestion @relation(fields: [questionId], references: [questionId])
 
-  @@index([authorId], map: "author")
-  @@index([questionId], map: "question")
-}
-
-model CodeSubmitRecord {
-  id                Int              @id @default(autoincrement())
-  content           String           @db.Text
-  authorId          String
-  questionId        String
-  recordId          String           @unique
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @default(now())
-  result            CodeSubmitResult @default(UNKNOWN)
-  resultDescription String           @db.VarChar(5000)
-  author            User             @relation(fields: [authorId], references: [userId])
-  question          CodeQuestion     @relation(fields: [questionId], references: [questionId])
-
-  @@index([authorId], map: "author")
-  @@index([questionId], map: "question")
+  @@index([authorId, questionId])
 }
 
 enum Role {
